@@ -29,11 +29,12 @@
       PROGRAM DRIVER
          USE LJ
          USE SG
+         USE SOCKETS
       IMPLICIT NONE
 
       ! SOCKET VARIABLES
       INTEGER, PARAMETER :: MSGLEN=12   ! length of the headers of the driver/wrapper communication protocol
-      INTEGER socket, inet, port        ! socket ID & address of the server
+      INTEGER ipi_socket, inet, port        ! socket ID & address of the server
       CHARACTER*1024 :: host
 
       ! COMMAND LINE PARSING
@@ -192,33 +193,35 @@
       ENDIF
 
       ! Calls the interface to the C sockets to open a communication channel
-      CALL open_socket(socket, inet, port, host)
+      CALL open_socketf(ipi_socket, inet, port, host)
+
+      CALL open_socket(ipi_socket, inet, port, host)
       nat = -1
       DO WHILE (.true.) ! Loops forever (or until the wrapper ends!)
 
          ! Reads from the socket one message header
-         CALL readbuffer(socket, header, MSGLEN)
+         CALL readbuffer(ipi_socket, header, MSGLEN)
          IF (verbose) WRITE(*,*) " Message from server: ", trim(header)
 
          IF (trim(header) == "STATUS") THEN
             ! The wrapper is inquiring on what we are doing
             IF (.not. isinit) THEN
-               CALL writebuffer(socket,"NEEDINIT    ",MSGLEN)  ! Signals that we need initialization data
+               CALL writebuffer(ipi_socket,"NEEDINIT    ",MSGLEN)  ! Signals that we need initialization data
             ELSEIF (hasdata) THEN
-               CALL writebuffer(socket,"HAVEDATA    ",MSGLEN)  ! Signals that we are done computing and can return forces
+               CALL writebuffer(ipi_socket,"HAVEDATA    ",MSGLEN)  ! Signals that we are done computing and can return forces
             ELSE
-               CALL writebuffer(socket,"READY       ",MSGLEN)  ! We are idling and eager to compute something
+               CALL writebuffer(ipi_socket,"READY       ",MSGLEN)  ! We are idling and eager to compute something
             ENDIF
          ELSEIF (trim(header) == "INIT") THEN     ! The driver is kindly providing a string for initialization
-            CALL readbuffer(socket, cbuf, 4)
-            CALL readbuffer(socket, initbuffer, cbuf)
+            CALL readbuffer(ipi_socket, cbuf, 4)
+            CALL readbuffer(ipi_socket, initbuffer, cbuf)
             IF (verbose) WRITE(*,*) " Initializing system from wrapper, using ", trim(initbuffer)
             isinit=.true. ! We actually do nothing with this string, thanks anyway. Could be used to pass some information (e.g. the input parameters, or the index of the replica, from the driver
          ELSEIF (trim(header) == "POSDATA") THEN  ! The driver is sending the positions of the atoms. Here is where we do the calculation!
 
             ! Parses the flow of data from the socket
-            CALL readbuffer(socket, cell_h,  9*8)  ! Cell matrix
-            CALL readbuffer(socket, cell_ih, 9*8)  ! Inverse of the cell matrix (so we don't have to invert it every time here)
+            CALL readbuffer(ipi_socket, cell_h,  9*8)  ! Cell matrix
+            CALL readbuffer(ipi_socket, cell_ih, 9*8)  ! Inverse of the cell matrix (so we don't have to invert it every time here)
 
             ! The wrapper uses atomic units for everything, and row major storage.
             ! At this stage one should take care that everything is converted in the
@@ -228,7 +231,7 @@
             ! We assume an upper triangular cell-vector matrix
             volume = cell_h(1,1)*cell_h(2,2)*cell_h(3,3)
 
-            CALL readbuffer(socket, cbuf, 4)       ! The number of atoms in the cell
+            CALL readbuffer(ipi_socket, cbuf, 4)       ! The number of atoms in the cell
             IF (nat < 0) THEN  ! Assumes that the number of atoms does not change throughout a simulation, so only does this once
                nat = cbuf
                IF (verbose) WRITE(*,*) " Allocating buffer and data arrays, with ", nat, " atoms"
@@ -240,7 +243,7 @@
                msgbuffer = 0.0d0
             ENDIF
 
-            CALL readbuffer(socket, msgbuffer, nat*3*8)
+            CALL readbuffer(ipi_socket, msgbuffer, nat*3*8)
             DO i = 1, nat
                atoms(i,:) = msgbuffer(3*(i-1)+1:3*i)
             ENDDO
@@ -298,14 +301,14 @@
             ENDDO
             virial = transpose(virial)
 
-            CALL writebuffer(socket,"FORCEREADY  ",MSGLEN)
-            CALL writebuffer(socket,pot,8)  ! Writing the potential
-            CALL writebuffer(socket,nat,4)  ! Writing the number of atoms
-            CALL writebuffer(socket,msgbuffer,3*nat*8) ! Writing the forces
-            CALL writebuffer(socket,virial,9*8)  ! Writing the virial tensor, NOT divided by the volume
+            CALL writebuffer(ipi_socket,"FORCEREADY  ",MSGLEN)
+            CALL writebuffer(ipi_socket,pot,8)  ! Writing the potential
+            CALL writebuffer(ipi_socket,nat,4)  ! Writing the number of atoms
+            CALL writebuffer(ipi_socket,msgbuffer,3*nat*8) ! Writing the forces
+            CALL writebuffer(ipi_socket,virial,9*8)  ! Writing the virial tensor, NOT divided by the volume
             cbuf = 7 ! Size of the "extras" string
-            CALL writebuffer(socket,cbuf,4) ! This would write out the "extras" string, but in this case we only use a dummy string.
-            CALL writebuffer(socket,"nothing",7)
+            CALL writebuffer(ipi_socket,cbuf,4) ! This would write out the "extras" string, but in this case we only use a dummy string.
+            CALL writebuffer(ipi_socket,"nothing",7)
 
             hasdata = .false.
          ELSE

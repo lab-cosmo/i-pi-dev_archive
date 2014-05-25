@@ -1,5 +1,5 @@
 <simulation verbosity="high">
-   <ffsocket mode='inet' name="aims">
+   <ffsocket mode='inet' name="cp2k">
       <latency>  1.00000000e-02</latency>
       <slots>4</slots>
       <port>40050</port>
@@ -8,7 +8,7 @@
    </ffsocket>
    <total_steps>400</total_steps>
    <output prefix="zundel_output">
-      <trajectory stride="2" filename="pos" cell_units="angstrom">positions</trajectory>
+      <trajectory stride="2" filename="pos" cell_units="angstrom">positions{angstrom}</trajectory>
       <trajectory stride="2" filename="xc" format="xyz">x_centroid{angstrom}</trajectory>
       <trajectory stride="2" filename="vc">v_centroid</trajectory>
       <properties stride="2" filename="out"> [ step, time{femtosecond}, conserved, temperature, kinetic_cv, 
@@ -27,7 +27,7 @@
     </cell>
     <velocities mode="thermal" units='kelvin'> 300 </velocities>
    </initialize>
-   <forces> <force> aims </force> </forces>
+   <forces> <force> cp2k </force> </forces>
    <ensemble mode='nvt'>
   <timestep units="femtosecond"> 0.5 </timestep>
   <thermostat mode='nm_gle'>

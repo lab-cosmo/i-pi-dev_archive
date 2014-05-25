@@ -29,7 +29,7 @@ Can be linked to a FORTRAN code that does not support sockets natively.
 Functions:
    error: Prints an error message and then exits.
    open_socket_: Opens a socket with the required host server, socket type and
-      port number.
+	      port number.
    write_buffer_: Writes a string to the socket.
    read_buffer_: Reads data from the socket.
 */
@@ -108,7 +108,6 @@ Args:
       if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) error("Error opening UNIX socket: path unavailable, or already existing");
    }
 
-
    *psockfd=sockfd;
 }
 
@@ -150,7 +149,7 @@ Args:
    while (nr>0 && n<len )
    {  nr=read(sockfd,&data[n],len-n); n+=nr; }
 
-   if (n == 0) error("Error reading from socket: server has quit or connection broke");
+   if (n <= 0) error("Error reading from socket: server has quit or connection broke");
 }
 
 
