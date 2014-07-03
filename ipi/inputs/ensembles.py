@@ -63,7 +63,7 @@ class InputEnsemble(Input):
 
    attribs={"mode"  : (InputAttribute, {"dtype"   : str,
                                     "help"    : "The ensemble that will be sampled during the simulation. 'replay' means that a simulation is restarted from a previous simulation.",
-                                    "options" : ['nve', 'nvt', 'npt', 'replay']}) }
+                                    "options" : ['nve', 'nvt', 'npt', 'replay', 'ffopt']}) }
    fields={"thermostat" : (InputThermo, {"default"   : input_default(factory=ipi.engine.thermostats.Thermostat),
                                          "help"      : "The thermostat for the atoms, keeps the atom velocity distribution at the correct temperature."} ),
            "barostat" : (InputBaro, {"default"       : input_default(factory=ipi.engine.barostats.Barostat),
@@ -88,7 +88,13 @@ class InputEnsemble(Input):
                                    "default"         : True,
                                    "help"            : "This describes whether the centre of mass of the particles is fixed."}),
            "replay_file": (InputInitFile, {"default" : input_default(factory=ipi.engine.initializer.InitBase),
-                           "help"            : "This describes the location to read a trajectory file from."})
+                           "help"            : "This describes the location to read a trajectory file from."}),
+           "ffopt_file": (InputInitFile, {"default" : input_default(factory=ipi.engine.initializer.InitBase),
+                           "help"            : "This describes the location to read a trajectory file from."}),
+           "ffopt_energies":  (InputArray, {"dtype"     : float,
+                                    "default"   : input_default(factory=np.zeros, args = (0,)),
+                                    "help"      : "The reference energies.",
+                                    "dimension" : "length"})
          }
    dynamic = {  }
 
@@ -104,7 +110,7 @@ class InputEnsemble(Input):
 
       super(InputEnsemble,self).store(ens)
       if type(ens) is ReplayEnsemble:
-         self.mode.store("rerun")
+         self.mode.store("replay")
          tens = 0
       elif type(ens) is NVEEnsemble:
          self.mode.store("nve")
@@ -115,13 +121,19 @@ class InputEnsemble(Input):
       elif type(ens) is NPTEnsemble:
          self.mode.store("npt")
          tens = 3
+      elif type(ens) is FFOptEnsemble:
+         self.mode.store("ffopt")
+         tens = 4
 
       self.timestep.store(ens.dt)
       self.temperature.store(ens.temp)
 
       if tens == 0:
          self.replay_file.store(ens.intraj)
-      if tens > 1:
+      if tens == 4:
+         self.ffopt_file.store(ens.refstruct)
+         self.ffopt_energies.store(ens.refnrg)
+      if tens > 1 and tens < 4:
          self.thermostat.store(ens.thermostat)
          self.fixcom.store(ens.fixcom)
          self.eens.store(ens.eens)
@@ -153,6 +165,10 @@ class InputEnsemble(Input):
       elif self.mode.fetch() == "replay":
          ens = ReplayEnsemble(dt=self.timestep.fetch(),
             temp=self.temperature.fetch(),fixcom=False, eens=self.eens.fetch() ,intraj=self.replay_file.fetch() )
+      elif self.mode.fetch() == "ffopt":
+         ens = FFOptEnsemble(dt=self.timestep.fetch(),
+            temp=self.temperature.fetch(),fixcom=False, eens=self.eens.fetch() , refstruct=self.ffopt_file.fetch(),
+            refnrg=self.ffopt_energies.fetch() )
       else:
          raise ValueError("'" + self.mode.fetch() + "' is not a supported ensemble mode.")
 

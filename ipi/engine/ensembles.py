@@ -32,7 +32,7 @@ Classes:
       scratch.
 """
 
-__all__ = ['Ensemble', 'NVEEnsemble', 'NVTEnsemble', 'NPTEnsemble', 'ReplayEnsemble']
+__all__ = ['Ensemble', 'NVEEnsemble', 'NVTEnsemble', 'NPTEnsemble', 'ReplayEnsemble', 'FFOptEnsemble']
 
 import numpy as np
 import time
@@ -159,10 +159,10 @@ class Ensemble(dobject):
       """Calculates the conserved energy quantity for constant energy
       ensembles.
       """
-      
+
       eham = self.beads.vpath*self.nm.omegan2 + self.nm.kin + self.forces.pot
       return eham + self.eens
-      
+
 
 
 class NVEEnsemble(Ensemble):
@@ -325,7 +325,7 @@ class NVTEnsemble(NVEEnsemble):
 
       #depending on the kind, the thermostat might work in the normal mode or the bead representation.
       self.thermostat.bind(beads=self.beads, nm=self.nm,prng=prng,fixdof=fixdof )
-      
+
       dget(self,"econs").add_dependency(dget(self.thermostat, "ethermo"))
 
    def step(self):
@@ -559,3 +559,80 @@ class ReplayEnsemble(Ensemble):
          softexit.trigger(" # Finished reading re-run trajectory")
 
       self.qtime += time.time()
+
+
+class FFOptEnsemble(Ensemble):
+   """Ensemble object that just loads snapshots from an external file in sequence.
+
+   Has the relevant conserved quantity and normal mode propagator for the
+   constant energy ensemble. Note that a temperature of some kind must be
+   defined so that the spring potential can be calculated.
+
+   Attributes:
+      intraj: The input trajectory file.
+      ptime: The time taken in updating the velocities.
+      qtime: The time taken in updating the positions.
+      ttime: The time taken in applying the thermostat steps.
+
+   Depend objects:
+      econs: Conserved energy quantity. Depends on the bead kinetic and
+         potential energy, and the spring potential energy.
+   """
+
+   def __init__(self, dt, temp, fixcom=False, eens=0.0, refstruct=None, refnrg=None):
+      """Initialises ReplayEnsemble.
+
+      Args:
+         dt: The simulation timestep.
+         temp: The system temperature.
+         fixcom: An optional boolean which decides whether the centre of mass
+            motion will be constrained or not. Defaults to False.
+         intraj: The input trajectory file.
+      """
+
+      super(ReplayEnsemble,self).__init__(dt=dt,temp=temp,fixcom=fixcom, eens=eens)
+      if refstruct == None:
+         raise ValueError("Must provide an initialized InitFile object to read trajectory from")
+      self.refstruct = refstruct
+      if refstruct.mode == "manual":
+         raise ValueError("FFOpt can only read from PDB or XYZ files -- or a single frame from a CHK file")
+      self.rfile = open(self.refstruct.value,"r")
+      self.refnrg = refnrg
+      if (self.intraj.mode == "xyz"):
+         for b in self.beads:
+            myatoms = read_xyz(self.rfile)
+            myatoms.q *= unit_to_internal("length",self.intraj.units,1.0)
+            b.q[:] = myatoms.q
+      elif (self.intraj.mode == "pdb"):
+         for b in self.beads:
+            myatoms, mycell = read_pdb(self.rfile)
+            myatoms.q *= unit_to_internal("length",self.intraj.units,1.0)
+            mycell.h  *= unit_to_internal("length",self.intraj.units,1.0)
+            b.q[:] = myatoms.q
+         self.cell.h[:] = mycell.h
+
+   def chi2(ffpars):
+
+      # translate ffpars into a LAMMPS input
+
+      # launch lammps with the appropriate input
+
+      self.beads.q[0,0]=self.beads.q[0,0]+0.0
+      estruct = self.forces.pots
+
+      x2=0.0
+      for i in range(1,len(self.refnrg)):
+         deiref=self.refnrg[i]-self.refnrg[0]
+         dei=estruct[i]-estruct[0]
+         x2=x2+(1.0-abs(dei/deiref))**2
+
+      # kill lammps
+
+      return x2/(len(self.refnrg)-1)
+
+
+
+   def step(self):
+      """Does one simulation time step."""
+
+      # call scipy nelder-mead minimizer using chi2 as the function!
