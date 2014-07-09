@@ -122,7 +122,7 @@ class Barostat(dobject):
       deppipe(self, "temp", self.thermostat,"temp")
 
 
-   def bind(self, beads, nm, cell, forces, prng=None, fixdof=None):
+   def bind(self, beads, nm, cell, forces, bias=None, prng=None, fixdof=None):
       """Binds beads, cell and forces to the barostat.
 
       This takes a beads object, a cell object and a forcefield object and
@@ -143,8 +143,9 @@ class Barostat(dobject):
       self.beads = beads
       self.cell = cell
       self.forces = forces
+      self.bias = bias
       self.nm = nm
-
+      print "!!MUST ADD THE TERMS FROM BIAS!!"
       dset(self,"pot",
          depend_value(name='pot', func=self.get_pot,
             dependencies=[ dget(cell,"V"), dget(self,"pext") ]))

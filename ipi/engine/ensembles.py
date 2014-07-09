@@ -95,8 +95,8 @@ class Ensemble(dobject):
       self.fixcom = fixcom
 
 
-   def bind(self, beads, nm, cell, bforce, prng):
-      """Binds beads, cell, bforce and prng to the ensemble.
+   def bind(self, beads, nm, cell, bforce, bbias, prng):
+      """Binds beads, cell, bforce, bbias and prng to the ensemble.
 
       This takes a beads object, a cell object, a forcefield object and a
       random number generator object and makes them members of the ensemble.
@@ -119,6 +119,7 @@ class Ensemble(dobject):
       self.beads = beads
       self.cell = cell
       self.forces = bforce
+      self.bias = bbias
       self.prng = prng
       self.nm = nm
 
@@ -130,6 +131,7 @@ class Ensemble(dobject):
 
       dget(self,"econs").add_dependency(dget(self.beads, "kin"))
       dget(self,"econs").add_dependency(dget(self.forces, "pot"))
+      if not self.bias is None: dget(self,"econs").add_dependency(dget(self.bias, "pot"))
       dget(self,"econs").add_dependency(dget(self.beads, "vpath"))
       dget(self,"econs").add_dependency(dget(self, "eens"))
 
@@ -161,6 +163,7 @@ class Ensemble(dobject):
       """
       
       eham = self.beads.vpath*self.nm.omegan2 + self.nm.kin + self.forces.pot
+      if not self.bias is None: eham += self.bias.pot
       return eham + self.eens
       
 
@@ -230,6 +233,8 @@ class NVEEnsemble(Ensemble):
       """Velocity Verlet momenta propagator."""
 
       self.beads.p += depstrip(self.forces.f)*(self.dt*0.5)
+      # also adds the bias force
+      if not self.bias is None: self.beads.p += depstrip(self.bias.f)*(self.dt*0.5)
 
    def qcstep(self):
       """Velocity Verlet centroid position propagator."""
@@ -293,7 +298,7 @@ class NVTEnsemble(NVEEnsemble):
       else:
          self.thermostat = thermostat
 
-   def bind(self, beads, nm, cell, bforce, prng):
+   def bind(self, beads, nm, cell, bforce, bbias, prng):
       """Binds beads, cell, bforce and prng to the ensemble.
 
       This takes a beads object, a cell object, a forcefield object and a
@@ -314,7 +319,7 @@ class NVTEnsemble(NVEEnsemble):
             generation.
       """
 
-      super(NVTEnsemble,self).bind(beads, nm, cell, bforce, prng)
+      super(NVTEnsemble,self).bind(beads, nm, cell, bforce, bbias, prng)
       fixdof = None
       if self.fixcom:
          fixdof = 3
@@ -408,7 +413,7 @@ class NPTEnsemble(NVTEnsemble):
       else: self.pext = 0.0
 
 
-   def bind(self, beads, nm, cell, bforce, prng):
+   def bind(self, beads, nm, cell, bforce, bbias, prng):
       """Binds beads, cell, bforce and prng to the ensemble.
 
       This takes a beads object, a cell object, a forcefield object and a
@@ -434,7 +439,7 @@ class NPTEnsemble(NVTEnsemble):
       if self.fixcom:
          fixdof = 3
 
-      super(NPTEnsemble,self).bind(beads, nm, cell, bforce, prng)
+      super(NPTEnsemble,self).bind(beads, nm, cell, bforce, bbias, prng)
       self.barostat.bind(beads, nm, cell, bforce, prng=prng, fixdof=fixdof)
 
 

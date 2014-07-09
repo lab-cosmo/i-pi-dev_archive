@@ -70,6 +70,7 @@ class InputSystem(Input):
              "initialize" : (InputInitializer, { "help" : InputInitializer.default_help,
                                                 "default" : input_default(factory=Initializer) } ),
              "forces" :   (InputForces,    { "help"  : InputForces.default_help }),
+             "bias" :   (InputForces,    { "help"  : InputForces.default_help }),
              "ensemble": (InputEnsemble, { "help"  : InputEnsemble.default_help } ),
              "beads" :   (InputBeads, { "help"     : InputBeads.default_help,
                                         "default"  : input_default(factory=Beads, kwargs={'natoms': 0, 'nbeads': 0}) } ),
@@ -98,6 +99,7 @@ class InputSystem(Input):
 
       self.prefix.store(psys.prefix)
       self.forces.store(psys.fproto)
+      self.bias.store(psys.bproto)
       self.ensemble.store(psys.ensemble)
       self.beads.store(psys.beads)
       self.normal_modes.store(psys.nm)
@@ -121,6 +123,6 @@ class InputSystem(Input):
       # this creates a simulation object which gathers all the little bits
       #TODO use named arguments since this list is a bit too long...
       rsys = ipi.engine.system.System(self.initialize.fetch(), self.beads.fetch(), self.cell.fetch(),
-               self.forces.fetch(), self.ensemble.fetch(), self.normal_modes.fetch(), self.prefix.fetch())
+               self.forces.fetch(), self.ensemble.fetch(), self.normal_modes.fetch(), self.prefix.fetch(), self.bias.fetch())
 
       return rsys
