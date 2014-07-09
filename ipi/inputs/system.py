@@ -42,6 +42,7 @@ from ipi.engine.normalmodes import NormalModes
 from ipi.engine.atoms import Atoms
 from ipi.engine.beads import Beads
 from ipi.engine.cell import Cell
+from ipi.engine.forces import Forces
 from ipi.inputs.initializer import InputInitializer
 from ipi.engine.initializer import Initializer
 
@@ -70,7 +71,8 @@ class InputSystem(Input):
              "initialize" : (InputInitializer, { "help" : InputInitializer.default_help,
                                                 "default" : input_default(factory=Initializer) } ),
              "forces" :   (InputForces,    { "help"  : InputForces.default_help }),
-             "bias" :   (InputForces,    { "help"  : InputForces.default_help }),
+             "bias" :   (InputForces,    { "help"  : InputForces.default_help, 
+                                           "default" : [] }),
              "ensemble": (InputEnsemble, { "help"  : InputEnsemble.default_help } ),
              "beads" :   (InputBeads, { "help"     : InputBeads.default_help,
                                         "default"  : input_default(factory=Beads, kwargs={'natoms': 0, 'nbeads': 0}) } ),

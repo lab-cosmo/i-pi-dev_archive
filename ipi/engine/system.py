@@ -64,7 +64,7 @@ class System(dobject):
       simul: The parent simulation object.
    """
 
-   def __init__(self, init, beads, cell, force_proto, ensemble, nm, prefix="", bias_proto=None):
+   def __init__(self, init, beads, cell, force_proto, ensemble, nm, prefix="", bias_proto=[]):
       """Initialises System class.
 
       Args:
@@ -94,7 +94,7 @@ class System(dobject):
       self.forces = Forces()
 
       self.bproto = bias_proto
-      if not bias_proto is None: self.bias = Forces()
+      self.bias = Forces()
 
 
       self.properties = Properties()
@@ -109,7 +109,7 @@ class System(dobject):
       self.nm.bind(self.beads, self.ensemble)
       self.forces.bind(self.beads, self.cell, self.fproto, self.simul.fflist)
       
-      if not self.bias is None: self.bias.bind(self.beads, self.cell, self.bproto, self.simul.fflist)
+      self.bias.bind(self.beads, self.cell, self.bproto, self.simul.fflist)
       
       self.ensemble.bind(self.beads, self.nm, self.cell, self.forces, self.bias, self.prng)
 

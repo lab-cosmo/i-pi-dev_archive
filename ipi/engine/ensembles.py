@@ -131,7 +131,7 @@ class Ensemble(dobject):
 
       dget(self,"econs").add_dependency(dget(self.beads, "kin"))
       dget(self,"econs").add_dependency(dget(self.forces, "pot"))
-      if not self.bias is None: dget(self,"econs").add_dependency(dget(self.bias, "pot"))
+      dget(self,"econs").add_dependency(dget(self.bias, "pot"))
       dget(self,"econs").add_dependency(dget(self.beads, "vpath"))
       dget(self,"econs").add_dependency(dget(self, "eens"))
 
@@ -163,7 +163,7 @@ class Ensemble(dobject):
       """
       
       eham = self.beads.vpath*self.nm.omegan2 + self.nm.kin + self.forces.pot
-      if not self.bias is None: eham += self.bias.pot
+      eham += self.bias.pot # bias
       return eham + self.eens
       
 
@@ -234,7 +234,7 @@ class NVEEnsemble(Ensemble):
 
       self.beads.p += depstrip(self.forces.f)*(self.dt*0.5)
       # also adds the bias force
-      if not self.bias is None: self.beads.p += depstrip(self.bias.f)*(self.dt*0.5)
+      self.beads.p += depstrip(self.bias.f)*(self.dt*0.5)
 
    def qcstep(self):
       """Velocity Verlet centroid position propagator."""
