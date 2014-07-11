@@ -94,7 +94,24 @@ class InputEnsemble(Input):
            "ffopt_energies":  (InputArray, {"dtype"     : float,
                                     "default"   : input_default(factory=np.zeros, args = (0,)),
                                     "help"      : "The reference energies.",
-                                    "dimension" : "length"})
+                                    "dimension" : "energy"}),
+           "ffopt_pars":  (InputArray, {"dtype"     : float,
+                                    "default"   : input_default(factory=np.zeros, args = (0,)),
+                                    "help"      : "The starting parameters."}),
+           "ffopt_kt":  (InputValue, {"dtype"     : float,
+                                    "default"   : 1.0,
+                                    "help"      : "The energy scale for the fit.",
+                                    "dimension" : "energy"}),
+           "ffopt_prepcmd":  (InputValue, {"dtype"     : str,
+                                    "default"   : "", 
+                                    "help"      : "The command to prepare input files."}),
+           "ffopt_runcmd":  (InputValue, {"dtype"     : str,
+                                    "default"   : "", 
+                                    "help"      : "The command to prepare input files."}),
+           "ffopt_runnmb":  (InputValue, {"dtype"     : int,
+                                    "default"   : 1,
+                                    "help"      : "The number of run."})                         
+                                    
          }
    dynamic = {  }
 
@@ -133,6 +150,11 @@ class InputEnsemble(Input):
       if tens == 4:
          self.ffopt_file.store(ens.refstruct)
          self.ffopt_energies.store(ens.refnrg)
+         self.ffopt_pars.store(ens.pars)
+         self.ffopt_kt.store(ens.kt)
+         self.ffopt_runcmd.store(ens.runcmd)
+         self.ffopt_prepcmd.store(ens.prepcmd)
+         self.ffopt_runnmb.store(ens.runnmb)
       if tens > 1 and tens < 4:
          self.thermostat.store(ens.thermostat)
          self.fixcom.store(ens.fixcom)
@@ -168,7 +190,8 @@ class InputEnsemble(Input):
       elif self.mode.fetch() == "ffopt":
          ens = FFOptEnsemble(dt=self.timestep.fetch(),
             temp=self.temperature.fetch(),fixcom=False, eens=self.eens.fetch() , refstruct=self.ffopt_file.fetch(),
-            refnrg=self.ffopt_energies.fetch() )
+            refnrg=self.ffopt_energies.fetch(), pars=self.ffopt_pars.fetch(), kt=self.ffopt_kt.fetch(), 
+            runcmd=self.ffopt_runcmd.fetch(), prepcmd=self.ffopt_prepcmd.fetch(), runnmb=self.ffopt_runnmb.fetch())
       else:
          raise ValueError("'" + self.mode.fetch() + "' is not a supported ensemble mode.")
 

@@ -35,9 +35,13 @@ Classes:
 __all__ = ['Ensemble', 'NVEEnsemble', 'NVTEnsemble', 'NPTEnsemble', 'ReplayEnsemble', 'FFOptEnsemble']
 
 import numpy as np
+import subprocess, sys
 import time
-from copy import deepcopy
+import math
 
+from scipy.optimize import minimize
+from copy import deepcopy
+from sys import exit
 from ipi.utils.depend import *
 from ipi.utils import units
 from ipi.utils.softexit import softexit
@@ -579,7 +583,7 @@ class FFOptEnsemble(Ensemble):
          potential energy, and the spring potential energy.
    """
 
-   def __init__(self, dt, temp, fixcom=False, eens=0.0, refstruct=None, refnrg=None):
+   def __init__(self, dt, temp, fixcom=False, eens=0.0, refstruct=None, refnrg=None, pars=None, kt=1.0, runcmd="", prepcmd="", runnmb=1):
       """Initialises ReplayEnsemble.
 
       Args:
@@ -590,7 +594,7 @@ class FFOptEnsemble(Ensemble):
          intraj: The input trajectory file.
       """
 
-      super(ReplayEnsemble,self).__init__(dt=dt,temp=temp,fixcom=fixcom, eens=eens)
+      super(FFOptEnsemble,self).__init__(dt=dt,temp=temp,fixcom=fixcom, eens=eens)
       if refstruct == None:
          raise ValueError("Must provide an initialized InitFile object to read trajectory from")
       self.refstruct = refstruct
@@ -598,41 +602,85 @@ class FFOptEnsemble(Ensemble):
          raise ValueError("FFOpt can only read from PDB or XYZ files -- or a single frame from a CHK file")
       self.rfile = open(self.refstruct.value,"r")
       self.refnrg = refnrg
-      if (self.intraj.mode == "xyz"):
+      if pars is None: pars = np.asarray([]); 
+      self.pars=pars
+      self.kt=kt
+      self.prepcmd=prepcmd
+      self.runcmd=runcmd
+      self.runnmb=runnmb
+      
+
+   def bind(self, beads, nm, cell, bforce, prng):  
+      
+      super(FFOptEnsemble,self).bind(beads, nm, cell, bforce, prng)
+      
+      # reads the reference structures
+      ii=0   
+      if (self.refstruct.mode == "xyz"):
          for b in self.beads:
+            ii=ii+1
             myatoms = read_xyz(self.rfile)
-            myatoms.q *= unit_to_internal("length",self.intraj.units,1.0)
+            myatoms.q *= unit_to_internal("length",self.refstruct.units,1.0)
             b.q[:] = myatoms.q
-      elif (self.intraj.mode == "pdb"):
+      elif (self.refstruct.mode == "pdb"):
          for b in self.beads:
             myatoms, mycell = read_pdb(self.rfile)
-            myatoms.q *= unit_to_internal("length",self.intraj.units,1.0)
-            mycell.h  *= unit_to_internal("length",self.intraj.units,1.0)
+            myatoms.q *= unit_to_internal("length",self.refstruct.units,1.0)
+            mycell.h  *= unit_to_internal("length",self.refstruct.units,1.0)
             b.q[:] = myatoms.q
          self.cell.h[:] = mycell.h
+      
 
-   def chi2(ffpars):
-
+   def chi2(self,ffpars):
+            
       # translate ffpars into a LAMMPS input
-
+      # ffpars should contain [ cceps ccsigma coeps cosigma cheps chsigma ]
+      print "Running with parameters: ", ffpars
+      def bash_command(cmd):
+         child=subprocess.Popen(cmd, shell=True, executable='/bin/bash')
+         child.wait()
+         
+      
+      # Fit only with C and O
+      # bash_command("sed 's/cceps/%s/; s/ccsigma/%s/; s/coeps/%s/; s/cosigma/%s/;' %s > lammps.red.inp" % (ffpars[0],ffpars[1],ffpars[2],ffpars[3],"./template.red.in") )
+      bash_command(self.prepcmd % tuple(ffpars))
+#      bash_command("sed 's/cceps/%s/; s/ccsigma/%s/; s/coeps/%s/; s/cosigma/%s/; s/ch1eps/%s/; s/ch1sigma/%s/; s/ch2eps/%s/; s/ch2sigma/%s/;' %s > lammps.red.inp"  
+#                  % (ffpars[0],ffpars[1],ffpars[2],ffpars[3],ffpars[4],ffpars[5],ffpars[6],ffpars[7],"./template.coh1h2.in") )
+       
       # launch lammps with the appropriate input
-
+#      lmp=[subprocess.Popen("exec lmp_ubuntu < lammps.red.inp &> lammps.red.log",shell=True, executable='/bin/bash') for i in range(16) ]  # opens four instances of lammps....
+      #print "running", self.runcmd
+      lmp=[subprocess.Popen(self.runcmd, shell=True, executable='/bin/bash') for i in range(self.runnmb) ]  # opens 16 instances of lammps....
+      
       self.beads.q[0,0]=self.beads.q[0,0]+0.0
-      estruct = self.forces.pots
+      estruct = depstrip(self.forces.pots)
+      # kill lammps
+      for child in lmp: 
+         child.kill()
 
       x2=0.0
-      for i in range(1,len(self.refnrg)):
+      nrml=0.0
+      mxdiff=0
+      kt=self.kt
+      for i in range(1,len(self.refnrg)):         
          deiref=self.refnrg[i]-self.refnrg[0]
-         dei=estruct[i]-estruct[0]
-         x2=x2+(1.0-abs(dei/deiref))**2
-
-      # kill lammps
-
-      return x2/(len(self.refnrg)-1)
-
-
+         dei=estruct[i]-estruct[0]       
+         print "Structure: %4d  Reference: %15.5e  FF: %15.5e" % ( i, deiref/kt, dei/kt)
+         # x2=x2+math.exp(-1.0*deiref/kt)*abs(deiref-dei)/kt   # One-norm fit
+         x2=x2+math.exp(-1.0*deiref/kt)*(abs(deiref-dei)/kt)**2
+         if abs(deiref-dei)/kt > mxdiff: mxdiff = abs(deiref-dei)/kt
+         nrml=nrml+math.exp(-1.0*deiref/kt)     
+      print "Sqrt(Chi2) Value: ", np.sqrt(x2/nrml), " Max. error: ", mxdiff
+      return np.sqrt(x2/nrml)
+         
 
    def step(self):
       """Does one simulation time step."""
 
-      # call scipy nelder-mead minimizer using chi2 as the function!
+      # call scipy nelder-mead minimizer using chi2 as the function!      
+      ffpars0 = np.array(self.pars)
+      print "Initial chi2: ", self.chi2(ffpars0)
+      res = minimize(self.chi2, ffpars0, method='nelder-mead', options={'xtol': 1e-4, 'disp': True})
+      print "Final parameters: ", res.x
+      self.pars = res.x
+      exit()
