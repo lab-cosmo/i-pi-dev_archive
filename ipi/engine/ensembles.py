@@ -608,6 +608,7 @@ class FFOptEnsemble(Ensemble):
       self.prepcmd=prepcmd
       self.runcmd=runcmd
       self.runnmb=runnmb
+      self.minchi2=1e100
       
 
    def bind(self, beads, nm, cell, bforce, prng):  
@@ -671,6 +672,9 @@ class FFOptEnsemble(Ensemble):
          if abs(deiref-dei)/kt > mxdiff: mxdiff = abs(deiref-dei)/kt
          nrml=nrml+math.exp(-1.0*deiref/kt)     
       print "Sqrt(Chi2) Value: ", np.sqrt(x2/nrml), " Max. error: ", mxdiff
+      if self.minchi2 > np.sqrt(x2/nrml): 
+         self.minchi2 = np.sqrt(x2/nrml)
+         self.bestnrg=estruct-estruct[0]
       return np.sqrt(x2/nrml)
          
 
@@ -680,7 +684,21 @@ class FFOptEnsemble(Ensemble):
       # call scipy nelder-mead minimizer using chi2 as the function!      
       ffpars0 = np.array(self.pars)
       print "Initial chi2: ", self.chi2(ffpars0)
-      res = minimize(self.chi2, ffpars0, method='nelder-mead', options={'xtol': 1e-4, 'disp': True})
+      print "Running Nelder-Mead"
+      res = minimize(self.chi2, ffpars0, method='nelder-mead', options={'xtol': 1e-3, 'disp': True, 'maxiter' : 50})
+      print "Final chi2: ", res.fun
       print "Final parameters: ", res.x
-      self.pars = res.x
-      exit()
+      print "Final energies - NM: "
+      for i in range(1,len(self.refnrg)):
+         print i, self.refnrg[i]-self.refnrg[0], self.bestnrg[i] - self.bestnrg[0]
+      self.pars = np.array(res.x)
+      print "Running Powell"
+      ffpars0 = np.array(self.pars)
+      res = minimize(self.chi2, ffpars0, method='powell', options={'xtol': 1e-3, 'disp': True, 'maxiter' : 15})
+      print "Final chi2: ", res.fun
+      print "Final parameters: ", res.x
+      print "Final energies - NM: "
+      for i in range(1,len(self.refnrg)):
+         print i, self.refnrg[i]-self.refnrg[0], self.bestnrg[i] - self.bestnrg[0]
+      self.pars = np.array(res.x)
+      # exit()
