@@ -40,4 +40,4 @@ driver.x: $(OBJECTS)
 	gfortran $(FLAGS) -c $<
 
 clean:
-	rm *.o *.mod *.x
+	rm *.o *.mod *.x pes/*.o

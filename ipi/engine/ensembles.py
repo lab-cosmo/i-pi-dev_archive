@@ -644,7 +644,8 @@ class FFOptEnsemble(Ensemble):
       
       # Fit only with C and O
       # bash_command("sed 's/cceps/%s/; s/ccsigma/%s/; s/coeps/%s/; s/cosigma/%s/;' %s > lammps.red.inp" % (ffpars[0],ffpars[1],ffpars[2],ffpars[3],"./template.red.in") )
-      bash_command(self.prepcmd % tuple(ffpars))
+      bash_command(self.prepcmd % tuple(np.abs(ffpars)))
+
 #      bash_command("sed 's/cceps/%s/; s/ccsigma/%s/; s/coeps/%s/; s/cosigma/%s/; s/ch1eps/%s/; s/ch1sigma/%s/; s/ch2eps/%s/; s/ch2sigma/%s/;' %s > lammps.red.inp"  
 #                  % (ffpars[0],ffpars[1],ffpars[2],ffpars[3],ffpars[4],ffpars[5],ffpars[6],ffpars[7],"./template.coh1h2.in") )
        
@@ -666,7 +667,7 @@ class FFOptEnsemble(Ensemble):
       for i in range(1,len(self.refnrg)):         
          deiref=self.refnrg[i]-self.refnrg[0]
          dei=estruct[i]-estruct[0]       
-         print "Structure: %4d  Reference: %15.5e  FF: %15.5e" % ( i, deiref/kt, dei/kt)
+         # print "Structure: %4d  Reference: %15.5e  FF: %15.5e" % ( i, deiref/kt, dei/kt)
          # x2=x2+math.exp(-1.0*deiref/kt)*abs(deiref-dei)/kt   # One-norm fit
          x2=x2+math.exp(-1.0*deiref/kt)*(abs(deiref-dei)/kt)**2
          if abs(deiref-dei)/kt > mxdiff: mxdiff = abs(deiref-dei)/kt
@@ -682,10 +683,12 @@ class FFOptEnsemble(Ensemble):
       """Does one simulation time step."""
 
       # call scipy nelder-mead minimizer using chi2 as the function!      
+      np.set_printoptions(linewidth=512, precision=5)
       ffpars0 = np.array(self.pars)
       print "Initial chi2: ", self.chi2(ffpars0)
       print "Running Nelder-Mead"
-      res = minimize(self.chi2, ffpars0, method='nelder-mead', options={'xtol': 1e-3, 'disp': True, 'maxiter' : 50})
+      res = minimize(self.chi2, ffpars0, method='nelder-mead', options={'xtol': 1e-3, 'ftol':1e-3, 'disp': True, 'maxiter' : 50})
+
       print "Final chi2: ", res.fun
       print "Final parameters: ", res.x
       print "Final energies - NM: "
@@ -694,7 +697,7 @@ class FFOptEnsemble(Ensemble):
       self.pars = np.array(res.x)
       print "Running Powell"
       ffpars0 = np.array(self.pars)
-      res = minimize(self.chi2, ffpars0, method='powell', options={'xtol': 1e-3, 'disp': True, 'maxiter' : 15})
+      res = minimize(self.chi2, ffpars0, method='powell', options={'xtol': 1e-2, 'ftol':1e-3, 'disp': True, 'maxiter' : 10})
       print "Final chi2: ", res.fun
       print "Final parameters: ", res.x
       print "Final energies - NM: "
