@@ -42,6 +42,7 @@ import numpy as np
 from copy import copy
 from ipi.utils.io.io_xml import *
 from ipi.utils.units import unit_to_internal, unit_to_user
+from ipi.utils.depend import dobject
 
 
 
@@ -87,7 +88,7 @@ class input_default(object):
       self.kwargs = kwargs
 
 
-class Input(object):
+class Input(dobject):
    """Base class for input handling.
 
    Has the generic methods for dealing with the xml input file. Parses the input
@@ -369,7 +370,7 @@ class Input(object):
 
       if self._default != None and issubclass(self.__class__, InputAttribute):
          #We only print out the default if it has a well defined value.
-         #For classes such as InputCell, self._default is not the value,
+         #For classes such as Cell, self._default is not the value,
          #instead it is an object that is stored to give the default value in
          #self.value. For this reason we print out self.value at this stage,
          #and not self._default
@@ -615,7 +616,7 @@ class Input(object):
 
       if self._default != None and issubclass(self.__class__, InputAttribute):
          #We only print out the default if it has a well defined value.
-         #For classes such as InputCell, self._default is not the value,
+         #For classes such as Cell, self._default is not the value,
          #instead it is an object that is stored, putting the default value in
          #self.value. For this reason we print out self.value at this stage,
          #and not self._default

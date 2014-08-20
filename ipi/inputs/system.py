@@ -35,7 +35,6 @@ from ipi.utils.io.io_xml import *
 from ipi.utils.messages import verbosity
 from ipi.inputs.forces import InputForces
 from ipi.inputs.beads import InputBeads
-from ipi.inputs.cell import InputCell
 from ipi.inputs.ensembles import InputEnsemble
 from ipi.inputs.normalmodes import InputNormalModes
 from ipi.engine.normalmodes import NormalModes
@@ -75,8 +74,8 @@ class InputSystem(Input):
                                         "default"  : input_default(factory=Beads, kwargs={'natoms': 0, 'nbeads': 0}) } ),
              "normal_modes" :   (InputNormalModes, { "help"     : InputNormalModes.default_help,
                                         "default"  : input_default(factory=NormalModes, kwargs={'mode': "rpmd"}) } ),
-             "cell" :    (InputCell,   { "help"    : InputCell.default_help,
-                                        "default"  : input_default(factory=Cell) })
+             "cell" :    (Cell,   { "help"    : Cell.default_help,
+                                    "default"  : input_default(factory=Cell) })
              }
    attribs = {
     "copies": (InputAttribute, {"help" : "Create multiple copies of the system. This is handy for initialising simulations with multiple systems.", "default": 1, "dtype": int}) ,

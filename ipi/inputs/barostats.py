@@ -27,7 +27,6 @@ from ipi.engine.barostats import *
 from ipi.utils.inputvalue import *
 from ipi.inputs.thermostats import *
 from ipi.engine.cell import Cell
-from ipi.inputs.cell import *
 
 __all__ = ['InputBaro']
 
@@ -65,10 +64,10 @@ class InputBaro(Input):
                                  "default"   : input_default(factory=np.zeros, args = (0,)),
                                  "help"      : "Momentum (or momenta) of the piston.",
                                  "dimension" : "momentum" }),
-            "h0": (InputCell, {  "dtype"     : float,
-                                 "default"   : input_default(factory=Cell) ,
-                                 "help"      : "Reference cell for Parrinello-Rahman-like barostats.",
-                                 "dimension" : "length" })
+            "h0": (Cell, {  "dtype"     : float,
+                            "default"   : input_default(factory=Cell) ,
+                            "help"      : "Reference cell for Parrinello-Rahman-like barostats.",
+                            "dimension" : "length" })
            }
 
    default_help = "Simulates an external pressure bath."

@@ -42,9 +42,10 @@ src_dir = "../"
 
 sys.path.append(src_dir)
 
-from ipi.inputs import barostats, cell, simulation, paratemp, system, \
+from ipi.inputs import barostats, simulation, paratemp, system, \
              ensembles, thermostats, forcefields, forces, atoms, beads, \
              prng, initializer, normalmodes, outputs
+from ipi.engine import cell
 from ipi.utils.io.io_xml import *
 from optparse import OptionParser
 
@@ -52,7 +53,7 @@ time.sleep(1)
 __all__ = ['help', 'objects']
 
 objects = { 'barostats': barostats.InputBaro(),
-            'cell': cell.InputCell(),
+            'cell': cell.Cell(),
             'simulation': simulation.InputSimulation(),
             'paratemp': paratemp.InputParaTemp(),
             'system': system.InputSystem(),

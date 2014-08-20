@@ -40,7 +40,6 @@ import ipi.utils.mathtools as mt
 import ipi.engine.initializer as ei
 from ipi.utils.inputvalue import *
 from ipi.inputs.beads import InputBeads
-from ipi.inputs.cell import InputCell
 from ipi.utils.io import io_xml
 from ipi.utils.messages import verbosity, warning
 

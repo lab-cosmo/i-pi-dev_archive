@@ -29,8 +29,11 @@ from ipi.utils.depend import *
 from ipi.utils.mathtools import *
 from ipi.utils import units
 
+from ipi.utils.inputvalue import input_default, InputArray
+from copy import copy
 
-class Cell(dobject):
+
+class Cell(InputArray):
    """Base class to represent the simulation cell in a periodic system.
 
    This class has the base attributes required for either flexible or
@@ -43,7 +46,12 @@ class Cell(dobject):
       V: The volume of the cell.
    """
 
-   def __init__(self, h=None):
+   attribs = copy(InputArray.attribs)
+
+   default_help = "Deals with the cell parameters. Takes as array which can be used to initialize the cell vector matrix."
+   default_label = "CELL"
+
+   def __init__(self, h=None, help=None, dimension=None, units=None, default=None, dtype=None):
       """Initialises base cell class.
 
       Args:
@@ -63,6 +71,9 @@ class Cell(dobject):
       dset(self,"V",
          depend_value(name = 'V', func=self.get_volume,
             dependencies=[dget(self,"h")]) )
+
+      super(Cell,self).__init__(dtype=float, dimension="length", default=self, help=self.default_help)
+
 
    def get_ih(self):
       """Inverts the lattice vector matrix."""
@@ -138,3 +149,26 @@ class Cell(dobject):
       for i in range(3):
          s[i] -= round(s[i])
       return np.dot(self.h, s)
+
+   def store(self, cell):
+      """Takes a Cell instance and stores of minimal representation of it.
+
+      Args:
+         cell: A cell object.
+      """
+
+      super(Cell,self).store(cell.h)
+      self.shape.store((3,3))
+
+   def fetch(self):
+      """Creates a cell object.
+
+      Returns:
+         A cell object of the appropriate type and with the appropriate
+         properties given the attributes of the Cell object.
+      """
+
+      h = super(Cell,self).fetch()
+      h.shape = (3,3)
+
+      return Cell(h=h)
