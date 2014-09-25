@@ -157,9 +157,9 @@ class InputThermoBase(Input):
       if self.mode.fetch() == "langevin":
          thermo = ethermostats.ThermoLangevin(tau=self.tau.fetch())
       elif self.mode.fetch() == "svr":
-         thermo = ethermostats.ThermoBerendsen(tau=self.tau.fetch())
-      elif self.mode.fetch() == "berendsen":
          thermo = ethermostats.ThermoSVR(tau=self.tau.fetch())
+      elif self.mode.fetch() == "berendsen":
+         thermo = ethermostats.ThermoBerendsen(tau=self.tau.fetch())
       elif self.mode.fetch() == "pile_l":
          thermo = ethermostats.ThermoPILE_L(tau=self.tau.fetch(), scale=self.pile_lambda.fetch())
       elif self.mode.fetch() == "pile_g":

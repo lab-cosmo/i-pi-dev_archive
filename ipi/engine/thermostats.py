@@ -503,7 +503,7 @@ class ThermoBerendsen(Thermostat):
       if K == 0.0:
          return
 
-      alpha2 = 1. +  (self.K/K - 1.) * self.et 
+      alpha2 = 1. +  (self.K*self.ndof/K - 1.) * self.et 
       alpha = np.sqrt(alpha2)
 
       self.ethermo += K*(1 - alpha2)
