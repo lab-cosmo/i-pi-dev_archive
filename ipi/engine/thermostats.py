@@ -29,6 +29,7 @@ Classes:
    ThermoPILE_G: Holds the algorithms for a path-integral langevin equation
       thermostat, with a thermostat coupled to the kinetic energy for
       the entire system.
+   ThermoBerendsen: Holds the algorithms for a Berendsen thermostat.
    ThermoSVR: Holds the algorithms for a stochastic velocity rescaling
       thermostat.
    ThermoGLE: Holds the algorithms for a generalised langevin equation
@@ -41,7 +42,7 @@ Classes:
 """
 
 __all__ = ['Thermostat', 'ThermoLangevin', 'ThermoPILE_L', 'ThermoPILE_G',
-           'ThermoSVR', 'ThermoGLE', 'ThermoNMGLE', 'ThermoNMGLEG', 'MultiThermo']
+           'ThermoSVR', 'ThermoBerendsen', 'ThermoGLE', 'ThermoNMGLE', 'ThermoNMGLEG', 'MultiThermo']
 
 import numpy as np
 from ipi.utils.depend   import *
@@ -446,6 +447,64 @@ class ThermoSVR(Thermostat):
       alpha = np.sqrt(alpha2)
       if (r1 + np.sqrt(2*K/self.K*self.et/(1 - self.et))) < 0:
          alpha *= -1
+
+      self.ethermo += K*(1 - alpha2)
+      self.p *= alpha
+
+
+class ThermoBerendsen(Thermostat):
+   """Represents a Berendsen thermostat.
+
+   Depend objects:
+      tau: Centroid thermostat damping time scale. Larger values give a
+         less strongly coupled centroid thermostat.
+      K: Scaling factor for the total kinetic energy. Depends on the
+         temperature.
+      et: Parameter determining the strength of the thermostat coupling.
+         Depends on tau and the time step.
+   """
+
+   def get_et(self):
+      """Calculates the damping term in the propagator."""
+
+      return self.dt/self.tau 
+
+   def get_K(self):
+      """Calculates the average kinetic energy per degree of freedom."""
+
+      return Constants.kb*self.temp*0.5
+
+   def __init__(self, temp = 1.0, dt = 1.0, tau = 1.0, ethermo=0.0):
+      """Initialises ThermoBerendsen.
+
+      Args:
+         temp: The simulation temperature. Defaults to 1.0.
+         dt: The simulation time step. Defaults to 1.0.
+         tau: The thermostat damping timescale. Defaults to 1.0.
+         ethermo: The initial conserved energy quantity. Defaults to 0.0. Will
+            be non-zero if the thermostat is initialised from a checkpoint file.
+      """
+
+      super(ThermoBerendsen,self).__init__(temp,dt,ethermo)
+
+      dset(self,"tau",depend_value(value=tau,name='tau'))
+      dset(self,"et",
+         depend_value(name="et",func=self.get_et,
+            dependencies=[dget(self,"tau"), dget(self,"dt")]))
+      dset(self,"K",
+         depend_value(name="K",func=self.get_K, dependencies=[dget(self,"temp")]))
+
+   def step(self):
+      """Updates the bound momentum vector """
+
+      K = np.dot(depstrip(self.p),depstrip(self.p)/depstrip(self.m))*0.5
+
+      # rescaling is un-defined if the KE is zero
+      if K == 0.0:
+         return
+
+      alpha2 = 1. +  (self.K/K - 1.) * self.et 
+      alpha = np.sqrt(alpha2)
 
       self.ethermo += K*(1 - alpha2)
       self.p *= alpha

@@ -56,7 +56,7 @@ class InputThermoBase(Input):
    """
 
    attribs = { "mode": (InputAttribute, { "dtype"   : str,
-                                      "options" : [ "", "langevin", "svr", "pile_l", "pile_g", "gle", "nm_gle", "nm_gle_g" ],
+                                      "options" : [ "", "langevin", "svr", "berendsen", "pile_l", "pile_g", "gle", "nm_gle", "nm_gle_g" ],
                                       "help"    : "The style of thermostatting. 'langevin' specifies a white noise langevin equation to be attached to the cartesian representation of the momenta. 'svr' attaches a velocity rescaling thermostat to the cartesian representation of the momenta. Both 'pile_l' and 'pile_g' attaches a white noise langevin thermostat to the normal mode representation, with 'pile_l' attaching a local langevin thermostat to the centroid mode and 'pile_g' instead attaching a global velocity rescaling thermostat. 'gle' attaches a coloured noise langevin thermostat to the cartesian representation of the momenta, 'nm_gle' attaches a coloured noise langevin thermostat to the normal mode representation of the momenta and a langevin thermostat to the centroid and 'nm_gle_g' attaches a gle thermostat to the normal modes and a svr thermostat to the centroid.  'multiple' is a special thermostat mode, in which one can define multiple thermostats _inside_ the thermostat tag."
                                          }) }
    fields = { "ethermo" : (InputValue, {  "dtype"     : float,
@@ -106,6 +106,9 @@ class InputThermoBase(Input):
       elif type(thermo) is ethermostats.ThermoSVR:
          self.mode.store("svr")
          self.tau.store(thermo.tau)
+      elif type(thermo) is ethermostats.ThermoBerendsen:
+         self.mode.store("berendsen")
+         self.tau.store(thermo.tau)
       elif type(thermo) is ethermostats.ThermoPILE_L:
          self.mode.store("pile_l")
          self.tau.store(thermo.tau)
@@ -154,6 +157,8 @@ class InputThermoBase(Input):
       if self.mode.fetch() == "langevin":
          thermo = ethermostats.ThermoLangevin(tau=self.tau.fetch())
       elif self.mode.fetch() == "svr":
+         thermo = ethermostats.ThermoBerendsen(tau=self.tau.fetch())
+      elif self.mode.fetch() == "berendsen":
          thermo = ethermostats.ThermoSVR(tau=self.tau.fetch())
       elif self.mode.fetch() == "pile_l":
          thermo = ethermostats.ThermoPILE_L(tau=self.tau.fetch(), scale=self.pile_lambda.fetch())
