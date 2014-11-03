@@ -25,6 +25,7 @@ import numpy as np
 import ipi.engine.thermostats
 import ipi.engine.initializer
 import ipi.engine.barostats
+from ipi.inputs.forces import InputForces
 from ipi.engine.ensembles import *
 from ipi.utils.inputvalue import *
 from ipi.inputs.barostats import *
@@ -63,7 +64,7 @@ class InputEnsemble(Input):
 
    attribs={"mode"  : (InputAttribute, {"dtype"   : str,
                                     "help"    : "The ensemble that will be sampled during the simulation. 'replay' means that a simulation is restarted from a previous simulation.",
-                                    "options" : ['nve', 'nvt', 'npt', 'nst', 'replay']}) }
+                                    "options" : ['nve', 'nvt', 'npt', 'nst', 'replay','socket']}) }
    fields={"thermostat" : (InputThermo, {"default"   : input_default(factory=ipi.engine.thermostats.Thermostat),
                                          "help"      : "The thermostat for the atoms, keeps the atom velocity distribution at the correct temperature."} ),
            "barostat" : (InputBaro, {"default"       : input_default(factory=ipi.engine.barostats.Barostat),
@@ -95,7 +96,8 @@ class InputEnsemble(Input):
                                     "default"      : np.zeros(0,int),
                                     "help"         : "Indices of the atmoms that should be held fixed."}),
            "replay_file": (InputInitFile, {"default" : input_default(factory=ipi.engine.initializer.InitBase),
-                           "help"            : "This describes the location to read a trajectory file from."})
+                           "help"            : "This describes the location to read a trajectory file from."}),
+           "socket_source" :   (InputForces,    { "help"  : InputForces.default_help })
          }
    dynamic = {  }
 

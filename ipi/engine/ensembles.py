@@ -706,3 +706,80 @@ class ReplayEnsemble(Ensemble):
          softexit.trigger(" # Finished reading re-run trajectory")
       if (step!=None and self.rstep<=step): self.step(step) 
       self.qtime += time.time()
+
+class SocketEnsemble(Ensemble):
+   """Ensemble object that updates positions in an external program, using "reverse"
+      sockets communication.
+
+   Attributes:
+      intraj: The input trajectory file.
+      ptime: The time taken in updating the velocities.
+      qtime: The time taken in updating the positions.
+      ttime: The time taken in applying the thermostat steps.
+
+   """
+
+   def __init__(self, dt, temp, fixcom=False, eens=0.0, fixatoms=None, q_proto=None):
+      """Initialises SocketEnsemble.
+
+      Args:
+         dt: The simulation timestep.
+         temp: The system temperature.
+         fixcom: An optional boolean which decides whether the centre of mass
+            motion will be constrained or not. Defaults to False.
+         intraj: The input trajectory file.
+      """
+
+      super(SocketEnsemble,self).__init__(dt=dt,temp=temp,fixcom=fixcom, eens=eens, fixatoms=fixatoms)
+      self.qproto=q_proto
+      self.qeval=Forces()
+      
+
+   def bind(self, beads, nm, cell, bforce, prng):
+      
+      super(SocketEnsemble,self).bind(beads,nm,cell,bforce,prng)
+      self.qebeads = Beads(beads.natoms, beads.nbeads)
+      self.qecell = Cell()      
+      
+      self.qeval.bind(self.qebeads, self.qecell, self.qproto)      
+      dget(self.qebeads,"q").add_dependency(dget(self.forces,"f"))
+      
+
+   
+   
+   def step(self, step=None):
+      """Does one simulation time step."""
+
+      self.ptime = self.ttime = 0
+      self.qtime = -time.time()
+
+      try:         
+         self.rstep += 1
+         if (self.intraj.mode == "xyz"):            
+            for b in self.beads:
+               myatoms = read_xyz(self.rfile)
+               myatoms.q *= unit_to_internal("length",self.intraj.units,1.0)
+               b.q[:] = myatoms.q
+         elif (self.intraj.mode == "pdb"):
+            for b in self.beads:
+               myatoms, mycell = read_pdb(self.rfile)
+               myatoms.q *= unit_to_internal("length",self.intraj.units,1.0)
+               mycell.h  *= unit_to_internal("length",self.intraj.units,1.0)
+               b.q[:] = myatoms.q
+            self.cell.h[:] = mycell.h
+         elif (self.intraj.mode == "chk" or self.intraj.mode == "checkpoint"):
+            # reads configuration from a checkpoint file
+            xmlchk = xml_parse_file(self.rfile) # Parses the file.
+
+            from ipi.inputs.simulation import InputSimulation
+            simchk = InputSimulation()
+            simchk.parse(xmlchk.fields[0][1])
+            mycell = simchk.cell.fetch()
+            mybeads = simchk.beads.fetch()
+            self.cell.h[:] = mycell.h
+            self.beads.q[:] = mybeads.q
+            softexit.trigger(" # Read single checkpoint")
+      except EOFError:
+         softexit.trigger(" # Finished reading re-run trajectory")
+      if (step!=None and self.rstep<=step): self.step(step) 
+      self.qtime += time.time()
