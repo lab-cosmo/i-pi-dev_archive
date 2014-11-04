@@ -9,7 +9,7 @@
    <ffsocket name="pw" mode="unix">
          <address>pw-driver</address>   <port>3141</port>   <timeout>100</timeout>   <latency> 0.01</latency>
    </ffsocket>
-   <ffsocket name="mh" mode="unix">
+   <ffsocket name="mh" mode="unix" pbc="false">
          <address>mh-driver</address>   <port>3142</port>   <timeout>100</timeout>   <latency> 0.01</latency>
    </ffsocket>
    <system>
