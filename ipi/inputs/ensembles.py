@@ -97,7 +97,8 @@ class InputEnsemble(Input):
                                     "help"         : "Indices of the atmoms that should be held fixed."}),
            "replay_file": (InputInitFile, {"default" : input_default(factory=ipi.engine.initializer.InitBase),
                            "help"            : "This describes the location to read a trajectory file from."}),
-           "socket_source" :   (InputForces,    { "help"  : InputForces.default_help })
+           "socket_source" :   (InputForces,    { "help"  : InputForces.default_help, "default": [] })
+           
          }
          
    dynamic = {  }
