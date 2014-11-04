@@ -6,15 +6,15 @@
    </output>
    <total_steps>1000</total_steps>
    <prng><seed>3141</seed></prng>
-   <ffsocket name="pw" mode="inet">
-         <address>localhost</address>   <port>3141</port>   <timeout>100</timeout>   <latency> 0.01</latency>
+   <ffsocket name="pw" mode="unix">
+         <address>pw-driver</address>   <port>3141</port>   <timeout>100</timeout>   <latency> 0.01</latency>
    </ffsocket>
-   <ffsocket name="mh" mode="inet">
-         <address>localhost</address>   <port>3142</port>   <timeout>100</timeout>   <latency> 0.01</latency>
+   <ffsocket name="mh" mode="unix">
+         <address>mh-driver</address>   <port>3142</port>   <timeout>100</timeout>   <latency> 0.01</latency>
    </ffsocket>
    <system>
    <forces> <force> pw </force></forces>
-   <initialize nbeads='8'>
+   <initialize nbeads='1'>
       <file mode='pdb'> h2o-init.pdb </file>
       <velocities mode='thermal' units="kelvin"> 150 </velocities>
    </initialize>

@@ -99,6 +99,7 @@ class InputEnsemble(Input):
                            "help"            : "This describes the location to read a trajectory file from."}),
            "socket_source" :   (InputForces,    { "help"  : InputForces.default_help })
          }
+         
    dynamic = {  }
 
    default_help = "Holds all the information that is ensemble specific, such as the temperature and the external pressure, and the thermostats and barostats that control it."
@@ -115,33 +116,38 @@ class InputEnsemble(Input):
       if type(ens) is ReplayEnsemble:
          self.mode.store("replay")
          tens = 0
+      elif type(ens) is SocketEnsemble:
+         self.mode.store("socket")
+         tens = 1
       elif type(ens) is NVEEnsemble:
          self.mode.store("nve")
-         tens = 1
+         tens = 2
       elif type(ens) is NVTEnsemble:
          self.mode.store("nvt")
-         tens = 2
+         tens = 3
       elif type(ens) is NPTEnsemble:
          self.mode.store("npt")
-         tens = 3
+         tens = 4
       elif type(ens) is NSTEnsemble:
          self.mode.store("nst")
-         tens = 4
+         tens = 5
 
       self.timestep.store(ens.dt)
       self.temperature.store(ens.temp)
 
       if tens == 0:
          self.replay_file.store(ens.intraj)
-      if tens > 1:
+      if tens == 1:
+         self.socket_source.store(ens.qproto)
+      if tens > 2:
          self.thermostat.store(ens.thermostat)
          self.fixcom.store(ens.fixcom)
          self.fixatoms.store(ens.fixatoms)
          self.eens.store(ens.eens)
-      if tens == 3:
+      if tens == 4:
          self.barostat.store(ens.barostat)
          self.pressure.store(ens.pext)
-      if tens == 4:
+      if tens == 5:
          self.barostat.store(ens.barostat)
          self.stress.store(ens.stressext)
 
@@ -173,6 +179,9 @@ class InputEnsemble(Input):
       elif self.mode.fetch() == "replay":
          ens = ReplayEnsemble(dt=self.timestep.fetch(),
             temp=self.temperature.fetch(),fixcom=False, eens=self.eens.fetch(), fixatoms=None, intraj=self.replay_file.fetch() )
+      elif self.mode.fetch() == "socket":
+         ens = SocketEnsemble(dt=self.timestep.fetch(),
+            temp=self.temperature.fetch(),fixcom=False, eens=self.eens.fetch(), fixatoms=None, q_proto = self.socket_source.fetch() )
       else:
          raise ValueError("'" + self.mode.fetch() + "' is not a supported ensemble mode.")
 

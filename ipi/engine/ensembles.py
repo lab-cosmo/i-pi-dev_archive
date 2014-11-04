@@ -32,7 +32,7 @@ Classes:
       scratch.
 """
 
-__all__ = ['Ensemble', 'NVEEnsemble', 'NVTEnsemble', 'NPTEnsemble', 'NSTEnsemble','ReplayEnsemble']
+__all__ = ['Ensemble', 'NVEEnsemble', 'NVTEnsemble', 'NPTEnsemble', 'NSTEnsemble','ReplayEnsemble', 'SocketEnsemble']
 
 import numpy as np
 import time
@@ -49,7 +49,9 @@ from ipi.inputs.thermostats import InputThermo
 from ipi.inputs.barostats import InputBaro
 from ipi.engine.thermostats import *
 from ipi.engine.barostats import *
-
+from ipi.engine.forces import *
+from ipi.engine.beads import *
+from ipi.engine.cell import *
 
 class Ensemble(dobject):
    """Base ensemble class.
@@ -99,7 +101,7 @@ class Ensemble(dobject):
          self.fixatoms = fixatoms
 
 
-   def bind(self, beads, nm, cell, bforce, prng):
+   def bind(self, beads, nm, cell, bforce, prng, simul=None):
       """Binds beads, cell, bforce and prng to the ensemble.
 
       This takes a beads object, a cell object, a forcefield object and a
@@ -735,51 +737,27 @@ class SocketEnsemble(Ensemble):
       self.qeval=Forces()
       
 
-   def bind(self, beads, nm, cell, bforce, prng):
+   def bind(self, beads, nm, cell, bforce, prng, simul):
       
-      super(SocketEnsemble,self).bind(beads,nm,cell,bforce,prng)
+      super(SocketEnsemble,self).bind(beads,nm,cell,bforce,prng, simul)
       self.qebeads = Beads(beads.natoms, beads.nbeads)
-      self.qecell = Cell()      
+      self.qecell = Cell()
       
-      self.qeval.bind(self.qebeads, self.qecell, self.qproto)      
+      self.qeval.bind(self.qebeads, self.qecell, self.qproto,simul.fflist)      
       dget(self.qebeads,"q").add_dependency(dget(self.forces,"f"))
-      
-
    
    
    def step(self, step=None):
       """Does one simulation time step."""
 
-      self.ptime = self.ttime = 0
       self.qtime = -time.time()
 
-      try:         
-         self.rstep += 1
-         if (self.intraj.mode == "xyz"):            
-            for b in self.beads:
-               myatoms = read_xyz(self.rfile)
-               myatoms.q *= unit_to_internal("length",self.intraj.units,1.0)
-               b.q[:] = myatoms.q
-         elif (self.intraj.mode == "pdb"):
-            for b in self.beads:
-               myatoms, mycell = read_pdb(self.rfile)
-               myatoms.q *= unit_to_internal("length",self.intraj.units,1.0)
-               mycell.h  *= unit_to_internal("length",self.intraj.units,1.0)
-               b.q[:] = myatoms.q
-            self.cell.h[:] = mycell.h
-         elif (self.intraj.mode == "chk" or self.intraj.mode == "checkpoint"):
-            # reads configuration from a checkpoint file
-            xmlchk = xml_parse_file(self.rfile) # Parses the file.
+      self.beads.q = self.qeval.f
+      self.cell.h = self.qeval.vir
+      
+      self.qecell.h = self.forces.vir
+      self.qebeads.q = self.forces.f      
+      print self.forces.f, self.qeval.f
 
-            from ipi.inputs.simulation import InputSimulation
-            simchk = InputSimulation()
-            simchk.parse(xmlchk.fields[0][1])
-            mycell = simchk.cell.fetch()
-            mybeads = simchk.beads.fetch()
-            self.cell.h[:] = mycell.h
-            self.beads.q[:] = mybeads.q
-            softexit.trigger(" # Read single checkpoint")
-      except EOFError:
-         softexit.trigger(" # Finished reading re-run trajectory")
-      if (step!=None and self.rstep<=step): self.step(step) 
+      
       self.qtime += time.time()

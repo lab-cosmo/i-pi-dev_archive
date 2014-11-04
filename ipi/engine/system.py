@@ -100,7 +100,7 @@ class System(dobject):
       # binds important computation engines
       self.nm.bind(self.beads, self.ensemble)
       self.forces.bind(self.beads, self.cell, self.fproto, self.simul.fflist)
-      self.ensemble.bind(self.beads, self.nm, self.cell, self.forces, self.prng)
+      self.ensemble.bind(self.beads, self.nm, self.cell, self.forces, self.prng, self.simul)
 
       self.init.init_stage2(self)
 
