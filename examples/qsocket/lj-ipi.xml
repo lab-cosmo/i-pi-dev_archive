@@ -1,12 +1,12 @@
 <simulation verbosity="high">
   <output prefix='lj_output'>
       <properties stride='1' filename='out'>  [ time{femtosecond}, conserved, temperature{kelvin}, kinetic_cv, potential, pressure_cv{bar} ] </properties>
-      <trajectory stride='1' filename='pos' cell_units="angstrom"> positions{angstrom} </trajectory>
+      <trajectory stride='1' filename='pos' format='pdb'> positions </trajectory>
       <checkpoint stride='20'/>
    </output>
    <total_steps>1000</total_steps>
    <prng><seed>3141</seed></prng>
-   <ffsocket name="lj" mode="unix">
+   <ffsocket name="lj" mode="unix" pbc="false">
          <address>lj-driver</address>   <port>3141</port>   <timeout>100</timeout>   <latency> 0.01</latency>
    </ffsocket>
    <ffsocket name="mh" mode="unix" pbc="false">

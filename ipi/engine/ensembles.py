@@ -751,13 +751,23 @@ class SocketEnsemble(Ensemble):
 
       self.qtime = -time.time()
 
-      self.beads.q = self.qeval.f      
       self.cell.h = self.qeval.vir      
+      self.beads.q = self.qeval.f      
+      
+      print "Got new positions", self.beads.q
+      print "Got new cell", self.cell.h
+            
+      print "Computing physical forces"
+      print "Driver energy", self.forces.pot
+      print "Driver force", self.forces.f
+      
       
       self.qecell.h = self.forces.vir      
       self.qecell.h[2,0] = self.forces.pot
       self.qebeads.q = self.forces.f      
-      print self.forces.f, self.qeval.f
-
+            
+      print "Ready to send forces", self.qebeads.q
+      print "Ready to send virial", self.qecell.h
+      
       
       self.qtime += time.time()
