@@ -743,8 +743,7 @@ class SocketEnsemble(Ensemble):
       self.qebeads = Beads(beads.natoms, beads.nbeads)
       self.qecell = Cell()
       
-      self.qeval.bind(self.qebeads, self.qecell, self.qproto,simul.fflist)      
-      dget(self.qebeads,"q").add_dependency(dget(self.forces,"f"))
+      self.qeval.bind(self.qebeads, self.qecell, self.qproto,simul.fflist)   
    
    
    def step(self, step=None):
@@ -752,10 +751,11 @@ class SocketEnsemble(Ensemble):
 
       self.qtime = -time.time()
 
-      self.beads.q = self.qeval.f
-      self.cell.h = self.qeval.vir
+      self.beads.q = self.qeval.f      
+      self.cell.h = self.qeval.vir      
       
-      self.qecell.h = self.forces.vir
+      self.qecell.h = self.forces.vir      
+      self.qecell.h[2,0] = self.forces.pot
       self.qebeads.q = self.forces.f      
       print self.forces.f, self.qeval.f
 
