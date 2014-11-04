@@ -1,0 +1,31 @@
+<simulation verbosity="high">
+  <output prefix='lj_output'>
+      <properties stride='1' filename='out'>  [ time{femtosecond}, conserved, temperature{kelvin}, kinetic_cv, potential, pressure_cv{bar} ] </properties>
+      <trajectory stride='1' filename='pos' cell_units="angstrom"> positions{angstrom} </trajectory>
+      <checkpoint stride='20'/>
+   </output>
+   <total_steps>1000</total_steps>
+   <prng><seed>3141</seed></prng>
+   <ffsocket name="lj" mode="unix">
+         <address>lj-driver</address>   <port>3141</port>   <timeout>100</timeout>   <latency> 0.01</latency>
+   </ffsocket>
+   <ffsocket name="mh" mode="unix" pbc="false">
+         <address>mh-driver</address>   <port>3142</port>   <timeout>100</timeout>   <latency> 0.01</latency>
+   </ffsocket>
+   <system>
+   <forces> <force> lj </force></forces>
+   <initialize nbeads='1'>
+      <file mode='pdb'> lj-init.pdb </file>
+      <velocities mode='thermal' units="kelvin"> 150 </velocities>
+   </initialize>
+   <ensemble mode='socket'>
+      <socket_source> <force> mh </force> </socket_source>
+      <thermostat mode='pile_l'>
+         <tau units="femtosecond">100</tau>
+      </thermostat>
+      <timestep units="femtosecond">0.5</timestep>
+      <fixcom>True</fixcom>
+      <temperature units="kelvin">150</temperature>
+   </ensemble>
+   </system>
+</simulation>
