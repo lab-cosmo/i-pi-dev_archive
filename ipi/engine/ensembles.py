@@ -743,7 +743,7 @@ class SocketEnsemble(Ensemble):
       self.qebeads = Beads(beads.natoms, beads.nbeads)
       self.qecell = Cell()
       
-      self.qeval.bind(self.qebeads, self.qecell, self.qproto,simul.fflist)   
+      self.qeval.bind(self.qebeads, self.qecell, self.qproto, simul.fflist)   
    
    
    def step(self, step=None):
