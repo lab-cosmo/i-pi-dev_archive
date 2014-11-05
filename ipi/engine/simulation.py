@@ -40,6 +40,7 @@ from ipi.utils.messages import verbosity, info, warning
 from ipi.utils.softexit import softexit
 from ipi.engine.atoms import *
 from ipi.engine.cell import *
+from ipi.engine.ensembles import SocketEnsemble
 
 # import objgraph
 
@@ -179,9 +180,19 @@ class Simulation(dobject):
       for (k,f) in self.fflist.iteritems():
          f.run()
 
+      
       # prints inital configuration -- only if we are not restarting
       if (self.step == 0):
          self.step = -1
+
+         # if ensemble is SocketEnsemble fetch the initial configuration FIRST         
+         for s in self.syslist:
+            # creates separate threads for the different systems
+            #st = threading.Thread(target=s.ensemble.step, name=s.prefix, kwargs={"step":self.step})
+            #st.daemon = True
+            if type(s.ensemble) is SocketEnsemble:
+               s.ensemble.step(step=self.step)
+
          # must use multi-threading to avoid blocking in multi-system runs
          stepthreads = []
          for o in self.outputs:
