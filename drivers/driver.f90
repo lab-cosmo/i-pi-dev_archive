@@ -218,6 +218,7 @@
       ! Calls the interface to the POSIX sockets library to open a communication channel
       CALL open_socket(socket, inet, port, host)
       nat = -1
+      isinit = .false.
       DO WHILE (.true.) ! Loops forever (or until the wrapper ends!)
 
          ! Reads from the socket one message header
@@ -234,9 +235,10 @@
                CALL writebuffer(socket,"READY       ",MSGLEN)  ! We are idling and eager to compute something
             ENDIF
          ELSEIF (trim(header) == "INIT") THEN     ! The driver is kindly providing a string for initialization
+            CALL readbuffer(socket, cbuf)    ! replica index
             CALL readbuffer(socket, cbuf)
             CALL readbuffer(socket, initbuffer, cbuf)
-            IF (verbose) WRITE(*,*) " Initializing system from wrapper, using ", trim(initbuffer)
+            IF (verbose) WRITE(*,*) " Initializing system from wrapper, using ", cbuf, trim(initbuffer)
             isinit=.true. ! We actually do nothing with this string, thanks anyway. Could be used to pass some information (e.g. the input parameters, or the index of the replica, from the driver
          ELSEIF (trim(header) == "POSDATA") THEN  ! The driver is sending the positions of the atoms. Here is where we do the calculation!
 
@@ -384,6 +386,7 @@
                CALL writebuffer(socket,"nothing",7)
             ENDIF
             hasdata = .false.
+            isinit = .false.
          ELSE
             WRITE(*,*) " Unexpected header ", header
             STOP -1

@@ -743,19 +743,21 @@ class SocketEnsemble(Ensemble):
       self.qebeads = Beads(beads.natoms, beads.nbeads)
       self.qecell = Cell()
       
-      self.qeval.bind(self.qebeads, self.qecell, self.qproto, simul.fflist)   
-   
+      self.qeval.bind(self.qebeads, self.qecell, self.qproto, simul.fflist)
+      self.fflist = simul.fflist         
    
    def step(self, step=None):
       """Does one simulation time step."""
 
       self.qtime = -time.time()
 
+      self.fflist['lj'].pars = {"ciao" : "string", "hello" : step}
       self.cell.h = self.qeval.vir      
       self.beads.q = self.qeval.f      
       
       print "Got new positions", self.beads.q
       print "Got new cell", self.cell.h
+      print "Got extra message", self.qeval.extras
             
       print "Computing physical forces"
       print "Driver energy", self.forces.pot

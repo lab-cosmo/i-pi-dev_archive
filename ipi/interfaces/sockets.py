@@ -380,10 +380,12 @@ class Driver(DriverSocket):
 
       if self.status & Status.NeedsInit:
          try:
+            print "SENDING INITIALIZATION MESSAGE", pars
             self.sendall(Message("init")) 
             self.sendall(np.int32(rid))
             self.sendall(np.int32(len(pars)))
             self.sendall(pars)
+            
          except:
             self.poll()
             return
