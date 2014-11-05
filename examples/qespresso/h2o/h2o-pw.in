@@ -9,7 +9,7 @@
     forc_conv_thr=1.0D-4
     prefix='h2o'
     outdir='./'
-    pseudo_dir='../'
+    pseudo_dir='./'
     max_seconds=7200
 /
 &SYSTEM
