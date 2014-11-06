@@ -273,7 +273,7 @@
             DO i = 1, nat
                atoms(i,:) = msgbuffer(3*(i-1)+1:3*i)
             ENDDO
-            write(*,*) "ATOMS", msgbuffer
+            
             IF (vstyle == 0) THEN   ! ideal gas, so no calculation done
                pot = 0
                forces = 0.0d0
@@ -368,7 +368,6 @@
                msgbuffer(3*(i-1)+1:3*i) = forces(i,:)
             ENDDO
             virial = transpose(virial)
-            write(*,*) "Forces", msgbuffer
             CALL writebuffer(socket,"FORCEREADY  ",MSGLEN)
             CALL writebuffer(socket,pot)  ! Writing the potential
             CALL writebuffer(socket,nat)  ! Writing the number of atoms

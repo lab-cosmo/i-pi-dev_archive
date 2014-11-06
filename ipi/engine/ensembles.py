@@ -101,7 +101,7 @@ class Ensemble(dobject):
          self.fixatoms = fixatoms
 
 
-   def bind(self, beads, nm, cell, bforce, prng, simul=None):
+   def bind(self, beads, nm, cell, bforce, prng):
       """Binds beads, cell, bforce and prng to the ensemble.
 
       This takes a beads object, a cell object, a forcefield object and a
@@ -308,7 +308,7 @@ class NVTEnsemble(NVEEnsemble):
       else:
          self.thermostat = thermostat
 
-   def bind(self, beads, nm, cell, bforce, prng, simul=None):
+   def bind(self, beads, nm, cell, bforce, prng):
       """Binds beads, cell, bforce and prng to the ensemble.
 
       This takes a beads object, a cell object, a forcefield object and a
@@ -329,7 +329,7 @@ class NVTEnsemble(NVEEnsemble):
             generation.
       """
 
-      super(NVTEnsemble,self).bind(beads, nm, cell, bforce, prng, simul)
+      super(NVTEnsemble,self).bind(beads, nm, cell, bforce, prng)
       
       fixdof = len(self.fixatoms)*3*self.beads.nbeads
       if self.fixcom:
@@ -426,7 +426,7 @@ class NPTEnsemble(NVTEnsemble):
          self.pext = pext
       else: self.pext = 0.0
 
-   def bind(self, beads, nm, cell, bforce, prng, simul=None):
+   def bind(self, beads, nm, cell, bforce, prng):
       """Binds beads, cell, bforce and prng to the ensemble.
 
       This takes a beads object, a cell object, a forcefield object and a
@@ -452,7 +452,7 @@ class NPTEnsemble(NVTEnsemble):
       if self.fixcom:
          fixdof = 3
 
-      super(NPTEnsemble,self).bind(beads, nm, cell, bforce, prng, simul)
+      super(NPTEnsemble,self).bind(beads, nm, cell, bforce, prng)
       self.barostat.bind(beads, nm, cell, bforce, prng=prng, fixdof=fixdof)
 
 
@@ -553,7 +553,7 @@ class NSTEnsemble(NVTEnsemble):
       else: self.stressext = 0.0
 
 
-   def bind(self, beads, nm, cell, bforce, prng, simul=None):
+   def bind(self, beads, nm, cell, bforce, prng):
       """Binds beads, cell, bforce and prng to the ensemble.
 
          This takes a beads object, a cell object, a forcefield object and a
@@ -579,7 +579,7 @@ class NSTEnsemble(NVTEnsemble):
       if self.fixcom:
          fixdof = 3
 
-      super(NSTEnsemble,self).bind(beads, nm, cell, bforce, prng, simul)
+      super(NSTEnsemble,self).bind(beads, nm, cell, bforce, prng)
       self.barostat.bind(beads, nm, cell, bforce, prng=prng, fixdof=fixdof)
 
 
@@ -721,7 +721,7 @@ class SocketEnsemble(Ensemble):
 
    """
 
-   def __init__(self, dt, temp, fixcom=False, eens=0.0, fixatoms=None, q_proto=None):
+   def __init__(self, dt, temp, fixcom=False, eens=0.0, fixatoms=None, qsocket=None):
       """Initialises SocketEnsemble.
 
       Args:
@@ -733,42 +733,43 @@ class SocketEnsemble(Ensemble):
       """
 
       super(SocketEnsemble,self).__init__(dt=dt,temp=temp,fixcom=fixcom, eens=eens, fixatoms=fixatoms)
-      self.qproto=q_proto
-      self.qeval=Forces()
+      self.qsocket=qsocket      
       
 
-   def bind(self, beads, nm, cell, bforce, prng, simul):
+   def bind(self, beads, nm, cell, bforce, prng):
       
-      super(SocketEnsemble,self).bind(beads,nm,cell,bforce,prng, simul)
+      super(SocketEnsemble,self).bind(beads,nm,cell,bforce,prng)
       self.qebeads = Beads(beads.natoms, beads.nbeads)
       self.qecell = Cell()
-      
-      self.qeval.bind(self.qebeads, self.qecell, self.qproto, simul.fflist)
-      self.fflist = simul.fflist         
+            
+      # creates a "fake force" object that is used to fetch new coordinates over sockets
+      self.qeval=Forces()
+      self.qeval.bind(self.qebeads, self.qecell, [ForceComponent(ffield="qsocket", name="qsocket",nbeads=beads.nbeads, weight=1)], {"qsocket":self.qsocket} )      
+      self.qsocket.run() # starts the socket for the coordinates
    
    def step(self, step=None):
       """Does one simulation time step."""
 
       self.qtime = -time.time()
 
-      self.fflist['lj'].pars = {"ciao" : "string", "hello" : step}
       self.cell.h = self.qeval.vir      
       self.beads.q = self.qeval.f      
+      self.forces.pars = { "qsocket" : self.qeval.extras[0] }
       
-      print "Got new positions", self.beads.q
+      print "Got new positions", self.beads.q[1:3]
       print "Got new cell", self.cell.h
       print "Got extra message", self.qeval.extras
             
       print "Computing physical forces"
       print "Driver energy", self.forces.pot
-      print "Driver force", self.forces.f
+      print "Driver force", self.forces.f[1:3]
       
       
       self.qecell.h = self.forces.vir      
-      self.qecell.h[2,0] = self.forces.pot
+      self.qecell.h[2,0] = self.forces.pot # stores the energy in the "useless" part of the cell tensor
       self.qebeads.q = self.forces.f      
             
-      print "Ready to send forces", self.qebeads.q
+      print "Ready to send forces", self.qebeads.q[1:3]
       print "Ready to send virial", self.qecell.h
       
       

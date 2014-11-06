@@ -154,7 +154,7 @@ class ForceBead(dobject):
       self._threadlock.acquire()
       try:
           if self.request is None and dget(self,"ufvx").tainted():
-             self.request = self.ff.queue(self.atoms, self.cell, reqid=self.uid)
+             self.request = self.ff.queue(self.atoms, self.cell, reqid=self.uid, pars = self.pars)
       finally:
          self._threadlock.release()
 
@@ -181,7 +181,7 @@ class ForceBead(dobject):
 
       # this is converting the distribution library requests into [ u, f, v ]  lists
       if self.request is None:
-         self.request = self.ff.queue(self.atoms, self.cell)
+         self.request = self.ff.queue(self.atoms, self.cell, self.uid, self.pars)
 
       # sleeps until the request has been evaluated
       while self.request["status"] != "Done":
@@ -376,6 +376,7 @@ class ForceComponent(dobject):
       # before accessing them. it is basically pre-queueing so that the
       # distributed-computing magic can work
       for b in range(self.nbeads):
+         self._forces[b].pars = self.pars # propagates parameters from overall force to beads
          self._forces[b].queue()
 
    def pot_gather(self):
@@ -485,6 +486,7 @@ class Forces(dobject):
       self.natoms = beads.natoms
       self.nbeads = beads.nbeads
       self.nforces = len(force_proto)
+      self.pars = {}
 
       # fflist should be a dictionary of forcefield objects
       self.mforces = []
@@ -584,6 +586,7 @@ class Forces(dobject):
       """Submits all the required force calculations to the forcefields."""
 
       for ff in self.mforces:
+         ff.pars = self.pars  # propagates the optional parameters to the force components
          ff.queue()
 
    def get_vir(self):

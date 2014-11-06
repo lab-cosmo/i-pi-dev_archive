@@ -25,13 +25,13 @@ import numpy as np
 import ipi.engine.thermostats
 import ipi.engine.initializer
 import ipi.engine.barostats
-from ipi.inputs.forces import InputForces
 from ipi.engine.ensembles import *
 from ipi.utils.inputvalue import *
 from ipi.inputs.barostats import *
 from ipi.inputs.thermostats import *
 from ipi.inputs.initializer import *
 from ipi.utils.units import *
+import ipi.inputs.forcefields as iforcefields
 
 __all__ = ['InputEnsemble']
 
@@ -96,12 +96,12 @@ class InputEnsemble(Input):
                                     "default"      : np.zeros(0,int),
                                     "help"         : "Indices of the atmoms that should be held fixed."}),
            "replay_file": (InputInitFile, {"default" : input_default(factory=ipi.engine.initializer.InitBase),
-                           "help"            : "This describes the location to read a trajectory file from."}),
-           "socket_source" :   (InputForces,    { "help"  : InputForces.default_help, "default": [] })
-           
+                           "help"            : "This describes the location to read a trajectory file from."})           
          }
          
-   dynamic = {  }
+   dynamic = {
+             "qsocket": (iforcefields.InputFFSocket, { "help": iforcefields.InputFFSocket.default_help} )
+             }
 
    default_help = "Holds all the information that is ensemble specific, such as the temperature and the external pressure, and the thermostats and barostats that control it."
    default_label = "ENSEMBLE"
@@ -135,11 +135,14 @@ class InputEnsemble(Input):
 
       self.timestep.store(ens.dt)
       self.temperature.store(ens.temp)
-
+    
+      self.extra = []
       if tens == 0:
          self.replay_file.store(ens.intraj)
       if tens == 1:
-         self.socket_source.store(ens.qproto)
+         iff = iforcefields.InputFFSocket()
+         iff.store(ens.qsocket)
+         self.extra.append(("qsocket", iff))
       if tens > 2:
          self.thermostat.store(ens.thermostat)
          self.fixcom.store(ens.fixcom)
@@ -181,8 +184,19 @@ class InputEnsemble(Input):
          ens = ReplayEnsemble(dt=self.timestep.fetch(),
             temp=self.temperature.fetch(),fixcom=False, eens=self.eens.fetch(), fixatoms=None, intraj=self.replay_file.fetch() )
       elif self.mode.fetch() == "socket":
+         # reads the socket parameters to get position updates
+         qsock = None         
+         for (k,v) in self.extra:
+            if k == "qsocket":
+               if not qsock is None: 
+                  raise ValueError("SocketEnsemble expects a single qsocket source of configurations")
+               qsock = v.fetch()
+            else:
+               raise ValueError("SocketEnsemble expects a single qsocket source of configurations")
+         if qsock is None:
+            raise ValueError("SocketEnsemble expects a single qsocket source of configurations")
          ens = SocketEnsemble(dt=self.timestep.fetch(),
-            temp=self.temperature.fetch(),fixcom=False, eens=self.eens.fetch(), fixatoms=None, q_proto = self.socket_source.fetch() )
+            temp=self.temperature.fetch(),fixcom=False, eens=self.eens.fetch(), fixatoms=None, qsocket = qsock)
       else:
          raise ValueError("'" + self.mode.fetch() + "' is not a supported ensemble mode.")
 

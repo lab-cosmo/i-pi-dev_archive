@@ -9,9 +9,6 @@
    <ffsocket name="lj" mode="unix" pbc="false">
          <address>lj-driver</address>   <port>3141</port>   <timeout>100</timeout>   <latency> 0.01</latency>
    </ffsocket>
-   <ffsocket name="mh" mode="unix" pbc="false">
-         <address>mh-driver</address>   <port>3142</port>   <timeout>100</timeout>   <latency> 0.01</latency>
-   </ffsocket>
    <system>
    <forces> <force> lj </force></forces>
    <initialize nbeads='1'>
@@ -19,7 +16,9 @@
       <velocities mode='thermal' units="kelvin"> 150 </velocities>
    </initialize>
    <ensemble mode='socket'>
-      <socket_source> <force> mh </force> </socket_source>
+      <qsocket name="mh" mode="unix" pbc="false">
+         <address>mh-driver</address>   <port>3142</port>   <timeout>100</timeout>   <latency> 0.01</latency>
+      </qsocket>
       <thermostat mode='pile_l'>
          <tau units="femtosecond">100</tau>
       </thermostat>

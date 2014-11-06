@@ -96,7 +96,7 @@ class ForceField(dobject):
       self._threadlock = threading.Lock()
 
 
-   def queue(self, atoms, cell, reqid=-1):
+   def queue(self, atoms, cell, reqid=-1, pars = None):
       """Adds a request.
 
       Note that the pars dictionary need to be sent as a string of a
@@ -125,8 +125,11 @@ class ForceField(dobject):
       if not self.pars is None:
          for k,v in self.pars.items():
             par_str += k + " : " + str(v) + " , "
-      else:
-         par_str = " "
+      
+      if not pars is None:
+         for k,v in pars.items():
+            par_str += k + " : " + str(v) + " , "
+       
 
       pbcpos = depstrip(atoms.q).copy()
       if self.dopbc:
