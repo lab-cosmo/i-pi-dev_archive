@@ -1,21 +1,5 @@
 """Contains the classes which deal with the atoms.
 
-Copyright (C) 2013, Joshua More and Michele Ceriotti
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <http.//www.gnu.org/licenses/>.
-
-
 Used for holding information about the atoms, including their positions, masses
 momenta and kinetic energy. Has separate classes for accessing the global
 arrays of atoms and for individual atoms.
@@ -37,33 +21,33 @@ class Atom(dobject):
    This is actually only an interface to the Atoms class, i.e. only stores
    views of the large arrays which contain all the coordinates.
 
-   Attributes:
-      kin: The kinetic energy of the atom.
-      kstress: The contribution of the atom to the kinetic stress tensor.
+   **Depend objects**
 
-   Depend objects:
-      p: The three components of the momentum of the atom.
-      q: The three components of the position of the atom.
-      m: The mass of the atom.
-      name: The name of the atom.
-      m3: An array of 3 elements with each element being the mass of the atom.
-         Used when each degree of freedom needs to be divided by the mass.
+   :p: The three components of the momentum of the atom.
+   :q: The three components of the position of the atom.
+   :m: The mass of the atom.
+   :name: The name of the atom.
+   :m3: An array of 3 elements with each element being the mass of the atom.
+        Used when each degree of freedom needs to be divided by the mass.
    """
 
    def __init__(self, system, index):
       """Initialises Atom.
 
-      Args:
-         system: An Atoms object containing the required atom.
-         index: An integer giving the index of the required atom in the atoms
-            list. Note that indices start from 0.
+      Arguments
+
+      `system`
+          An Atoms object containing the required atom.
+      `index`
+          An integer giving the index of the required atom in the atoms
+          list. Note that indices start from 0.
       """
 
-      dset(self,"p",system.p[3*index:3*index+3])
-      dset(self,"q",system.q[3*index:3*index+3])
-      dset(self,"m",system.m[index:index+1])
-      dset(self,"name",system.names[index:index+1])
-      dset(self,"m3",system.m3[3*index:3*index+3])
+      dset(self, "p", system.p[3*index:3*index+3])
+      dset(self, "q", system.q[3*index:3*index+3])
+      dset(self, "m", system.m[index:index+1])
+      dset(self, "name", system.names[index:index+1])
+      dset(self, "m3", system.m3[3*index:3*index+3])
 
    @property
    def kin(self):
@@ -92,26 +76,28 @@ class Atoms(dobject):
    and a convenience-access is provided through a list of Atom objects.
 
    Attributes:
-      natoms: The number of atoms.
+
+   * **natoms** The number of atoms.
 
    Depend objects:
-      p: An array giving the components of the atom positions.
-      q: An array giving the components of the atom momenta.
-      m: An array giving the atom masses.
-      names: An array giving the atom names.
-      m3: An array of 3*n elements where each element of m has been copied
-         three times. Used when each degree of freedom needs to be divided
-         by the mass.
-      M: The total mass of all the atoms.
-      kin: The total kinetic energy of the atoms. Depends on p and m3.
-      kstress: The contribution of the atoms to the kinetic stress tensor.
-         Depends on px, py, pz and m.
-      qx: An array giving the x components of the positions.
-      qy: An array giving the y components of the positions.
-      qz: An array giving the z components of the positions.
-      px: An array giving the x components of the momenta.
-      py: An array giving the y components of the momenta.
-      pz: An array giving the z components of the momenta.
+
+   * **p** An array giving the components of the atom positions.
+   * **q** An array giving the components of the atom momenta.
+   * **m** An array giving the atom masses.
+   * **names** An array giving the atom names.
+   * **m3** An array of 3*n elements where each element of m has been copied
+     three times. Used when each degree of freedom needs to be divided
+     by the mass.
+   * **M** The total mass of all the atoms.
+   * **kin** The total kinetic energy of the atoms. Depends on p and m3.
+   * **kstress** The contribution of the atoms to the kinetic stress tensor.
+     Depends on px, py, pz and m.
+   * **qx** An array giving the x components of the positions.
+   * **qy** An array giving the y components of the positions.
+   * **qz** An array giving the z components of the positions.
+   * **px** An array giving the x components of the momenta.
+   * **py** An array giving the y components of the momenta.
+   * **pz** An array giving the z components of the momenta.
    """
 
 
@@ -122,11 +108,12 @@ class Atoms(dobject):
       and so slices of the global position and momentum arrays must be used in
       the initialisation so that they always agree with each other.
 
-      Args:
-         natoms: An integer giving the number of atoms.
-         _prebind: An optional tuple of four elements; a depend_array of length
-            3*natoms for the positions, another for the momenta, a depend_array
-            of length natoms for the masses and another for the names.
+      Arguments:
+
+      * **natoms** An integer giving the number of atoms.
+      * **_prebind** An optional tuple of four elements; a depend_array of length
+        3*natoms for the positions, another for the momenta, a depend_array
+        of length natoms for the masses and another for the names.
       """
 
       self.natoms = natoms
