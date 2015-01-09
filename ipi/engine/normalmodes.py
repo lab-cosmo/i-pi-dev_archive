@@ -287,7 +287,7 @@ class NormalModes(dobject):
          if len(self.nm_freqs) > 0:
             warning("Normal mode frequencies will be ignored for PIMD mode.", verbosity.low)
          for b in range(1, self.nbeads):
-            sk[b] = self.omegak[b] / self.omegan
+            sk[b] = self.omegak[b] / (self.omegan / self.nbeads)
       elif self.mode == "pa-cmd":
          if len(self.nm_freqs) > 1:
             warning("Only the first element in nm.frequencies will be considered for PA-CMD mode.", verbosity.low)
@@ -307,18 +307,24 @@ class NormalModes(dobject):
 
       dmf = sk**2
 
+      return dmf
+
+   def get_nm_report(self):
+      """ """
+
       # TODO
+      # - return, rather than print
+      # - add a header
       # - nicely print info at medium verbosity level regardless of mode
       # - do this elsewhere so that it is not repeated - aparently it gets printed twice here
-      # - also print the actual frequency used in dynamics - is that just `get_dynwk` above?
       # - replace original code:
       #      info(" ".join(["NM FACTOR", str(b), str(sk), str(self.omegak[b]), str(self.nm_freqs[0])]), verbosity.medium)
       print 'DBG | NM | mode =', self.mode
-      print 'DBG | NM | omegan = ', self.omegan
+      print 'DBG | NM | omega_n = ', self.omegan
+      for i, f in enumerate(self.nm_freqs):
+         print 'DBG | NM | %3d %12.6f' % (i ,f)
       for b in range(self.nbeads):
-        print 'DBG | NM | %3d %12.6f %12.6f %12.6f' % (b, sk[b], dmf[b], self.omegak[b])
-
-      return dmf
+         print 'DBG | NM | %3d %12.6f %12.6f %12.6f' % (b, self.omegak[b], self.nm_factor[b], self.dynomegak[b])
 
    def get_dynm3(self):
       """Returns an array with the dynamical masses of individual atoms in the normal modes representation."""
@@ -326,6 +332,9 @@ class NormalModes(dobject):
       dm3 = np.zeros(self.beads.m3.shape,float)
       for b in range(self.nbeads):
          dm3[b] = self.beads.m3[b]*self.nm_factor[b]
+
+      # TODO: call this from somewhere else!
+      self.get_nm_report()
 
       return dm3
 
