@@ -93,7 +93,7 @@ class Ensemble(dobject):
       dset(self, "dt",    depend_value(name='dt',    value=dt))
       dset(self, "eens", depend_value(name='eens', value=eens))
       self.fixcom = fixcom
-      if fixatoms is None: 
+      if fixatoms is None:
          self.fixatoms = np.zeros(0,int)
       else:
          self.fixatoms = fixatoms
@@ -168,8 +168,8 @@ class Ensemble(dobject):
       return eham + self.eens
 
    def pconstraints(self):
-      pass      
-      
+      pass
+
 
 
 class NVEEnsemble(Ensemble):
@@ -200,6 +200,8 @@ class NVEEnsemble(Ensemble):
       """
 
       super(NVEEnsemble,self).__init__(dt=dt,temp=temp, fixcom=fixcom, eens=eens, fixatoms=fixatoms)
+
+      self.n_RESPA = 1
 
    def pconstraints(self):
       """This removes the centre of mass contribution to the kinetic energy.
@@ -241,7 +243,7 @@ class NVEEnsemble(Ensemble):
             bp[self.fixatoms*3]=0.0
             bp[self.fixatoms*3+1]=0.0
             bp[self.fixatoms*3+2]=0.0
-               
+
    def pstep(self):
       """Velocity Verlet momenta propagator."""
 
@@ -250,7 +252,7 @@ class NVEEnsemble(Ensemble):
    def qcstep(self):
       """Velocity Verlet centroid position propagator."""
 
-      self.nm.qnm[0,:] += depstrip(self.nm.pnm)[0,:]/depstrip(self.beads.m3)[0]*self.dt
+      self.nm.qnm[0,:] += depstrip(self.nm.pnm)[0,:]/depstrip(self.beads.m3)[0]*self.dt/2
 
    def step(self, step=None):
       """Does one simulation time step."""
@@ -328,15 +330,17 @@ class NVTEnsemble(NVEEnsemble):
       """
 
       super(NVTEnsemble,self).bind(beads, nm, cell, bforce, prng)
-      
+
       fixdof = len(self.fixatoms)*3*self.beads.nbeads
       if self.fixcom:
          fixdof += 3
-      
 
       # first makes sure that the thermostat has the correct temperature, then proceed with binding it.
       deppipe(self,"ntemp", self.thermostat,"temp")
-      deppipe(self,"dt", self.thermostat, "dt")
+      #deppipe(self,"dt", self.thermostat, "dt")
+      # this is even more hackish than the rest of the modifications, but I
+      # don't see a way to do it otherwise without a major overhaul
+      self.thermostat.dt = 2 * self.dt / self.n_RESPA
 
       #depending on the kind, the thermostat might work in the normal mode or the bead representation.
       self.thermostat.bind(beads=self.beads, nm=self.nm,prng=prng,fixdof=fixdof )
@@ -346,30 +350,24 @@ class NVTEnsemble(NVEEnsemble):
    def step(self, step=None):
       """Does one simulation time step."""
 
-      self.ttime = -time.time()
-      self.thermostat.step()
-      self.pconstraints() 
-      self.ttime += time.time()
-
-      self.ptime = -time.time()
       self.pstep()
       self.pconstraints()
-      self.ptime += time.time()
 
-      self.qtime = -time.time()
       self.qcstep()
-      self.nm.free_qstep()
-      self.qtime += time.time()
 
-      self.ptime -= time.time()
+      for i in range(self.n_RESPA):
+
+         self.nm.free_qstep()
+
+         self.thermostat.step()
+         self.pconstraints()
+
+         self.nm.free_qstep()
+
+      self.qcstep()
+
       self.pstep()
       self.pconstraints()
-      self.ptime += time.time()
-
-      self.ttime -= time.time()
-      self.thermostat.step()
-      self.pconstraints()
-      self.ttime += time.time()
 
    def get_econs(self):
       """Calculates the conserved energy quantity for constant temperature
@@ -457,7 +455,7 @@ class NPTEnsemble(NVTEnsemble):
       deppipe(self,"ntemp", self.barostat, "temp")
       deppipe(self,"dt", self.barostat, "dt")
       deppipe(self,"pext", self.barostat, "pext")
-      dget(self,"econs").add_dependency(dget(self.barostat, "ebaro"))      
+      dget(self,"econs").add_dependency(dget(self.barostat, "ebaro"))
 
    def get_econs(self):
       """Calculates the conserved energy quantity for the constant pressure
@@ -479,8 +477,8 @@ class NPTEnsemble(NVTEnsemble):
 
       self.ttime = -time.time()
       self.thermostat.step()
-      self.barostat.thermostat.step()  
-      self.pconstraints()    
+      self.barostat.thermostat.step()
+      self.pconstraints()
       self.ttime += time.time()
 
       self.ptime = -time.time()
@@ -607,8 +605,8 @@ class NSTEnsemble(NVTEnsemble):
 
       self.ttime = -time.time()
       self.thermostat.step()
-      self.barostat.thermostat.step()     
-      self.pconstraints() 
+      self.barostat.thermostat.step()
+      self.pconstraints()
       self.ttime += time.time()
 
       self.ptime = -time.time()
@@ -676,9 +674,9 @@ class ReplayEnsemble(Ensemble):
       self.ptime = self.ttime = 0
       self.qtime = -time.time()
 
-      try:         
+      try:
          self.rstep += 1
-         if (self.intraj.mode == "xyz"):            
+         if (self.intraj.mode == "xyz"):
             for b in self.beads:
                myatoms = read_xyz(self.rfile)
                myatoms.q *= unit_to_internal("length",self.intraj.units,1.0)
@@ -704,5 +702,5 @@ class ReplayEnsemble(Ensemble):
             softexit.trigger(" # Read single checkpoint")
       except EOFError:
          softexit.trigger(" # Finished reading re-run trajectory")
-      if (step!=None and self.rstep<=step): self.step(step) 
+      if (step!=None and self.rstep<=step): self.step(step)
       self.qtime += time.time()

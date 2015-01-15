@@ -249,7 +249,7 @@ class NormalModes(dobject):
          ring polymer.
       """
 
-      dt = self.ensemble.dt
+      dt = self.ensemble.dt / 2 / self.ensemble.n_RESPA
       pqk = np.zeros((self.nbeads,2,2), float)
       pqk[0] = np.array([[1,0], [dt,1]])
 
