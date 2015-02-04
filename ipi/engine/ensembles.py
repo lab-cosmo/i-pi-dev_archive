@@ -201,8 +201,6 @@ class NVEEnsemble(Ensemble):
 
       super(NVEEnsemble,self).__init__(dt=dt,temp=temp, fixcom=fixcom, eens=eens, fixatoms=fixatoms)
 
-      self.n_RESPA = 1
-
    def pconstraints(self):
       """This removes the centre of mass contribution to the kinetic energy.
 
@@ -340,7 +338,15 @@ class NVTEnsemble(NVEEnsemble):
       #deppipe(self,"dt", self.thermostat, "dt")
       # this is even more hackish than the rest of the modifications, but I
       # don't see a way to do it otherwise without a major overhaul
-      self.thermostat.dt = 2 * self.dt / self.n_RESPA
+      # self.thermostat.dt = 2 * self.dt / self.n_RESPA
+      
+      # this is actually easy to do. 
+      # n times the temperature
+      dset(self,"nrespa", depend_value(name='nrespa'))
+      # a bit hackish, we make a "2dt" step to make sure the thermostat works for a full step when called
+      dset(self,"dtrespa2", depend_value(name='dtrespa2', func=(lambda : 2.0*self.dt/self.nrespa)))
+      deppipe(self,"dtrespa2", self.thermostat, "dt")
+      self.nrespa = 1
 
       #depending on the kind, the thermostat might work in the normal mode or the bead representation.
       self.thermostat.bind(beads=self.beads, nm=self.nm,prng=prng,fixdof=fixdof )
@@ -355,7 +361,7 @@ class NVTEnsemble(NVEEnsemble):
 
       self.qcstep()
 
-      for i in range(self.n_RESPA):
+      for i in range(int(self.nrespa)):
 
          self.nm.free_qstep()
 
