@@ -9,22 +9,22 @@
    <ffsocket name="lammps" mode="unix">
       <address>lammps-h2o</address>
    </ffsocket>
-   <ffsocket name="driver" mode="unix">
-     <address> driver </address>
+   <ffsocket name="pull" mode="unix">
+     <address> lammps-pull </address>
    </ffsocket>
    <system>
-      <initialize nbeads='1'>
+      <initialize nbeads='4'>
          <file mode='pdb'> water_298K.pdb </file>
          <velocities mode="thermal" units='kelvin'> 300 </velocities>
       </initialize>   
       <forces><force> lammps </force></forces>
-      <bias> <force> driver </force></bias>
+      <bias> <force nbeads="1"> pull </force></bias>
       <ensemble mode='nvt'>
-         <thermostat mode='pile_g'>
+         <thermostat mode='pile_l'>
             <tau units='femtosecond'> 100 </tau>
             <pile_lambda> 0.2 </pile_lambda>
          </thermostat>
-         <timestep units='femtosecond'> 0.25 </timestep>
+         <timestep units='femtosecond'> 0.5 </timestep>
          <temperature units='kelvin'> 300 </temperature>
       </ensemble>
    </system>
