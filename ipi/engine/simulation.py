@@ -212,7 +212,7 @@ class Simulation(dobject):
       tttime = 0.0
       ttot = 0.0
       # main MD loop
-      for self.step in range(self.step,self.tsteps):
+      for self.step in xrange(self.step,self.tsteps):
          # stores the state before doing a step.
          # this is a bit time-consuming but makes sure that we can honor soft
          # exit requests without screwing the trajectory
