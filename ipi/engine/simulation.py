@@ -228,11 +228,11 @@ class Simulation(dobject):
          #   s.ensemble.step()
          for s in self.syslist:
             # creates separate threads for the different systems
-            #st = threading.Thread(target=s.ensemble.step, name=s.prefix, kwargs={"step":self.step})
-            #st.daemon = True
-            s.ensemble.step(step=self.step)
-            #st.start()
-            #stepthreads.append(st)
+            st = threading.Thread(target=s.ensemble.step, name=s.prefix, kwargs={"step":self.step})
+            st.daemon = True
+            #s.ensemble.step(step=self.step)
+            st.start()
+            stepthreads.append(st)
 
          for st in stepthreads:
             while st.isAlive(): st.join(2.0)   # this is necessary as join() without timeout prevents main from receiving signals
