@@ -79,6 +79,7 @@ def main(inputfile, prefix="PTW-", ttemp="300.0", skip="5000"):
    # these are variables used to compute the weighting factors 
    tprops=[]
    vfields=[]
+   refpots=[]
    vunits=[]
    nw = []
    tw = [] 
@@ -116,6 +117,7 @@ def main(inputfile, prefix="PTW-", ttemp="300.0", skip="5000"):
                            p["ofile"] = open(p["ofilename"],"w")
                            p["ofile"].write("# column   1     --> ptlogweight: ln of re-weighing factor with target temperature %s K\n" % (txtemp) )
                         vfields.append(int(rm.group(1))-1)
+                        refpots.append(np.zeros(nsys))
                         nw.append(np.zeros(nsys))
                         tw.append(np.zeros(nsys))
                         tw2.append(np.zeros(nsys))
@@ -126,8 +128,10 @@ def main(inputfile, prefix="PTW-", ttemp="300.0", skip="5000"):
                   if prop in tprops: # do temperature weighing    
                      pot = unit_to_internal("energy", vunits[wk],float(iline.split()[vfields[wk]]))
                      ir = irep[isys]
+                     if (nw[wk][ir]==0):
+                        refpots[wk][ir]=pot # picks the first value as a reference potential to avoid insane absolute values of the logweight
                      temp = tlist[ir]
-                     lw = pot*(1/temp-1/ttemp)
+                     lw = (pot-refpots[wk][ir])*(1/temp-1/ttemp)
                      if step > skip: # computes trajectory weights avoiding the initial - possibly insane - values
                         if nw[wk][ir] ==0 :
                            tw[wk][ir] = lw
@@ -144,7 +148,7 @@ def main(inputfile, prefix="PTW-", ttemp="300.0", skip="5000"):
          fpw = open(prefix+"WEIGHTS","w")
          for prop in lprop:
             if prop in tprops:
-               for ir in range(nsys):                  
+               for ir in range(nsys):
                   fpw.write("%s   %15.7e \n" % (prop[ir]["ofilename"], 1.0/(np.exp(tw2[wk][ir]-2*tw[wk][ir])*nw[wk][ir])  )  )
                wk+=1
          break
