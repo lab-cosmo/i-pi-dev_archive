@@ -8,10 +8,7 @@ main directory must be added to the PYTHONPATH environment variable.
 Post-processes the output of a parallel-tempering simulation and
 re-orders the outputs so that they correspond to the different
 temperatures ensembles rather than to the time series of one of
-the replicas exchanging temperature over time. 
-Given a target temperature for re-weighing, it will also print out 
-relative weights for the different trajectories based on 
-Ceriotti, Brain, Riordan, Manolopoulos, Proc. Royal Soc. A 468 (2011)
+the replicas exchanging temperature over time.
 
 It should be run in the same dyrectory as where i-pi was (or is being)
 run, and simply fetches all information from the simulation input file.
@@ -22,7 +19,7 @@ Syntax:
    parasort.py inputfile.xml
 """
 
-import sys, re
+import sys
 import numpy as np
 from ipi.engine.simulation import Simulation
 from ipi.engine.outputs import *
@@ -31,10 +28,9 @@ from ipi.inputs.simulation import InputSimulation
 from ipi.utils.io.io_xml import *
 
 
-def main(inputfile, prefix="PT", ttemp="-1.0"):
-   # run in weigh mode when ttemp > 0
-   ttemp = float(ttemp)
-   
+def main(inputfile, prefix="PT"):
+
+
    # opens & parses the input file
    ifile = open(inputfile,"r")
    xmlrestart = xml_parse_file(ifile) # Parses the file.
@@ -63,12 +59,12 @@ def main(inputfile, prefix="PT", ttemp="-1.0"):
             if s.prefix != "":
                filename = s.prefix+"_"+o.filename
             else: filename=o.filename
-            ofilename = prefix+str(isys)+"_"+o.filename
+            ofilename = prefix+ ( ("%0" + str(int(1 + np.floor(np.log(len(simul.syslist))/np.log(10)))) + "d") % (isys) )+"_"+o.filename
             nprop.append( { "filename" : filename, "ofilename" : ofilename, "stride": o.stride,
-                           "ifile" : open(filename, "r"), "ofile" : (open(ofilename, "w") if ttemp<0 else None) # do not output when run in weighing mode
+                           "ifile" : open(filename, "r"), "ofile" : open(ofilename, "w")
              } )
             isys+=1
-         lprop.append(nprop)         
+         lprop.append(nprop)
       elif type(o) is TrajectoryOutput:   # trajectories are more complex, as some have per-bead output
          if getkey(o.what) in [ "positions", "velocities", "forces", "extras" ]:   # multiple beads
             nbeads = simul.syslist[0].beads.nbeads
@@ -81,7 +77,7 @@ def main(inputfile, prefix="PT", ttemp="-1.0"):
                   if s.prefix != "":
                      filename = s.prefix+"_"+o.filename
                   else: filename=o.filename
-                  ofilename = prefix+str(isys)+"_"+o.filename
+                  ofilename = prefix+( ("%0" + str(int(1 + np.floor(np.log(len(simul.syslist))/np.log(10)))) + "d") % (isys) )+"_"+o.filename
                   if (o.ibead < 0 or o.ibead == b):
                      if getkey(o.what) == "extras":
                         filename = filename+"_" + padb
@@ -91,7 +87,7 @@ def main(inputfile, prefix="PT", ttemp="-1.0"):
                         ofilename = ofilename+"_" + padb + "." + o.format
                         ntraj.append({ "filename" : filename, "format" : o.format,
                       "ofilename" : ofilename, "stride": o.stride,
-                      "ifile" : open(filename, "r"), "ofile" : (open(ofilename, "w") if ttemp<0 else None)
+                      "ifile" : open(filename, "r"), "ofile" : open(ofilename, "w")
                         })
                   isys+=1
                if ntraj != []:
@@ -108,7 +104,7 @@ def main(inputfile, prefix="PT", ttemp="-1.0"):
                ofilename = prefix+str(isys)+"_"+o.filename+"."+o.format
                ntraj.append( { "filename" : filename, "format" : o.format,
                       "ofilename" : ofilename, "stride": o.stride,
-                      "ifile" : open(filename, "r"), "ofile" : (open(ofilename, "w") if ttemp<0 else None)
+                      "ifile" : open(filename, "r"), "ofile" : open(ofilename, "w")
                 } )
 
                isys+=1
@@ -116,15 +112,6 @@ def main(inputfile, prefix="PT", ttemp="-1.0"):
 
    ptfile=open("PARATEMP", "r")
 
-   # these are variables used to compute the weighting factors 
-   tprops=[]
-   vfields=[]
-   vunits=[]
-   vweights=np.zeros(nsys)
-   repot = re.compile(' ([0-9]*) *--> potential')
-   reunit = re.compile('{(.*)}')
-   
- 
    # now reads files one frame at a time, and re-direct output to the appropriate location
    irep = np.zeros(nsys,int)
    while True:
@@ -137,34 +124,19 @@ def main(inputfile, prefix="PT", ttemp="-1.0"):
       irep[:] = line[1:]
 
       try:
+
          for prop in lprop:
             for isys in range(nsys):
                sprop = prop[isys]
                if step % sprop["stride"] == 0: # property transfer
                   iline = sprop["ifile"].readline()
-                  while iline[0] == "#":  # fast forward if line is a comment 
-                     if ttemp<0:
-                        prop[irep[isys]]["ofile"].write(iline)                     
-                     else: # checks if we have one single file with potential energies
-                        rm=repot.search(iline)
-                        if not (rm is None) and not (prop in tprops):
-                           print "Adding for weighing ", prop
-                           tprops.append(prop)
-                           for p in prop:
-                              p["ofile"] = open(p["ofilename"],"w")
-                           vfields.append(int(rm.group(1)))
-                           rm=reunit.search(iline)
-                           if rm: vunits.append(rm.groum(1))
-                           else: vunits.append("atomic_unit")                              
-                     iline = sprop["ifile"].readline()                     
-                  if ttemp<0: prop[irep[isys]]["ofile"].write(iline)
-                  elif prop in tprops: # do temperature weighing
-                     w=1.0
-                     prop[irep[isys]]["ofile"].write("%15.7e\n" %(w))
-                     vweights[irep[isys]]+=w
+                  if len(iline)==0: raise EOFError
+                  while iline[0] == "#":  # fast forward if line is a comment
+                     prop[irep[isys]]["ofile"].write(iline)
+                     iline = sprop["ifile"].readline()
+                  prop[irep[isys]]["ofile"].write(iline)
 
-         if ttemp<0:  # do not process trajectories if we are in weighing mode
-           for traj in ltraj:
+         for traj in ltraj:
             for isys in range(nsys):
                straj = traj[isys]
                if step % straj["stride"] == 0: # property transfer

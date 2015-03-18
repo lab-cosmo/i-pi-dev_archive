@@ -90,6 +90,7 @@ class ParaTemp(dobject):
       def make_tempgetter(k):
          return lambda: self.system_temp[k]
 
+      # every time system_temp is changed the temperatures of individual systems will be updated
       isys=0
       for s in self.slist:
          dget(s.ensemble,"temp").add_dependency(dget(self,"system_temp"))
