@@ -115,7 +115,7 @@ def main(inputfile, prefix="PTW-", ttemp="300.0", skip="5000"):
                         for p in prop:
                            p["ofile"] = open(p["ofilename"],"w")
                            p["ofile"].write("# column   1     --> ptlogweight: ln of re-weighing factor with target temperature %s K\n" % (txtemp) )
-                        vfields.append(int(rm.group(1)))
+                        vfields.append(int(rm.group(1))-1)
                         nw.append(np.zeros(nsys))
                         tw.append(np.zeros(nsys))
                         tw2.append(np.zeros(nsys))
