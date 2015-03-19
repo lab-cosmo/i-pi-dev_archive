@@ -16,11 +16,12 @@ Will create a series of PTindex_* files, each corresponding to the
 data for replica 'index'.
 
 Syntax:
-   parasort.py inputfile.xml
+   parasort.py inputfile.xml [prefix]
 """
 
 import sys
 import numpy as np
+from ipi.utils.messages import verbosity, banner
 from ipi.engine.simulation import Simulation
 from ipi.engine.outputs import *
 from ipi.engine.properties import getkey
@@ -38,6 +39,8 @@ def main(inputfile, prefix="PT"):
 
    verbosity.level="quiet"
    verbosity.lock = True
+   banner()
+   print "# Re-ordering trajectories in a parallel tempering simulation"
 
    isimul = InputSimulation()
    isimul.parse(xmlrestart.fields[0][1])
