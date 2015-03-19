@@ -1,29 +1,35 @@
 #!/usr/bin/python
-""" parasort.py
+""" paraweights.py
 
 Relies on the infrastructure of i-pi, so the ipi package should
 be installed in the Python module directory, or the i-pi
 main directory must be added to the PYTHONPATH environment variable.
 
 Post-processes the output of a parallel-tempering simulation and
-re-orders the outputs so that they correspond to the different
-temperatures ensembles rather than to the time series of one of
-the replicas exchanging temperature over time. 
-Given a target temperature for re-weighing, it will also print out 
-relative weights for the different trajectories based on 
+computes - for each output file that contains potential energy 
+information - the log-weights that should be given to each 
+line to re-weight the ensemble at a given target temperature. 
+For each file, it also prints out the "global" weighing factor that
+should be used to combine different PT replicas, based on a simple
+estimate of the error based on 
 Ceriotti, Brain, Riordan, Manolopoulos, Proc. Royal Soc. A 468 (2011)
+and the assumption that the observable and the weight are un-correlated.
+In computing the global weight, by default a certain number of steps
+will be ignored.
 
 It should be run in the same dyrectory as where i-pi was (or is being)
 run, and simply fetches all information from the simulation input file.
-Will create a series of PTindex_* files, each corresponding to the
-data for replica 'index'.
+Will create a series of (prefix)index_* files, each corresponding to the
+data for replica 'index', and a (prefix)WEIGHTS file containing the
+trajectory weights. 
 
 Syntax:
-   parasort.py inputfile.xml [prefix] [temperature(K)]
+   paraweights.py inputfile.xml [prefix] [temperature(K)] [skip]
 """
 
 import sys, re
 import numpy as np
+from ipi.utils.messages import verbosity
 from ipi.engine.simulation import Simulation
 from ipi.engine.outputs import *
 from ipi.engine.properties import getkey
@@ -33,18 +39,21 @@ from ipi.utils.units import unit_to_internal
 from ipi.utils.mathtools import logsumlog
 
 
-def main(inputfile, prefix="PTW-", ttemp="300.0", skip="5000"):
+def main(inputfile, prefix="PTW-", ttemp="300.0", skip="2000"):
    txtemp = ttemp
    ttemp = unit_to_internal("energy","kelvin",float(ttemp))
    skip = int(skip)
    
-   # opens & parses the input file
+   # opens & parses the input file   
    ifile = open(inputfile,"r")
+   verbosity.level="quiet"
+   verbosity.lock = True
    xmlrestart = xml_parse_file(ifile) # Parses the file.
    ifile.close()
 
    isimul = InputSimulation()
    isimul.parse(xmlrestart.fields[0][1])
+   verbosity.level="quiet"
 
    simul = isimul.fetch()
 
@@ -146,6 +155,10 @@ def main(inputfile, prefix="PTW-", ttemp="300.0", skip="5000"):
          # print out trajectory weights based on PRSA 2011, assuming that observables and weights are weakly correlated
          wk=0
          fpw = open(prefix+"WEIGHTS","w")
+         fpw.write("# Global trajectory weights for temperature %s K\n" % (txtemp) )
+         fpw.write("# Please cite M. Ceriotti, G. A. Brain, O. Riordan, D.E. Manolopoulos, "+
+                   "The inefficiency of re-weighted sampling and the curse of system size in high-order path integration. "+
+                   "Proceedings of the Royal Society A, 468(2137), 2-17  (2011) \n" )      
          for prop in lprop:
             if prop in tprops:
                for ir in range(nsys):

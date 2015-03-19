@@ -36,6 +36,9 @@ def main(inputfile, prefix="PT"):
    xmlrestart = xml_parse_file(ifile) # Parses the file.
    ifile.close()
 
+   verbosity.level="quiet"
+   verbosity.lock = True
+
    isimul = InputSimulation()
    isimul.parse(xmlrestart.fields[0][1])
 
