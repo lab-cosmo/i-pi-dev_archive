@@ -54,7 +54,8 @@ def main(inputfile, prefix="PTW-", ttemp="300.0", skip="2000"):
    isimul = InputSimulation()
    isimul.parse(xmlrestart.fields[0][1])
    verbosity.level="quiet"
-
+   banner()
+   print "# Printing out temperature re-weighing factors for a parallel tempering simulation"   
    simul = isimul.fetch()
 
    if simul.mode != "paratemp":
