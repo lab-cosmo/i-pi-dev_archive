@@ -29,7 +29,7 @@ Syntax:
 
 import sys, re
 import numpy as np
-from ipi.utils.messages import verbosity
+from ipi.utils.messages import verbosity, banner
 from ipi.engine.simulation import Simulation
 from ipi.engine.outputs import *
 from ipi.engine.properties import getkey
