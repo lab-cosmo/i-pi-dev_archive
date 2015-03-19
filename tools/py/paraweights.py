@@ -127,7 +127,7 @@ def main(inputfile, prefix="PTW-", ttemp="300.0", skip="2000"):
                            p["ofile"] = open(p["ofilename"],"w")
                            p["ofile"].write("# column   1     --> ptlogweight: ln of re-weighing factor with target temperature %s K\n" % (txtemp) )
                         vfields.append(int(rm.group(1))-1)
-                        refpots.append(np.zeros(nsys))
+                        refpots.append(np.zeros(nsys)+np.nan) # initially sets the reference potential to nan...
                         nw.append(np.zeros(nsys))
                         tw.append(np.zeros(nsys))
                         tw2.append(np.zeros(nsys))
@@ -138,7 +138,7 @@ def main(inputfile, prefix="PTW-", ttemp="300.0", skip="2000"):
                   if prop in tprops: # do temperature weighing    
                      pot = unit_to_internal("energy", vunits[wk],float(iline.split()[vfields[wk]]))
                      ir = irep[isys]
-                     if (nw[wk][ir]==0):
+                     if (np.isnan(refpots[wk][ir])):
                         refpots[wk][ir]=pot # picks the first value as a reference potential to avoid insane absolute values of the logweight
                      temp = tlist[ir]
                      lw = (pot-refpots[wk][ir])*(1/temp-1/ttemp)
