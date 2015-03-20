@@ -262,6 +262,11 @@ class Properties(dobject):
       "potential": {  "dimension" : "energy",
                       "help": "The physical system potential energy.",
                       'func': (lambda: self.forces.pot/self.beads.nbeads)},
+      "pot_component": {  "dimension" : "energy",
+                      "help": "The contribution to the system potential from one of the force components. ",
+                       "longhelp":  """The contribution to the system potential from one of the force components. Takes one mandatory 
+                         argument index (zero-based) that indicates which component of the potential must be returned.""",
+                      'func': (lambda index: self.forces.pots_component(int(index)).sum()/self.beads.nbeads)},
       "spring": {     "dimension" : "energy",
                       "help": "The total spring potential energy between the beads of all the ring polymers in the system.",
                       'func': (lambda: self.beads.vpath*self.nm.omegan2/self.beads.nbeads)},
