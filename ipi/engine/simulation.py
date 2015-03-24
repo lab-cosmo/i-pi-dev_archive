@@ -72,7 +72,7 @@ class Simulation(dobject):
       step: The current simulation step.
    """
 
-   def __init__(self, mode, syslist, fflist, outputs, prng, paratemp, step=0, tsteps=1000, ttime=0):
+   def __init__(self, mode, syslist, fflist, outputs, prng, paratemp, step=0, tsteps=1000, ttime=0, threaded=True):
       """Initialises Simulation class.
 
       Args:
@@ -88,6 +88,7 @@ class Simulation(dobject):
             to 1000.
          ttime: The simulation running time. Used on restart, to keep a
             cumulative total.
+         threaded: Whether to use threads when evalating multiple systems (e.g. in a paratemp run)          
       """
 
       info(" # Initializing simulation object ", verbosity.low )
@@ -112,6 +113,7 @@ class Simulation(dobject):
       self.tsteps = tsteps
       self.ttime = ttime
       self.paratemp = paratemp
+      self.threaded = threaded
 
       self.chk = None
       self.rollback = True
@@ -185,12 +187,14 @@ class Simulation(dobject):
          # must use multi-threading to avoid blocking in multi-system runs
          stepthreads = []
          for o in self.outputs:
-            # st = threading.Thread(target=o.write, name=o.filename)
-            #st.daemon = True
-            #st.start()
-            #stepthreads.append(st)
-            o.write()
-            
+            if self.threaded:
+               st = threading.Thread(target=o.write, name=o.filename)
+               st.daemon = True
+               st.start()
+               stepthreads.append(st)
+            else:
+               o.write()
+           
          for st in stepthreads:
             while st.isAlive(): st.join(2.0)   # this is necessary as join() without timeout prevents main from receiving signals
 
@@ -228,11 +232,13 @@ class Simulation(dobject):
          #   s.ensemble.step()
          for s in self.syslist:
             # creates separate threads for the different systems
-            st = threading.Thread(target=s.ensemble.step, name=s.prefix, kwargs={"step":self.step})
-            st.daemon = True
-            #s.ensemble.step(step=self.step)
-            st.start()
-            stepthreads.append(st)
+            if self.threaded:
+               st = threading.Thread(target=s.ensemble.step, name=s.prefix, kwargs={"step":self.step})
+               st.daemon = True            
+               st.start()
+               stepthreads.append(st)
+            else:
+               s.ensemble.step(step=self.step) # comment the above and uncomment this to make this blocking
 
          for st in stepthreads:
             while st.isAlive(): st.join(2.0)   # this is necessary as join() without timeout prevents main from receiving signals
@@ -240,7 +246,16 @@ class Simulation(dobject):
          if softexit.triggered: break # don't continue if we are about to exit!
 
          for o in self.outputs:
-            o.write()
+            if self.threaded:
+               st = threading.Thread(target=o.write, name=o.filename)
+               st.daemon = True
+               st.start()
+               stepthreads.append(st)
+            else:
+               o.write()
+         for st in stepthreads:
+            while st.isAlive(): st.join(2.0)   # this is necessary as join() without timeout prevents main from receiving signals
+
 
          if self.mode == "paratemp": # does parallel tempering
 

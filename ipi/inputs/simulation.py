@@ -94,7 +94,10 @@ class InputSimulation(Input):
                "mode"  : (InputAttribute, {"dtype"   : str,
                                     "default" : "md",
                                     "help"    : "What kind of simulation should be run.",
-                                    "options" : ['md', 'paratemp']})
+                                    "options" : ['md', 'paratemp']}),
+               "threaded"  : (InputAttribute, {"dtype"   : bool,
+                                    "default" : True,
+                                    "help"    : "Specifies whether multiple system/multiple outputs should be threaded"} )
              }
 
    dynamic = {
@@ -121,6 +124,7 @@ class InputSimulation(Input):
       self.step.store(simul.step)
       self.total_steps.store(simul.tsteps)
       self.total_time.store(simul.ttime)
+      self.threaded.store(simul.threaded)
       self.paratemp.store(simul.paratemp)
 
       # this we pick from the messages class. kind of a "global" but it seems to
@@ -204,6 +208,7 @@ class InputSimulation(Input):
                   paratemp = self.paratemp.fetch(),
                   step = self.step.fetch(),
                   tsteps = self.total_steps.fetch(),
-                  ttime = self.total_time.fetch())
+                  ttime = self.total_time.fetch(),
+                  threaded = self.threaded.fetch())
 
       return rsim
