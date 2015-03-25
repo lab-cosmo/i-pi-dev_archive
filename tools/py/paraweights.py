@@ -105,12 +105,17 @@ def main(inputfile, prefix="PTW-", ttemp="300.0", skip="2000"):
       # reads one line from PARATEMP index file
       line=ptfile.readline()
       line = line.split()
-      if len(line) == 0: break
+      # if len(line) == 0: break
 
-      step = int(line[0])
-      irep[:] = line[1:]
+      # step = int(line[0])
+      # irep[:] = line[1:]
 
       try:
+         if len(line) == 0: raise EOFError
+
+         step = int(line[0])
+         irep[:] = line[1:]
+
          wk = 0
          for prop in lprop:
             for isys in range(nsys):
