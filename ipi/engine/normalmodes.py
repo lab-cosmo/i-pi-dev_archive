@@ -202,7 +202,20 @@ class NormalModes(dobject):
          depend_array(name="kstress",value=np.zeros((3,3), float),
             func=self.get_kstress,
                dependencies=[dget(self,"pnm"), dget(self.beads,"sm3"), dget(self, "nm_factor") ] ))
-
+               
+      # set up interface to get spring force (and possibly MTS++ second derivative correction)
+      dset(self,"fspringnm", depend_array(name="fsnm",
+         value=np.zeros((self.nbeads,3*self.natoms), float),func=self.get_fspringnm,      
+            dependencies=[dget(self,"qnm"), dget(self, "omegak")] ) )
+      dset(self,"fspring", depend_array(name="fs",
+         value=np.zeros((self.nbeads,3*self.natoms), float),
+         func=(lambda : self.transform.nm2b(depstrip(self.fspringnm)) ),
+         dependencies = [dget(self,fspringnm)]) )
+      
+   def get_fspringnm(self):
+      """ TODO: COMPUTE ACTUALLY SOMETHING! """
+      return np.zeros((self.nbeads, self.natoms*3))
+      
    def get_omegan(self):
       """Returns the effective vibrational frequency for the interaction
       between replicas.
