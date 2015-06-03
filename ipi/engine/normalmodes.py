@@ -210,7 +210,7 @@ class NormalModes(dobject):
       dset(self,"fspring", depend_array(name="fs",
          value=np.zeros((self.nbeads,3*self.natoms), float),
          func=(lambda : self.transform.nm2b(depstrip(self.fspringnm)) ),
-         dependencies = [dget(self,fspringnm)]) )
+         dependencies = [dget(self,"fspringnm")]) )
       
    def get_fspringnm(self):
       """ TODO: COMPUTE ACTUALLY SOMETHING! """
