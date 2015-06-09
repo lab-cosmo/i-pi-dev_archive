@@ -172,8 +172,7 @@ class NormalModes(dobject):
       if not self.forces is None: dset(self,"fnm", depend_array(name="fnm",
          value=np.zeros((self.nbeads,3*self.natoms), float),func=(lambda : self.transform.b2nm(depstrip(self.forces.f)) ),    
             dependencies=[dget(self.forces,"f")] ) )
-      else: # have a fall-back plan when we don't want to initialize a force mechanism, e.g. for ring-polymer initialization
-         
+      else: # have a fall-back plan when we don't want to initialize a force mechanism, e.g. for ring-polymer initialization         
          dset(self,"fnm", depend_array(name="fnm",
          value=np.zeros((self.nbeads,3*self.natoms), float),
          func=(lambda: depraise(ValueError("Cannot access NM forces when initializing the NM object without providing a force reference!") ) ),    
