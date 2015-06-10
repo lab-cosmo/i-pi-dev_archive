@@ -117,8 +117,10 @@ class NormalModes(dobject):
          ensemble: An ensemble object to be bound.
       """
 
-      if beads is None: beads = ensemble.beads
-      if forces is None: forces = ensemble.forces
+      if beads is None:
+         beads = ensemble.beads
+      if forces is None:
+         forces = ensemble.forces
 
       self.nbeads = beads.nbeads
       self.natoms = beads.natoms
@@ -169,14 +171,15 @@ class NormalModes(dobject):
 
       # forces can be converted in nm representation, but here it makes no sense to set up a sync mechanism,
       # as they always get computed in the bead rep
-      if not self.forces is None: dset(self,"fnm", depend_array(name="fnm",
-         value=np.zeros((self.nbeads,3*self.natoms), float),func=(lambda : self.transform.b2nm(depstrip(self.forces.f)) ),
-            dependencies=[dget(self.forces,"f")] ) )
-      else: # have a fall-back plan when we don't want to initialize a force mechanism, e.g. for ring-polymer initialization
-
+      if not self.forces is None:
          dset(self,"fnm", depend_array(name="fnm",
-         value=np.zeros((self.nbeads,3*self.natoms), float),
-         func=(lambda: depraise(ValueError("Cannot access NM forces when initializing the NM object without providing a force reference!") ) ),
+            value=np.zeros((self.nbeads,3*self.natoms), float),func=(lambda : self.transform.b2nm(depstrip(self.forces.f)) ),
+            dependencies=[dget(self.forces,"f")] ) )
+      else:
+         # have a fall-back plan when we don't want to initialize a force mechanism, e.g. for ring-polymer initialization
+         dset(self,"fnm", depend_array(name="fnm",
+            value=np.zeros((self.nbeads,3*self.natoms), float),
+            func=(lambda: depraise(ValueError("Cannot access NM forces when initializing the NM object without providing a force reference!") ) ),
             dependencies=[] ) )
 
       # create path-frequencies related properties
