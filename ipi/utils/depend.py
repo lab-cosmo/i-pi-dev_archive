@@ -55,7 +55,7 @@ Functions:
 """
 
 __all__ = ['depend_base', 'depend_value', 'depend_array', 'synchronizer',
-           'dobject', 'dget', 'dset', 'depstrip', 'depcopy', 'deppipe']
+           'dobject', 'dget', 'dset', 'depstrip', 'depcopy', 'deppipe', 'depraise']
 
 import numpy as np
 import weakref
@@ -743,6 +743,8 @@ def depcopy(objfrom,memberfrom,objto,memberto):
    if hasattr(dfrom,"_bval"):
       dto._bval = dfrom._bval
 
+def depraise(exception): 
+    raise exception
 
 class dobject(object):
    """Class that allows standard notation to be used for depend objects."""
