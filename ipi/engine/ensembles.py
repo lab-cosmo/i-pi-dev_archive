@@ -97,7 +97,7 @@ class Ensemble(dobject):
          self.fixatoms = np.zeros(0,int)
       else:
          self.fixatoms = fixatoms
-         
+
       self.beads = self.cell = self.forces = self.bias = self.prng = self.nm = None
 
 
@@ -159,6 +159,11 @@ class Ensemble(dobject):
       # They are close, but the difference still seems a bit large to be just
       # due to numerics.
       print 'DBG | vspring: ', vspring_from_nm, vspring_from_beads, vspring_from_nm - vspring_from_beads
+
+      # select the momenta update method
+      # TODO: Have a setting to select.
+      #self.pstep = self._pstep
+      self.pstep = self.nm.pstep
 
    def get_ntemp(self):
       """Returns the PI simulation temperature (P times the physical T)."""
@@ -263,7 +268,7 @@ class NVEEnsemble(Ensemble):
             bp[self.fixatoms*3+1]=0.0
             bp[self.fixatoms*3+2]=0.0
 
-   def pstep(self):
+   def _pstep(self):
       """Velocity Verlet momenta propagator."""
 
       self.beads.p += depstrip(self.forces.f)*(self.dt*0.5)
