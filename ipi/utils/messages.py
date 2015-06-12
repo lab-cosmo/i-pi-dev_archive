@@ -9,7 +9,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
@@ -28,7 +28,7 @@ Functions:
 
 import traceback, sys
 
-__all__ = ['Verbosity', 'verbosity',' help', 'banner', 'info', 'warning']
+__all__ = ['Verbosity', 'verbosity',' help', 'banner', 'info', 'warning', 'raise_']
 
 
 VERB_QUIET  = 0
@@ -82,7 +82,7 @@ class Verbosity(object):
          ValueError: Raised if either the name or the level is not
             a valid option.
       """
-      
+
       if name == "level":
          if self.lock : return # do not set the verbosity level if this is locked
          if value == "quiet":
@@ -95,7 +95,7 @@ class Verbosity(object):
             level = VERB_HIGH
          elif value == "debug":
             level = VERB_DEBUG
-         else: 
+         else:
             raise ValueError("Invalid verbosity level " + str(value) + " specified.")
          super(Verbosity,self).__setattr__("level", level)
       else: super(Verbosity,self).__setattr__(name, value)
@@ -112,20 +112,20 @@ def banner():
    """Prints out a banner."""
 
    print """
- ____       ____       ____       ____  
-/    \     /    \     /    \     /    \  
-|  #################################  | 
-\__#_/     \____/     \____/     \_#__/     
-   #    _        _______  _____    #                 
-   #   (_)      |_   __ \|_   _|   #      -*-     Development version    -*-                      
-   #   __  ______ | |__) | | |     #                                         
-   Y  [  ||______||  ___/  | |     #      A Python interface for (ab initio)  
-  0 0  | |       _| |_    _| |_    #      (path integral) molecular dynamics. 
+ ____       ____       ____       ____
+/    \     /    \     /    \     /    \
+|  #################################  |
+\__#_/     \____/     \____/     \_#__/
+   #    _        _______  _____    #
+   #   (_)      |_   __ \|_   _|   #      -*-     Development version    -*-
+   #   __  ______ | |__) | | |     #
+   Y  [  ||______||  ___/  | |     #      A Python interface for (ab initio)
+  0 0  | |       _| |_    _| |_    #      (path integral) molecular dynamics.
    #  [___]     |_____|  |_____|   #
- __#_       ____       ____       _#__                
-/  # \     /    \     /    \     / #  \                                      
-|  #################################  |                                      
-\____/     \____/     \____/     \____/        
+ __#_       ____       ____       _#__
+/  # \     /    \     /    \     / #  \
+|  #################################  |
+\____/     \____/     \____/     \____/
 
    """
 
@@ -157,3 +157,12 @@ def warning(text="", show=True):
    if verbosity.debug:
       traceback.print_stack(file=sys.stdout)
    print " !W! " + text
+
+def raise_(exception):
+    """Raise `exception`.
+
+    Useful to turn the `raise` statement into a function call, which is needed
+    in lambda functions.
+    """
+
+    raise(exception)

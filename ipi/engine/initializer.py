@@ -490,9 +490,8 @@ class Initializer(dobject):
             if v.index >= 0:
                rv *= simul.beads.m[v.index]
             else: 
-                for ev in rv:
-                    ev *= simul.beads.m3[0]
-
+               for ev in rv:
+                  ev *= simul.beads.m3[0]
             rv *= np.sqrt(self.nbeads/nbeads)
             set_vector(v, simul.beads.p, rv)
             fmom = True

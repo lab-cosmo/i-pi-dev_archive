@@ -9,7 +9,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
@@ -55,7 +55,7 @@ Functions:
 """
 
 __all__ = ['depend_base', 'depend_value', 'depend_array', 'synchronizer',
-           'dobject', 'dget', 'dset', 'depstrip', 'depcopy', 'deppipe', 'depraise']
+           'dobject', 'dget', 'dset', 'depstrip', 'depcopy', 'deppipe']
 
 import numpy as np
 import weakref
@@ -189,7 +189,7 @@ class depend_base(object):
          tainted: A boolean that decides whether newdep should be tainted.
             True by default.
       """
-      
+
       if type(newdep) is weakref.ref:
          self._dependants.append(newdep)
          if tainted:
@@ -742,9 +742,6 @@ def depcopy(objfrom,memberfrom,objto,memberto):
    dto._func = dfrom._func
    if hasattr(dfrom,"_bval"):
       dto._bval = dfrom._bval
-
-def depraise(exception): 
-    raise exception
 
 class dobject(object):
    """Class that allows standard notation to be used for depend objects."""

@@ -93,11 +93,11 @@ class Ensemble(dobject):
       dset(self, "dt",    depend_value(name='dt',    value=dt))
       dset(self, "eens", depend_value(name='eens', value=eens))
       self.fixcom = fixcom
-      if fixatoms is None: 
+      if fixatoms is None:
          self.fixatoms = np.zeros(0,int)
       else:
          self.fixatoms = fixatoms
-         
+
       self.beads = self.cell = self.forces = self.bias = self.prng = self.nm = None
 
 
@@ -142,6 +142,28 @@ class Ensemble(dobject):
       dget(self,"econs").add_dependency(dget(self, "eens"))
       self.pconstraints() # applies momentum constraints to initial configurations
 
+      # TODO: remove this test code, or even create a test from it
+      fspring_from_nm = depstrip(self.nm.fspring)
+      fspring_from_beads = self.nm.omegan**2 * self.beads.get_fpath()
+      fdiff = fspring_from_nm - fspring_from_beads
+      vspring_from_nm = self.nm.vspring
+      vspring_from_beads = self.nm.omegan**2 * self.beads.get_vpath()
+      print 'DBG | fspring_from_beads'
+      print fspring_from_beads
+      print 'DBG | fspring_from_nm'
+      print fspring_from_nm
+      print 'DBG | fdiff'
+      print fdiff
+      print 'DBG | fspring diff distribution: {:16.10e} +- {:16.10e}'.format(fdiff.mean(), fdiff.std())
+      print 'DBG | allclose:', np.allclose(fspring_from_nm, fspring_from_beads, atol=5e-4, rtol=1e-4)
+      # They are close, but the difference still seems a bit large to be just
+      # due to numerics.
+      print 'DBG | vspring: ', vspring_from_nm, vspring_from_beads, vspring_from_nm - vspring_from_beads
+
+      # select the momenta update method
+      # TODO: Have a setting to select.
+      #self.pstep = self._pstep
+      self.pstep = self.nm.pstep
 
    def get_ntemp(self):
       """Returns the PI simulation temperature (P times the physical T)."""
@@ -173,8 +195,7 @@ class Ensemble(dobject):
       return eham + self.eens
 
    def pconstraints(self):
-      pass      
-      
+      pass
 
 
 class NVEEnsemble(Ensemble):
@@ -246,8 +267,8 @@ class NVEEnsemble(Ensemble):
             bp[self.fixatoms*3]=0.0
             bp[self.fixatoms*3+1]=0.0
             bp[self.fixatoms*3+2]=0.0
-               
-   def pstep(self):
+
+   def _pstep(self):
       """Velocity Verlet momenta propagator."""
 
       self.beads.p += depstrip(self.forces.f)*(self.dt*0.5)
@@ -277,6 +298,7 @@ class NVEEnsemble(Ensemble):
       self.pstep()
       self.pconstraints()
       self.ptime += time.time()
+
 
 class NVTEnsemble(NVEEnsemble):
    """Ensemble object for constant temperature simulations.
@@ -335,11 +357,11 @@ class NVTEnsemble(NVEEnsemble):
       """
 
       super(NVTEnsemble,self).bind(beads, nm, cell, bforce, bbias, prng)
-      
+
       fixdof = len(self.fixatoms)*3*self.beads.nbeads
       if self.fixcom:
          fixdof += 3
-      
+
 
       # first makes sure that the thermostat has the correct temperature, then proceed with binding it.
       deppipe(self,"ntemp", self.thermostat,"temp")
@@ -355,7 +377,7 @@ class NVTEnsemble(NVEEnsemble):
 
       self.ttime = -time.time()
       self.thermostat.step()
-      self.pconstraints() 
+      self.pconstraints()
       self.ttime += time.time()
 
       self.ptime = -time.time()
@@ -465,7 +487,7 @@ class NPTEnsemble(NVTEnsemble):
       deppipe(self,"ntemp", self.barostat, "temp")
       deppipe(self,"dt", self.barostat, "dt")
       deppipe(self,"pext", self.barostat, "pext")
-      dget(self,"econs").add_dependency(dget(self.barostat, "ebaro"))      
+      dget(self,"econs").add_dependency(dget(self.barostat, "ebaro"))
 
    def get_econs(self):
       """Calculates the conserved energy quantity for the constant pressure
@@ -487,8 +509,8 @@ class NPTEnsemble(NVTEnsemble):
 
       self.ttime = -time.time()
       self.thermostat.step()
-      self.barostat.thermostat.step()  
-      self.pconstraints()    
+      self.barostat.thermostat.step()
+      self.pconstraints()
       self.ttime += time.time()
 
       self.ptime = -time.time()
@@ -615,8 +637,8 @@ class NSTEnsemble(NVTEnsemble):
 
       self.ttime = -time.time()
       self.thermostat.step()
-      self.barostat.thermostat.step()     
-      self.pconstraints() 
+      self.barostat.thermostat.step()
+      self.pconstraints()
       self.ttime += time.time()
 
       self.ptime = -time.time()
@@ -684,11 +706,10 @@ class ReplayEnsemble(Ensemble):
       self.ptime = self.ttime = 0
       self.qtime = -time.time()
 
-      
       while True:
        self.rstep += 1
-       try:         
-         if (self.intraj.mode == "xyz"):            
+       try:
+         if (self.intraj.mode == "xyz"):
             for b in self.beads:
                myatoms = read_xyz(self.rfile)
                myatoms.q *= unit_to_internal("length",self.intraj.units,1.0)
@@ -714,5 +735,5 @@ class ReplayEnsemble(Ensemble):
             softexit.trigger(" # Read single checkpoint")
        except EOFError:
          softexit.trigger(" # Finished reading re-run trajectory")
-       if (step==None or self.rstep>step): break 
+       if (step==None or self.rstep>step): break
       self.qtime += time.time()
