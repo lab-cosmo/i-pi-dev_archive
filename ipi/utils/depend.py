@@ -640,6 +640,7 @@ class depend_array(np.ndarray, depend_base):
 # ** np.dot
 __dp_dot = np.dot
 
+# We should reevaluate if this is really needed.
 def dep_dot(da, db):
     a = depstrip(da)
     b = depstrip(db)
