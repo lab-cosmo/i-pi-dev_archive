@@ -27,7 +27,7 @@ PES=pes/zundel.f pes/morse.f pes/qtip4pf.f
 OBJECTS=$(MODULES:%.f90=%.o) $(PES:%.f=%.o)
 FC=gfortran
 CC=gcc
-all: driver.x driver_pure.x
+all: driver.x driver_pure.x driver_rid.x
 
 sockets.o: sockets.c
 	$(CC) $(FLAGS) -c -o sockets.o sockets.c
@@ -37,7 +37,10 @@ driver.x: $(OBJECTS) sockets.o fsockets.o driver.o | $(OBJECTS)
 
 driver_pure.x: $(OBJECTS) fsockets_pure.o driver.o | $(OBJECTS)
 	$(FC) $(FLAGS) -o driver_pure.x $^
-	
+
+driver_rid.x: $(OBJECTS) sockets.o fsockets.o driver_rid.o | $(OBJECTS)
+	$(FC) $(FLAGS) -o driver_rid.x $^
+
 %.o: %.f90
 	$(FC) $(FLAGS) -c $< -o $@
 
