@@ -248,6 +248,13 @@ class NormalModes(dobject):
             func=(lambda: self.transform.nm2b(depstrip(self.fspringnm))),
             dependencies=[dget(self, "fspringnm")]))
 
+      # TODO: rename
+      dset(self, "corr",
+         depend_array(name="corr",
+            value=np.zeros((self.nbeads,1), float),
+            func=self.get_corr,
+            dependencies=[dget(self, "dynomegak"), dget(self.ensemble, "dt")]))
+
    def get_fspringnm(self):
       """Returns the spring force calculated in NM representation."""
 
@@ -258,13 +265,32 @@ class NormalModes(dobject):
 
       return 0.5 * (self.beads.m3 * self.omegak[:,np.newaxis]**2 * self.qnm**2).sum()
 
+   def get_corr(self):
+      """Momentum update correction for fast forces."""
+      # TODO: document, rename
+
+      corr = - (self.ensemble.dt * self.dynomegak[:,np.newaxis])**2 / 12
+
+      print 'DBG | corr.shape: ', corr.shape
+      print 'DBG | corr = '
+      print corr
+
+      return corr
+
    def pstep(self):
-      """Velocity Verlet momenta propagator in NM coordinates."""
+      """Velocity Verlet momenta propagator in NM coordinates.
+
+      Optionally apply correction for fast harmonic forces.
+      """
 
       # TODO
+      # "optionally"
       # What do we do about bias force? It would have to be transformed as well.
 
-      self.pnm += depstrip(self.fnm) * self.ensemble.dt * 0.5
+      #dt = self.ensemble.dt
+      dt = self.ensemble.dt * (1.0 - self.corr)
+
+      self.pnm += depstrip(self.fnm) * dt * 0.5
 
    def get_omegan(self):
       """Returns the effective vibrational frequency for the interaction
