@@ -106,7 +106,6 @@ def main(inputfile, prefix="PTW-", ttemp="300.0", skip="2000"):
       line=ptfile.readline()
       line = line.split()
 
-
       try:
          if len(line) == 0: raise EOFError
 
@@ -130,6 +129,7 @@ def main(inputfile, prefix="PTW-", ttemp="300.0", skip="2000"):
                            p["ofile"].write("# column   1     --> ptlogweight: ln of re-weighing factor with target temperature %s K\n" % (txtemp) )
                         vfields.append(int(rm.group(1))-1)
                         refpots.append(np.zeros(nsys)+np.nan) # initially sets the reference potential to nan...
+                        refpots.append(np.zeros(nsys))
                         nw.append(np.zeros(nsys))
                         tw.append(np.zeros(nsys))
                         tw2.append(np.zeros(nsys))
