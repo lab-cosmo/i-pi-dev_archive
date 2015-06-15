@@ -273,26 +273,28 @@ class NormalModes(dobject):
       # also checks that the frequencies and the mode given in init are
       # consistent with the beads and ensemble
 
-      dmf = np.zeros(self.nbeads,float)
-      dmf[:] = 1.0
+      sk = np.ones(self.nbeads)
+
       if self.mode == "rpmd":
          if len(self.nm_freqs) > 0:
-            warning("nm.frequencies will be ignored for RPMD mode.", verbosity.low)
+            warning("Normal mode frequencies will be ignored for RPMD mode.", verbosity.low)
       elif self.mode == "manual":
          if len(self.nm_freqs) != self.nbeads-1:
             raise ValueError("Manual path mode requires (nbeads-1) frequencies, one for each internal mode of the path.")
          for b in range(1, self.nbeads):
-            sk = self.omegak[b]/self.nm_freqs[b-1]
-            dmf[b] = sk**2
+            sk[b] = self.omegak[b]/self.nm_freqs[b-1]
+      elif self.mode == "pimd":
+         if len(self.nm_freqs) > 0:
+            warning("Normal mode frequencies will be ignored for PIMD mode.", verbosity.low)
+         for b in range(1, self.nbeads):
+            sk[b] = self.omegak[b] / (self.omegan / self.nbeads)
       elif self.mode == "pa-cmd":
          if len(self.nm_freqs) > 1:
             warning("Only the first element in nm.frequencies will be considered for PA-CMD mode.", verbosity.low)
          if len(self.nm_freqs) == 0:
             raise ValueError("PA-CMD mode requires the target frequency of all the internal modes.")
          for b in range(1, self.nbeads):
-            sk = self.omegak[b]/self.nm_freqs[0]
-            info(" ".join(["NM FACTOR", str(b), str(sk), str(self.omegak[b]), str(self.nm_freqs[0])]), verbosity.medium)
-            dmf[b] = sk**2
+            sk[b] = self.omegak[b]/self.nm_freqs[0]
       elif self.mode == "wmax-cmd":
          if len(self.nm_freqs) > 2:
             warning("Only the first two element in nm.frequencies will be considered for WMAX-CMD mode.", verbosity.low)
@@ -301,10 +303,28 @@ class NormalModes(dobject):
          wmax = self.nm_freqs[0]
          wt = self.nm_freqs[1]
          for b in range(1, self.nbeads):
-            sk = 1.0/np.sqrt((wt)**2*(1+(wmax/self.omegak[1])**2)/(wmax**2+(self.omegak[b])**2))
-            dmf[b] = sk**2
+            sk[b] = 1.0/np.sqrt((wt)**2*(1+(wmax/self.omegak[1])**2)/(wmax**2+(self.omegak[b])**2))
+
+      dmf = sk**2
 
       return dmf
+
+   def get_nm_report(self):
+      """ """
+
+      # TODO
+      # - return, rather than print
+      # - add a header
+      # - nicely print info at medium verbosity level regardless of mode
+      # - do this elsewhere so that it is not repeated - aparently it gets printed twice here
+      # - replace original code:
+      #      info(" ".join(["NM FACTOR", str(b), str(sk), str(self.omegak[b]), str(self.nm_freqs[0])]), verbosity.medium)
+      print 'DBG | NM | mode =', self.mode
+      print 'DBG | NM | omega_n = ', self.omegan
+      for i, f in enumerate(self.nm_freqs):
+         print 'DBG | NM | %3d %12.6f' % (i ,f)
+      for b in range(self.nbeads):
+         print 'DBG | NM | %3d %12.6f %12.6f %12.6f' % (b, self.omegak[b], self.nm_factor[b], self.dynomegak[b])
 
    def get_dynm3(self):
       """Returns an array with the dynamical masses of individual atoms in the normal modes representation."""
@@ -312,6 +332,9 @@ class NormalModes(dobject):
       dm3 = np.zeros(self.beads.m3.shape,float)
       for b in range(self.nbeads):
          dm3[b] = self.beads.m3[b]*self.nm_factor[b]
+
+      # TODO: call this from somewhere else!
+      self.get_nm_report()
 
       return dm3
 
