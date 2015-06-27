@@ -21,7 +21,9 @@
  
 .PHONY: all modules clean
 
-FLAGS=-g -O3 -Wall -Wno-maybe-uninitialized
+FLAGS=-g -O3 -Wall
+CFLAGS=$(FLAGS)
+FFLAGS=$(FLAGS) -ffree-line-length-none -ffixed-line-length-none -Wno-maybe-uninitialized
 MODULES=distance.f90 LJ.f90 SG.f90 
 PES=pes/zundel.f pes/morse.f pes/qtip4pf.f
 OBJECTS=$(MODULES:%.f90=%.o) $(PES:%.f=%.o)
@@ -30,10 +32,10 @@ CC=gcc
 all: driver.x driver_pure.x driver_rid.x
 
 sockets.o: sockets.c
-	$(CC) $(FLAGS) -c -o sockets.o sockets.c
+	$(CC) $(CFLAGS) -c -o sockets.o sockets.c
 
 driver.x: $(OBJECTS) sockets.o fsockets.o driver.o | $(OBJECTS)
-	$(FC) $(FLAGS) -o driver.x $^
+	$(FC) $(FFLAGS) -o driver.x $^
 
 driver_pure.x: $(OBJECTS) fsockets_pure.o driver.o | $(OBJECTS)
 	$(FC) $(FLAGS) -o driver_pure.x $^
@@ -42,10 +44,10 @@ driver_rid.x: $(OBJECTS) sockets.o fsockets.o driver_rid.o | $(OBJECTS)
 	$(FC) $(FLAGS) -o driver_rid.x $^
 
 %.o: %.f90
-	$(FC) $(FLAGS) -c $< -o $@
+	$(FC) $(FFLAGS) -c $< -o $@
 
 %.o: %.f
-	$(FC) $(FLAGS) -c $< -o $@
+	$(FC) $(FFLAGS) -c $< -o $@
 	
 clean:
 	rm *.o *.mod *.x
