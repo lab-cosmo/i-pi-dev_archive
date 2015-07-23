@@ -2,6 +2,8 @@
    <output prefix='h2o-bias'>
       <properties stride='10' filename='out'>  [ step, time{picosecond}, conserved{electronvolt}, temperature{kelvin}, kinetic_cv{electronvolt}, potential{electronvolt}, bias_potential{electronvolt}, pot_component{electronvolt}(0), pot_component{electronvolt}(1) ] </properties>
       <trajectory stride='100' filename='xc' format='pdb' cell_units='angstrom'> x_centroid{angstrom}</trajectory>
+      <trajectory stride='100' filename='fc' format='pdb' cell_units='angstrom'> f_centroid</trajectory>
+      <trajectory stride='100' filename='fb' format='pdb' cell_units='angstrom'> f_bias </trajectory>
       <checkpoint stride='2000'/>
    </output>
    <total_steps>100000</total_steps>
