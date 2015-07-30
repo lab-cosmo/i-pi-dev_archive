@@ -122,6 +122,8 @@
                   vstyle = 6
                ELSEIF (trim(cmdbuffer) == "linear") THEN
                   vstyle = 7
+               ELSEIF (trim(cmdbuffer) == "cylinder") THEN
+                  vstyle = 8
                ELSEIF (trim(cmdbuffer) == "gas") THEN
                   vstyle = 0  ! ideal gas
                ELSE
@@ -213,6 +215,8 @@
             STOP "ENDED" ! Note that if initialization from the wrapper is implemented this exit should be removed.
          ENDIF
          ks = vpars(1)
+         isinit = .true.
+      ELSEIF (vstyle == 8) THEN
          isinit = .true.
       ENDIF
 
@@ -324,6 +328,11 @@
                      forces(i,j)=(forces(i,j)-dpot)/(2*fddx)
                   ENDDO
                ENDDO
+               ! do not compute the virial term
+            ELSEIF (vstyle == 8) THEN ! Constraining cylinder on water molecules
+               ! JUST FIX THE NORDER THING!!!
+               CALL apply_constrain(pot, forces, nat, norder, atoms)
+     
                ! do not compute the virial term
             ELSEIF (vstyle == 6) THEN ! qtip4pf potential.             
                IF (mod(nat,3)/=0) THEN
