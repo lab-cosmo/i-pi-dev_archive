@@ -235,12 +235,17 @@ class Properties(dobject):
       "ensemble_temperature":  {  "dimension": "temperature",
                        "help" : "The target temperature for the current ensemble",
                        "func": (lambda: self.ensemble.temp) },
-#      "ensemble_bias":  {  "dimension": "energy",
-#                       "help" : "The bias applied to the current ensemble",
-#                       "func": (lambda: self.ensemble.bias) },
-#      "ensemble_logweight":  {  "dimension": "",
-#                       "help" : "The (log) weight of the configuration in the biassed ensemble",
-#                       "func": (lambda: self.ensemble.bias/(Constants.kb*self.ensemble.temp)) },
+      "bias_potential":  {  "dimension": "energy",
+                       "help" : "The bias energy",
+                       "func": (lambda: 0 if self.ensemble.bias is None else self.ensemble.bias.pot  ) },
+      "ensemble_logweight":  {  "dimension": "",
+                       "help" : "The (log) weight of the configuration in the biassed ensemble",
+                       "func": (lambda: 0 if self.ensemble.bias is None else self.ensemble.bias.pot/(Constants.kb*self.ensemble.temp)) },
+      "pot_component": {  "dimension" : "energy",
+                      "help": "The contribution to the system potential from one of the force components. ",
+                       "longhelp":  """The contribution to the system potential from one of the force components. Takes one mandatory 
+                         argument index (zero-based) that indicates which component of the potential must be returned.""",
+                      'func': (lambda index, bead="-1" : self.forces.pots_component(int(index)).sum()/self.beads.nbeads if int(bead)<0 else self.forces.pots_component(int(index))[bead] ) },
       "potential": {  "dimension" : "energy",
                       "help" : "The physical system potential energy.",
                       "longhelp": """The physical system potential energy. With the optional argument 'bead'
@@ -1689,6 +1694,13 @@ class Trajectories(dobject):
       "forces": {    "dimension" : "force",
                      "help": "The force trajectories. Will print out one file per bead, unless the bead attribute is set by the user.",
                      'func': (lambda : 1.0*self.system.forces.f)},
+      "f_component": { "dimension" : "force",
+                     "help": """Separate force components. Will print out one file per bead, unless the bead attribute is set by the user. Takes an 
+                             'index' argument that specifies which FF component one is interested in""",
+                     'func': (lambda index: 1.0*self.system.forces_component(int(index)).f)},
+      "f_bias": {    "dimension" : "force",
+                     "help": "The bias force trajectories. Will print out one file per bead, unless the bead attribute is set by the user.",
+                     'func': (lambda: 0.0*self.system.beads.p if self.system.bias is None else self.system.bias.f)},
       "x_centroid": {"dimension" : "length",
                      "help": "The centroid coordinates.",
                      'func': (lambda : 1.0*self.system.beads.qc)},
@@ -1947,7 +1959,7 @@ class Trajectories(dobject):
 			stream.flush()
 			os.fsync(stream)
          return
-      elif getkey(what) in [ "positions", "velocities", "forces" ] :
+      elif getkey(what) in [ "positions", "velocities", "forces", "f_bias", "f_component" ] :
          fatom = Atoms(self.system.beads.natoms)
          fatom.names[:] = self.system.beads.names
          fatom.q[:] = cq[b]
