@@ -25,17 +25,17 @@
       <forces><force weight="0.75"> lammps </force> <force weight="0.25" nbeads="2"> lammps-2 </force></forces>
       <bias> <force nbeads="1"> pull </force></bias>
       <ensemble mode='npt'>
-         <barostat mode="isotropic">
+           <barostat mode="isotropic">
              <tau units='femtosecond'> 200 </tau>
              <thermostat mode='langevin'> <tau units='femtosecond'> 100 </tau> </thermostat>
          </barostat>
+         <pressure units='kilobar'> 1 </pressure>
          <thermostat mode='pile_l'>
             <tau units='femtosecond'> 100 </tau>
             <pile_lambda> 0.2 </pile_lambda>
          </thermostat>
          <timestep units='femtosecond'> 0.5 </timestep>
          <temperature units='kelvin'> 300 </temperature>
-         <pressure units='kilobar'> 1 </pressure>
       </ensemble>
    </system>
 </simulation>
