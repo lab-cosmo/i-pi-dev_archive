@@ -59,6 +59,9 @@
       DOUBLE PRECISION cell_h(3,3), cell_ih(3,3), virial(3,3), mtxbuf(9), dip(3)
       DOUBLE PRECISION volume
       DOUBLE PRECISION, PARAMETER :: fddx = 1.0d-5
+      ! ARRAY TO STORE ATOM LABELS AND NAME OF XYZ FILE
+      CHARACTER*4, DIMENSION(:), ALLOCATABLE :: labels
+      LOGICAL :: exist      
 
       ! NEIGHBOUR LIST ARRAYS
       INTEGER, DIMENSION(:), ALLOCATABLE :: n_list, index_list
@@ -217,6 +220,13 @@
          ks = vpars(1)
          isinit = .true.
       ELSEIF (vstyle == 8) THEN
+         INQUIRE(file="geometry.xyz", exist=exist)
+         IF (.not.exist) THEN
+            WRITE(*,*) "Error: Can't find geometry file."
+            WRITE(*,*) "For cylinder potential needs to provide an initial geometry.xyz file,"
+            WRITE(*,*) "in order to get the labels"
+            STOP "ENDED" ! Note that if initialization from the wrapper is implemented this exit should be removed.
+         ENDIF
          isinit = .true.
       ENDIF
 
@@ -330,8 +340,9 @@
                ENDDO
                ! do not compute the virial term
             ELSEIF (vstyle == 8) THEN ! Constraining cylinder on water molecules
-               ! JUST FIX THE NORDER THING!!!
-               CALL apply_constrain(pot, forces, nat, norder, atoms)
+               IF (.not. allocated(labels)) ALLOCATE(labels(nat))
+               CALL readlabxyz(labels, nat, 'geometry.xyz') 
+               CALL apply_constrain(pot, forces, nat, labels, atoms)
      
                ! do not compute the virial term
             ELSEIF (vstyle == 6) THEN ! qtip4pf potential.             
@@ -428,6 +439,22 @@
          WRITE(*,*) " For 1D morse oscillator use -o r0,D,a"         
          WRITE(*,*) " For the ideal gas, qtip4pf or zundel no options needed! "
       END SUBROUTINE
+      SUBROUTINE readlabxyz(lab, nat, nfile)
+      ! Reads xyz file and keeps only labels
+      INTEGER :: nat
+      CHARACTER*4 :: lab(nat)
+      CHARACTER*60 :: nfile, trash
+      INTEGER :: i
+
+      open(321,file=nfile)
+      read(321,*) trash
+      read(321,*) trash
+      do i=1,nat
+        read(321,*) lab(i), trash, trash, trash
+      enddo  
+      close(321)
+      END SUBROUTINE
+
    END PROGRAM
 
     

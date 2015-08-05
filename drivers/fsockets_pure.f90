@@ -202,7 +202,7 @@
          ENDIF            
          
          CALL memcpy(c_loc(res), ptr, sizeof(res))
-         WRITE(6,*) "pointer", res
+!         WRITE(6,*) "pointer", res
          psockfd = socket_make(res%ai_family, res%ai_socktype, res%ai_protocol)
          IF (psockfd < 0)  THEN 
             WRITE(6,*) "Error opening socket"
