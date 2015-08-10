@@ -131,7 +131,7 @@
                   vstyle = 0  ! ideal gas
                ELSE
                   WRITE(*,*) " Unrecognized potential type ", trim(cmdbuffer)
-                  WRITE(*,*) " Use -m [gas|lj|sg|harm|morse|zundel|qtip4pf] "
+                  WRITE(*,*) " Use -m [gas|lj|sg|harm|morse|zundel|qtip4pf|cylinder] "
                   STOP "ENDED"
                ENDIF
             ELSEIF (ccmd == 4) THEN
@@ -430,13 +430,14 @@
       CONTAINS
       SUBROUTINE helpmessage
          ! Help banner
-         WRITE(*,*) " SYNTAX: driver.x [-u] -h hostname -p port -m [gas|lj|sg|harm|morse|zundel|qtip4pf] "
+         WRITE(*,*) " SYNTAX: driver.x [-u] -h hostname -p port -m [gas|lj|sg|harm|morse|zundel|qtip4pf|cylinder] "
          WRITE(*,*) "         -o 'comma_separated_parameters' [-v] "
          WRITE(*,*) ""
          WRITE(*,*) " For LJ potential use -o sigma,epsilon,cutoff "
          WRITE(*,*) " For SG potential use -o cutoff "
          WRITE(*,*) " For 1D harmonic oscillator use -o k "
-         WRITE(*,*) " For 1D morse oscillator use -o r0,D,a"         
+         WRITE(*,*) " For 1D morse oscillator use -o r0,D,a"
+         WRITE(*,*) " For cylinder provide geometry.xyz file."         
          WRITE(*,*) " For the ideal gas, qtip4pf or zundel no options needed! "
       END SUBROUTINE
       SUBROUTINE readlabxyz(lab, nat, nfile)
@@ -448,9 +449,12 @@
 
       open(321,file=nfile)
       read(321,*) trash
+ !     write(*,*) trash
       read(321,*) trash
+ !     write(*,*) trash
       do i=1,nat
         read(321,*) lab(i), trash, trash, trash
+ !       write(*,*) lab(i), trash
       enddo  
       close(321)
       END SUBROUTINE

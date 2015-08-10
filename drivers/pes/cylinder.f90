@@ -16,6 +16,7 @@
  
       en=0.d0
       call cylinder(norder, nat, en, force, coords)
+!      write(*,*) en
       end subroutine
 
       subroutine cylinder(norder, n_atoms, pot, forces, coords)
