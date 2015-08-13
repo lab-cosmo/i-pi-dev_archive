@@ -1,0 +1,58 @@
+#  Water intuitive dipole model with GSP hoppings and O-H pp
+#  O-O pp is exp * power law function
+#  used without cutoffs 
+# uo=1.077532941 eso=-2.005196962 esh=-0.8888049184 vsss=-0.5017726192 vsps=0.4361767834 nhosss=2.096344571 nhosps=1.501873927 mch=4.056079003 frc=2.099329699 mc=6.309640351 rc=3.355049409 dspp=-0.9429665886
+#0.261935369613 FC-sym=1.02869 FC-asym=0.93562 FC-angle=0.09020 theta=104.160 dipole=1.84659 energy=-0.858610 alpha=1.34804 gap=0.81320 dalpha=1.355 dbeta=124.299 ddalpha=0.147 ddbeta=0.945 ohm=0.15266 orient=-0.37
+
+# H-p - O (not used)
+        nhopps=2 nhoppp=2
+        vpps=0 vppp=0 shpps=0 shppp=0
+        esh=-0.8888049184 eso=-2.005196962 epo=-1.038
+        UO=1.077532941 UH=1 dspp=-0.9429665886
+# H-s - O (GSP rc=frc*d0)
+#       vscalsss=0.5 vscalsps=0.5
+        nhosss=2.096344571 nhosps=1.501873927
+#       vsss=-vscalsss*2*1.4/d0^nhosss 
+#       vsps=vscalsps*2*1.8/d0^nhosps 
+        vsss=-0.5017726192              
+        vsps=0.4361767834              
+#      overlap
+        shfac=0
+        shsss=-shfac*vsss shsps=-shfac*vsps
+# H - O pair potential (GSP fitted to symmetric force constant FC)
+#        Ep= 4.0481796518  Epp= -6.224276588
+        Ep=3.0778142259  Epp=-4.8529246795
+        frc=2.099329699 mch=4.056079003 mc=6.309640351
+        rc=3.355049409 r0overrc=d0/rc
+        alpha_pp=mc*r0overrc^mc beta_pp=(mc-1)*alpha_pp
+        mA=0.5*(d0/(1+alpha_pp))*Ep
+        m=(beta_pp-1-(d0^2/mA)*(Epp/2-FC))/(1+alpha_pp)^2
+        AGSP=mA/m
+# end of O-H parameters
+#
+# O - O (not used for monomer)
+        sssoo=-0.015 nssoo=2  ncssoo=6  r0ssoo=5.6    rcssoo=9
+        spsoo=0.002  nspoo=2  ncspoo=6  r0spoo=5.6    rcspoo=9
+        ppsoo=0.050  nppsoo=3 ncppsoo=6 r0ppsoo=5.6   rcppsoo=9
+        pppoo=-0.02  npppoo=3 ncpppoo=6 r0pppoo=5.6   rcpppoo=9
+# O - O pair potential
+        foo1=1 foo2=1 foo3=1
+        A1=122252.8 B1=-10  C1=0
+        A2=-62.5    B2=-6   C2=0
+        A3=0        B3=0    C3=0
+
+
+## cutoffs (rc1, rc2 - in inits of alat; rc1a, rc2a - in Bohr)
+## O - O
+#        rcoo1=8.0 rcoo2=11.0
+## H - O
+#        rcho1=2.1 rcho2=5.5
+#        cutmod=2
+
+#            SCALE=F
+#H-H  
+#     1 1 MEMODE=5 PPMODE=10 CUTMOD=2 CUTPP=2.9 3.4
+#           | 0 0 0 0 0   0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0 0
+#             0 0 0 0 0   0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0 0
+#           ! 100 -12 0  0 0 0  0 0 0
+
