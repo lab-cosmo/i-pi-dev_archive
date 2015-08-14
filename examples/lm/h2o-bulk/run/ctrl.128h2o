@@ -1,4 +1,4 @@
-% const lmmc=0 tb=1 show=F help=F pv=0
+% const lmmc=0 tb=1 show=F help=F pv=1
 % const n=128 nbas=3*n nspec=2
 % const nsp=1 mom=0 rel=T frz=F xcf=4 gga=3 tpan=0 smear=.005 xcqs=0
 % const verb=20 nmix=5 betamix=0.8 ul=1 io=1 ovlp=0 nitq=99
