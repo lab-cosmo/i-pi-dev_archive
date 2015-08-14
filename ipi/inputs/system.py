@@ -60,7 +60,7 @@ class InputSystem(Input):
              "initialize" : (InputInitializer, { "help" : InputInitializer.default_help,
                                                 "default" : input_default(factory=Initializer) } ),
              "forces" :   (InputForces,    { "help"  : InputForces.default_help }),
-             "bias" :   (InputForces,    { "help"  : InputForces.default_help,
+             "bias" :   (InputForces,    { "help"  : InputForces.default_help, 
                                            "default" : [] }),
              "ensemble": (InputEnsemble, { "help"  : InputEnsemble.default_help } ),
              "beads" :   (InputBeads, { "help"     : InputBeads.default_help,

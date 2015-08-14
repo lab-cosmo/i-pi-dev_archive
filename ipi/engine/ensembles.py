@@ -438,7 +438,7 @@ class NPTEnsemble(NVTEnsemble):
          fixdof = 3
 
       super(NPTEnsemble,self).bind(beads, nm, cell, bforce, bbias, prng)
-      self.barostat.bind(beads, nm, cell, bforce, prng=prng, fixdof=fixdof)
+      self.barostat.bind(beads, nm, cell, bforce, bias=bbias, prng=prng, fixdof=fixdof)
 
 
       deppipe(self,"ntemp", self.barostat, "temp")

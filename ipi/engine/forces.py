@@ -474,7 +474,7 @@ class Forces(dobject):
       self.nforces = len(force_proto)
 
       # fflist should be a dictionary of forcefield objects
-      self.mforces = []
+      self.mforces = []      
       self.mbeads = []
       self.mrpc = []
 
@@ -590,7 +590,10 @@ class Forces(dobject):
 
    def pots_component(self, index):
       return self.mforces[index].weight*self.mrpc[index].b2tob1(self.mforces[index].pots)
-
+   
+   def forces_component(self, index):
+      return self.mforces[index].weight*self.mrpc[index].b2tob1(depstrip(self.mforces[index].f))      
+      
    def forces_component(self, index):
       return self.mforces[index].weight*self.mrpc[index].b2tob1(depstrip(self.mforces[index].f))
 

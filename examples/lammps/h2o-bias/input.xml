@@ -1,0 +1,41 @@
+<simulation verbosity="high">
+   <output prefix='h2o-bias'>
+      <properties stride='10' filename='out'>  [ step, time{picosecond}, conserved{electronvolt}, temperature{kelvin}, kinetic_cv{electronvolt}, potential{electronvolt}, bias_potential{electronvolt}, pot_component{electronvolt}(0), pot_component{electronvolt}(1) ] </properties>
+      <trajectory stride='100' filename='xc' format='pdb' cell_units='angstrom'> x_centroid{angstrom}</trajectory>
+      <trajectory stride='100' filename='fc' format='pdb' cell_units='angstrom'> f_centroid</trajectory>
+      <trajectory stride='100' filename='fb' format='pdb' cell_units='angstrom'> f_bias </trajectory>
+      <checkpoint stride='2000'/>
+   </output>
+   <total_steps>100000</total_steps>
+   <prng><seed>31415</seed></prng>
+   <ffsocket name="lammps" mode="unix">
+      <address>lammps-h2o</address>
+   </ffsocket>
+  <ffsocket name="lammps-2" mode="unix"> <!-- useless duplication, just to demonstrate pot_component property output -->
+      <address>lammps-h2o-2</address>
+   </ffsocket>
+   <ffsocket name="pull" mode="unix">
+     <address> lammps-pull </address>
+   </ffsocket>
+   <system>
+      <initialize nbeads='4'>
+         <file mode='pdb'> water_298K.pdb </file>
+         <velocities mode="thermal" units='kelvin'> 300 </velocities>
+      </initialize>   
+      <forces><force weight="0.75"> lammps </force> <force weight="0.25" nbeads="2"> lammps-2 </force></forces>
+      <bias> <force nbeads="1"> pull </force></bias>
+      <ensemble mode='npt'>
+           <barostat mode="isotropic">
+             <tau units='femtosecond'> 200 </tau>
+             <thermostat mode='langevin'> <tau units='femtosecond'> 100 </tau> </thermostat>
+         </barostat>
+         <pressure units='kilobar'> 1 </pressure>
+         <thermostat mode='pile_l'>
+            <tau units='femtosecond'> 100 </tau>
+            <pile_lambda> 0.2 </pile_lambda>
+         </thermostat>
+         <timestep units='femtosecond'> 0.5 </timestep>
+         <temperature units='kelvin'> 300 </temperature>
+      </ensemble>
+   </system>
+</simulation>

@@ -232,7 +232,7 @@ class TrajectoryOutput(dobject):
    def open_stream(self):
       """Opens the output stream(s)."""
 
-      if getkey(self.what) in [ "positions", "velocities", "forces", "extras" ]:
+      if getkey(self.what) in [ "positions", "velocities", "forces", "extras", "f_bias", "f_component" ]:
          # must write out trajectories for each bead, so must create b streams
          self.out = []
          for b in range(self.system.beads.nbeads):

@@ -127,7 +127,7 @@ class Barostat(dobject):
       self.forces = forces
       self.bias = bias
       self.nm = nm
-
+    
       dset(self,"kstress",
          depend_value(name='kstress', func=self.get_kstress,
             dependencies=[ dget(beads,"q"), dget(beads,"qc"), dget(beads,"pc"), dget(forces,"f") ]))
@@ -174,7 +174,7 @@ class Barostat(dobject):
 
    def get_stress(self):
       """Calculates the internal stress tensor."""
-
+      
       bvir = np.zeros((3,3),float)
       if self.bias != None: bvir[:]=self.bias.vir
       return (self.kstress + self.forces.vir + bvir)/self.cell.V
