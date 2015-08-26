@@ -1,54 +1,34 @@
 """Contains the classes that deal with the different dynamics required in
 different types of ensembles.
 
-Copyright (C) 2013, Joshua More and Michele Ceriotti
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <http.//www.gnu.org/licenses/>.
-
-
 Holds the algorithms required for normal mode propagators, and the objects to
 do the constant temperature and pressure algorithms. Also calculates the
 appropriate conserved energy quantity for the ensemble of choice.
-
-Classes:
-   Ensemble: Base ensemble class with generic methods and attributes.
-   NVEEnsemble: Deals with constant energy dynamics.
-   NVTEnsemble: Deals with constant temperature dynamics.
-   NPTEnsemble: Deals with constant pressure dynamics.
-   ReplayEnsemble: Takes a trajectory, and simply sets the atom positions to
-      match it, rather than doing dynamics. In this way new properties can
-      be calculated on an old simulation, without having to rerun it from
-      scratch.
 """
 
-__all__ = ['Ensemble', 'NVEEnsemble', 'NVTEnsemble', 'NPTEnsemble', 'NSTEnsemble','ReplayEnsemble']
+# This file is part of i-PI.
+# i-PI Copyright (C) 2014-2015 i-PI developers
+# See the "licenses" directory for full license information.
+
+
+import time
 
 import numpy as np
-import time
-from copy import deepcopy
 
 from ipi.utils.depend import *
 from ipi.utils import units
 from ipi.utils.softexit import softexit
-from ipi.utils.io.io_xyz import read_xyz
-from ipi.utils.io.io_pdb import read_pdb
-from ipi.utils.io.io_xml import xml_parse_file
+from ipi.utils.io.backends.io_xyz import read_xyz
+from ipi.utils.io.backends.io_pdb import read_pdb
+from ipi.utils.io.inputs.io_xml import xml_parse_file
 from ipi.utils.units import Constants, unit_to_internal
 from ipi.inputs.thermostats import InputThermo
 from ipi.inputs.barostats import InputBaro
 from ipi.engine.thermostats import *
 from ipi.engine.barostats import *
+
+
+__all__ = ['Ensemble', 'NVEEnsemble', 'NVTEnsemble', 'NPTEnsemble', 'NSTEnsemble']
 
 
 class Ensemble(dobject):
@@ -235,6 +215,7 @@ class NVEEnsemble(Ensemble):
          pcom *= 1.0/(nb*M)
          for i in range(3):
             self.beads.p[:,i:na3:3] -= m*pcom[i]
+            
       if (len(self.fixatoms)>0):
          for bp in self.beads.p:
             m = depstrip(self.beads.m)
@@ -333,10 +314,11 @@ class NVTEnsemble(NVEEnsemble):
       """
 
       super(NVTEnsemble,self).bind(beads, nm, cell, bforce, bbias, prng)
-      
+
       fixdof = len(self.fixatoms)*3*self.beads.nbeads
       if self.fixcom:
          fixdof += 3
+
 
       # first makes sure that the thermostat has the correct temperature, then proceed with binding it.
       deppipe(self,"ntemp", self.thermostat,"temp")
@@ -361,6 +343,12 @@ class NVTEnsemble(NVEEnsemble):
    def step(self, step=None):
       """Does one simulation time step."""
 
+      self.ttime = -time.time()
+      self.thermostat.step()
+      self.pconstraints()
+      self.ttime += time.time()
+
+      self.ptime = -time.time()
       self.pstep()
       self.pconstraints()
 
@@ -641,80 +629,3 @@ class NSTEnsemble(NVTEnsemble):
       self.thermostat.step()
       self.pconstraints()
       self.ttime += time.time()
-
-class ReplayEnsemble(Ensemble):
-   """Ensemble object that just loads snapshots from an external file in sequence.
-
-   Has the relevant conserved quantity and normal mode propagator for the
-   constant energy ensemble. Note that a temperature of some kind must be
-   defined so that the spring potential can be calculated.
-
-   Attributes:
-      intraj: The input trajectory file.
-      ptime: The time taken in updating the velocities.
-      qtime: The time taken in updating the positions.
-      ttime: The time taken in applying the thermostat steps.
-
-   Depend objects:
-      econs: Conserved energy quantity. Depends on the bead kinetic and
-         potential energy, and the spring potential energy.
-   """
-
-   def __init__(self, dt, temp, fixcom=False, eens=0.0, intraj=None, fixatoms=None):
-      """Initialises ReplayEnsemble.
-
-      Args:
-         dt: The simulation timestep.
-         temp: The system temperature.
-         fixcom: An optional boolean which decides whether the centre of mass
-            motion will be constrained or not. Defaults to False.
-         intraj: The input trajectory file.
-      """
-
-      super(ReplayEnsemble,self).__init__(dt=dt,temp=temp,fixcom=fixcom, eens=eens, fixatoms=fixatoms)
-      if intraj == None:
-         raise ValueError("Must provide an initialized InitFile object to read trajectory from")
-      self.intraj = intraj
-      if intraj.mode == "manual":
-         raise ValueError("Replay can only read from PDB or XYZ files -- or a single frame from a CHK file")
-      self.rfile = open(self.intraj.value,"r")
-      self.rstep = 0
-
-   def step(self, step=None):
-      """Does one simulation time step."""
-
-      self.ptime = self.ttime = 0
-      self.qtime = -time.time()
-      
-      while True:
-       self.rstep += 1
-       try:         
-         if (self.intraj.mode == "xyz"):            
-            for b in self.beads:
-               myatoms = read_xyz(self.rfile)
-               myatoms.q *= unit_to_internal("length",self.intraj.units,1.0)
-               b.q[:] = myatoms.q
-         elif (self.intraj.mode == "pdb"):
-            for b in self.beads:
-               myatoms, mycell = read_pdb(self.rfile)
-               myatoms.q *= unit_to_internal("length",self.intraj.units,1.0)
-               mycell.h  *= unit_to_internal("length",self.intraj.units,1.0)
-               b.q[:] = myatoms.q
-            self.cell.h[:] = mycell.h
-         elif (self.intraj.mode == "chk" or self.intraj.mode == "checkpoint"):
-            # reads configuration from a checkpoint file
-            xmlchk = xml_parse_file(self.rfile) # Parses the file.
-
-            from ipi.inputs.simulation import InputSimulation
-            simchk = InputSimulation()
-            simchk.parse(xmlchk.fields[0][1])
-            mycell = simchk.cell.fetch()
-            mybeads = simchk.beads.fetch()
-            self.cell.h[:] = mycell.h
-            self.beads.q[:] = mybeads.q
-            softexit.trigger(" # Read single checkpoint")
-       except EOFError:
-         softexit.trigger(" # Finished reading re-run trajectory")
-       if (step==None or self.rstep>step): break 
-       
-      self.qtime += time.time()
