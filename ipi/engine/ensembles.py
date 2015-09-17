@@ -1,54 +1,35 @@
 """Contains the classes that deal with the different dynamics required in
 different types of ensembles.
 
-Copyright (C) 2013, Joshua More and Michele Ceriotti
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <http.//www.gnu.org/licenses/>.
-
-
 Holds the algorithms required for normal mode propagators, and the objects to
 do the constant temperature and pressure algorithms. Also calculates the
 appropriate conserved energy quantity for the ensemble of choice.
-
-Classes:
-   Ensemble: Base ensemble class with generic methods and attributes.
-   NVEEnsemble: Deals with constant energy dynamics.
-   NVTEnsemble: Deals with constant temperature dynamics.
-   NPTEnsemble: Deals with constant pressure dynamics.
-   ReplayEnsemble: Takes a trajectory, and simply sets the atom positions to
-      match it, rather than doing dynamics. In this way new properties can
-      be calculated on an old simulation, without having to rerun it from
-      scratch.
 """
 
-__all__ = ['Ensemble', 'NVEEnsemble', 'NVTEnsemble', 'NPTEnsemble', 'NSTEnsemble','ReplayEnsemble']
+# This file is part of i-PI.
+# i-PI Copyright (C) 2014-2015 i-PI developers
+# See the "licenses" directory for full license information.
 
-import numpy as np
+
 import time
 from copy import deepcopy
+
+import numpy as np
 
 from ipi.utils.depend import *
 from ipi.utils import units
 from ipi.utils.softexit import softexit
-from ipi.utils.io.io_xyz import read_xyz
-from ipi.utils.io.io_pdb import read_pdb
-from ipi.utils.io.io_xml import xml_parse_file
+from ipi.utils.io.backends.io_xyz import read_xyz
+from ipi.utils.io.backends.io_pdb import read_pdb
+from ipi.utils.io.inputs.io_xml import xml_parse_file
 from ipi.utils.units import Constants, unit_to_internal
 from ipi.inputs.thermostats import InputThermo
 from ipi.inputs.barostats import InputBaro
 from ipi.engine.thermostats import *
 from ipi.engine.barostats import *
+
+
+__all__ = ['Ensemble', 'NVEEnsemble', 'NVTEnsemble', 'NPTEnsemble', 'NSTEnsemble','ReplayEnsemble']
 
 
 class Ensemble(dobject):
@@ -93,14 +74,14 @@ class Ensemble(dobject):
       dset(self, "dt",    depend_value(name='dt',    value=dt))
       dset(self, "eens", depend_value(name='eens', value=eens))
       self.fixcom = fixcom
-      if fixatoms is None: 
+      if fixatoms is None:
          self.fixatoms = np.zeros(0,int)
       else:
          self.fixatoms = fixatoms
 
 
-   def bind(self, beads, nm, cell, bforce, prng):
-      """Binds beads, cell, bforce and prng to the ensemble.
+   def bind(self, beads, nm, cell, bforce, bbias, prng):
+      """Binds beads, cell, bforce, bbias and prng to the ensemble.
 
       This takes a beads object, a cell object, a forcefield object and a
       random number generator object and makes them members of the ensemble.
@@ -123,6 +104,7 @@ class Ensemble(dobject):
       self.beads = beads
       self.cell = cell
       self.forces = bforce
+      self.bias = bbias
       self.prng = prng
       self.nm = nm
 
@@ -134,6 +116,7 @@ class Ensemble(dobject):
 
       dget(self,"econs").add_dependency(dget(self.beads, "kin"))
       dget(self,"econs").add_dependency(dget(self.forces, "pot"))
+      dget(self,"econs").add_dependency(dget(self.bias, "pot"))
       dget(self,"econs").add_dependency(dget(self.beads, "vpath"))
       dget(self,"econs").add_dependency(dget(self, "eens"))
       self.pconstraints() # applies momentum constraints to initial configurations
@@ -165,11 +148,12 @@ class Ensemble(dobject):
       ensembles.
       """
       eham = self.beads.vpath*self.nm.omegan2 + self.nm.kin + self.forces.pot
+      eham += self.bias.pot # bias
       return eham + self.eens
 
    def pconstraints(self):
-      pass      
-      
+      pass
+
 
 
 class NVEEnsemble(Ensemble):
@@ -241,11 +225,13 @@ class NVEEnsemble(Ensemble):
             bp[self.fixatoms*3]=0.0
             bp[self.fixatoms*3+1]=0.0
             bp[self.fixatoms*3+2]=0.0
-               
+
    def pstep(self):
       """Velocity Verlet momenta propagator."""
 
       self.beads.p += depstrip(self.forces.f)*(self.dt*0.5)
+      # also adds the bias force
+      self.beads.p += depstrip(self.bias.f)*(self.dt*0.5)
 
    def qcstep(self):
       """Velocity Verlet centroid position propagator."""
@@ -306,7 +292,7 @@ class NVTEnsemble(NVEEnsemble):
       else:
          self.thermostat = thermostat
 
-   def bind(self, beads, nm, cell, bforce, prng):
+   def bind(self, beads, nm, cell, bforce, bbias, prng):
       """Binds beads, cell, bforce and prng to the ensemble.
 
       This takes a beads object, a cell object, a forcefield object and a
@@ -327,12 +313,12 @@ class NVTEnsemble(NVEEnsemble):
             generation.
       """
 
-      super(NVTEnsemble,self).bind(beads, nm, cell, bforce, prng)
-      
+      super(NVTEnsemble,self).bind(beads, nm, cell, bforce, bbias, prng)
+
       fixdof = len(self.fixatoms)*3*self.beads.nbeads
       if self.fixcom:
          fixdof += 3
-      
+
 
       # first makes sure that the thermostat has the correct temperature, then proceed with binding it.
       deppipe(self,"ntemp", self.thermostat,"temp")
@@ -348,7 +334,7 @@ class NVTEnsemble(NVEEnsemble):
 
       self.ttime = -time.time()
       self.thermostat.step()
-      self.pconstraints() 
+      self.pconstraints()
       self.ttime += time.time()
 
       self.ptime = -time.time()
@@ -424,7 +410,8 @@ class NPTEnsemble(NVTEnsemble):
          self.pext = pext
       else: self.pext = 0.0
 
-   def bind(self, beads, nm, cell, bforce, prng):
+
+   def bind(self, beads, nm, cell, bforce, bbias, prng):
       """Binds beads, cell, bforce and prng to the ensemble.
 
       This takes a beads object, a cell object, a forcefield object and a
@@ -450,14 +437,14 @@ class NPTEnsemble(NVTEnsemble):
       if self.fixcom:
          fixdof = 3
 
-      super(NPTEnsemble,self).bind(beads, nm, cell, bforce, prng)
+      super(NPTEnsemble,self).bind(beads, nm, cell, bforce, bbias, prng)
       self.barostat.bind(beads, nm, cell, bforce, prng=prng, fixdof=fixdof)
 
 
       deppipe(self,"ntemp", self.barostat, "temp")
       deppipe(self,"dt", self.barostat, "dt")
       deppipe(self,"pext", self.barostat, "pext")
-      dget(self,"econs").add_dependency(dget(self.barostat, "ebaro"))      
+      dget(self,"econs").add_dependency(dget(self.barostat, "ebaro"))
 
    def get_econs(self):
       """Calculates the conserved energy quantity for the constant pressure
@@ -479,8 +466,8 @@ class NPTEnsemble(NVTEnsemble):
 
       self.ttime = -time.time()
       self.thermostat.step()
-      self.barostat.thermostat.step()  
-      self.pconstraints()    
+      self.barostat.thermostat.step()
+      self.pconstraints()
       self.ttime += time.time()
 
       self.ptime = -time.time()
@@ -551,7 +538,7 @@ class NSTEnsemble(NVTEnsemble):
       else: self.stressext = 0.0
 
 
-   def bind(self, beads, nm, cell, bforce, prng):
+   def bind(self, beads, nm, cell, bforce, bbias, prng):
       """Binds beads, cell, bforce and prng to the ensemble.
 
          This takes a beads object, a cell object, a forcefield object and a
@@ -577,8 +564,8 @@ class NSTEnsemble(NVTEnsemble):
       if self.fixcom:
          fixdof = 3
 
-      super(NSTEnsemble,self).bind(beads, nm, cell, bforce, prng)
-      self.barostat.bind(beads, nm, cell, bforce, prng=prng, fixdof=fixdof)
+      super(NSTEnsemble,self).bind(beads, nm, cell, bforce, bbias, prng)
+      self.barostat.bind(beads, nm, cell, bforce, bbias, prng=prng, fixdof=fixdof)
 
 
       deppipe(self,"ntemp", self.barostat, "temp")
@@ -607,8 +594,8 @@ class NSTEnsemble(NVTEnsemble):
 
       self.ttime = -time.time()
       self.thermostat.step()
-      self.barostat.thermostat.step()     
-      self.pconstraints() 
+      self.barostat.thermostat.step()
+      self.pconstraints()
       self.ttime += time.time()
 
       self.ptime = -time.time()
@@ -634,6 +621,10 @@ class NSTEnsemble(NVTEnsemble):
 
 class ReplayEnsemble(Ensemble):
    """Ensemble object that just loads snapshots from an external file in sequence.
+
+   Takes a trajectory, and simply sets the atom positions to match it, rather
+   than doing dynamics. In this way new properties can be calculated on an old
+   simulation, without having to rerun it from scratch.
 
    Has the relevant conserved quantity and normal mode propagator for the
    constant energy ensemble. Note that a temperature of some kind must be
@@ -676,9 +667,11 @@ class ReplayEnsemble(Ensemble):
       self.ptime = self.ttime = 0
       self.qtime = -time.time()
 
-      try:         
-         self.rstep += 1
-         if (self.intraj.mode == "xyz"):            
+
+      while True:
+       self.rstep += 1
+       try:
+         if (self.intraj.mode == "xyz"):
             for b in self.beads:
                myatoms = read_xyz(self.rfile)
                myatoms.q *= unit_to_internal("length",self.intraj.units,1.0)
@@ -702,7 +695,7 @@ class ReplayEnsemble(Ensemble):
             self.cell.h[:] = mycell.h
             self.beads.q[:] = mybeads.q
             softexit.trigger(" # Read single checkpoint")
-      except EOFError:
+       except EOFError:
          softexit.trigger(" # Finished reading re-run trajectory")
-      if (step!=None and self.rstep<=step): self.step(step) 
+       if (step==None or self.rstep>step): break
       self.qtime += time.time()
