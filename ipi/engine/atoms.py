@@ -25,33 +25,33 @@ class Atom(dobject):
    This is actually only an interface to the Atoms class, i.e. only stores
    views of the large arrays which contain all the coordinates.
 
-   **Depend objects**
+   Attributes:
+      kin: The kinetic energy of the atom.
+      kstress: The contribution of the atom to the kinetic stress tensor.
 
-   :p: The three components of the momentum of the atom.
-   :q: The three components of the position of the atom.
-   :m: The mass of the atom.
-   :name: The name of the atom.
-   :m3: An array of 3 elements with each element being the mass of the atom.
-        Used when each degree of freedom needs to be divided by the mass.
+   Depend objects:
+      p: The three components of the momentum of the atom.
+      q: The three components of the position of the atom.
+      m: The mass of the atom.
+      name: The name of the atom.
+      m3: An array of 3 elements with each element being the mass of the atom.
+         Used when each degree of freedom needs to be divided by the mass.
    """
 
    def __init__(self, system, index):
       """Initialises Atom.
 
-      Arguments
-
-      `system`
-          An Atoms object containing the required atom.
-      `index`
-          An integer giving the index of the required atom in the atoms
-          list. Note that indices start from 0.
+      Args:
+         system: An Atoms object containing the required atom.
+         index: An integer giving the index of the required atom in the atoms
+            list. Note that indices start from 0.
       """
 
-      dset(self, "p", system.p[3*index:3*index+3])
-      dset(self, "q", system.q[3*index:3*index+3])
-      dset(self, "m", system.m[index:index+1])
-      dset(self, "name", system.names[index:index+1])
-      dset(self, "m3", system.m3[3*index:3*index+3])
+      dset(self,"p",system.p[3*index:3*index+3])
+      dset(self,"q",system.q[3*index:3*index+3])
+      dset(self,"m",system.m[index:index+1])
+      dset(self,"name",system.names[index:index+1])
+      dset(self,"m3",system.m3[3*index:3*index+3])
 
    @property
    def kin(self):
