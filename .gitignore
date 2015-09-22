@@ -10,3 +10,4 @@ bin/i-pi-driver
 *.tex
 *.pdf
 *~
+_build
