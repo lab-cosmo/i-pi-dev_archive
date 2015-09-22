@@ -39,13 +39,13 @@ class Ensemble(dobject):
    ensemble classes.
 
    Attributes:
-      beads: A beads object giving the atoms positions.
-      cell: A cell object giving the system box.
+      beads (Beads): A beads object giving the atoms positions.
+      cell (Cell): A cell object giving the system box.
       forces: A forces object giving the virial and the forces acting on
          each bead.
       prng: A random number generator object.
       nm: An object which does the normal modes transformation.
-      fixcom: A boolean which decides whether the centre of mass
+      fixcom (bool): A boolean which decides whether the centre of mass
          motion will be constrained or not.
 
    Depend objects:
