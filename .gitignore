@@ -8,6 +8,5 @@ bin/i-pi-driver
 *.out
 *.o
 *.tex
-*.pdf
 *~
 _build
