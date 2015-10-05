@@ -19,25 +19,33 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
-.PHONY: all
+.PHONY: all modules clean
 
-SOURCES=$(shell ls *.f90)
-FLAGS=-O3 -Wall
-MODULES=distance.f90 LJ.f90 SG.f90
-OBJECTS=$(SOURCES:.f90=.o) sockets.o
-all: modules sockets.o driver.x
-
-modules: $(MODULES)
-	gfortran $(FLAGS) -c $(MODULES)
+FLAGS=-g -O3 -Wall
+CFLAGS=$(FLAGS)
+FFLAGS=$(FLAGS) -ffree-line-length-none -ffixed-line-length-none -Wno-maybe-uninitialized
+MODULES=distance.f90 LJ.f90 SG.f90 
+PES=pes/zundel.f pes/morse.f pes/qtip4pf.f
+OBJECTS=$(MODULES:%.f90=%.o) $(PES:%.f=%.o)
+FC=gfortran
+CC=gcc
+all: driver.x driver_pure.x
 
 sockets.o: sockets.c
-	gcc $(FLAGS) -c -o sockets.o sockets.c
+	$(CC) $(CFLAGS) -c -o sockets.o sockets.c
 
-driver.x: $(OBJECTS)
-	gfortran $(FLAGS) -o driver.x $(OBJECTS)
+driver.x: $(OBJECTS) sockets.o fsockets.o driver.o | $(OBJECTS)
+	$(FC) $(FFLAGS) -o driver.x $^
+	ln -s ../drivers/driver.x ../bin/i-pi-driver
 
+driver_pure.x: $(OBJECTS) fsockets_pure.o driver.o | $(OBJECTS)
+	$(FC) $(FFLAGS) -o driver_pure.x $^
+	
 %.o: %.f90
-	gfortran $(FLAGS) -c $<
+	$(FC) $(FFLAGS) -c $< -o $@
 
+%.o: %.f
+	$(FC) $(FFLAGS) -c $< -o $@
+	
 clean:
-	rm *.o *.mod *.x
+	rm -f *.o *.mod *.x ../bin/i-pi-driver
