@@ -6,3 +6,5 @@ This folder contains examples for running DFTB+ as the backend of i-PI.
 Examples exploit fairly advanced features of i-PI, including replica exchange,
 threaded execution, and the evaluation of isotope fractionation estimators.
 
+The examples with the suffix "plumed2" exploit the bias engine of i-PI using
+PLUMED2 as backend.  
