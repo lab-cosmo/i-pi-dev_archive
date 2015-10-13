@@ -237,10 +237,11 @@ class Properties(dobject):
                        "func": (lambda: self.ensemble.temp) },
       "bias_potential":  {  "dimension": "energy",
                        "help" : "The bias energy",
+                       "longhelp": """The bias energy. With the optional argument 'bead' will print the potential associated with the specified bead.""",
                        "func": (lambda bead="-1": 0 if self.ensemble.bias is None else self.ensemble.bias.pot/self.beads.nbeads if int(bead)<0 else self.forces.pots[int(bead)]) },
       "ensemble_logweight":  {  "dimension": "",
                        "help" : "The (log) weight of the configuration in the biassed ensemble",
-                       "func": (lambda: 0 if self.ensemble.bias is None else self.ensemble.bias.pot/(Constants.kb*self.ensemble.temp)) },
+                       "func": (lambda bead="-1": 0 if self.ensemble.bias is None else self.ensemble.bias.pot/self.beads.nbeads/(Constants.kb*self.ensemble.temp) if int(bead)<0 else self.forces.pots[int(bead)]/(Constants.kb*self.ensemble.temp)) },
       "pot_component": {  "dimension" : "energy",
                       "help": "The contribution to the system potential from one of the force components. ",
                        "longhelp":  """The contribution to the system potential from one of the force components. Takes one mandatory 
