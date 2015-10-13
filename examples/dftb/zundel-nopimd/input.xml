@@ -4,31 +4,20 @@
          <slots>4</slots>
          <port>20614</port>
          <timeout>  6.00000000e+02</timeout>
-         <address>dftb-zundel</address>
+         <address>dftb-zundel-nobias</address>
    </ffsocket>
-   <ffsocket mode='unix' name='bias'>
-     <latency>  1.00000000e-02</latency>
-     <slots>4</slots>
-     <port>20614</port>
-     <timeout>  6.00000000e+02</timeout>
-     <address>bias-zundel</address>
-   </ffsocket>
-   <total_steps>40000</total_steps>
+   <total_steps>100000</total_steps>
    <output prefix="data">
       <trajectory stride="2" filename="pos" cell_units="angstrom">positions{angstrom}</trajectory>
       <trajectory stride="2" filename="xc" format="xyz">x_centroid{angstrom}</trajectory>
-      <!-- <trajectory stride="2" filename="bias" format="xyz">f_bias</trajectory> -->
-      <properties stride="2"> [ step, time, conserved, temperature{kelvin}, kinetic_cv, potential, bias_potential, ensemble_logweight ] </properties>
-      <properties stride="2" filename="bias"> [ step, time, bias_potential, ensemble_logweight ] </properties>
+      <properties stride="2"> [ step, time, conserved, temperature{kelvin}, kinetic_cv, 
+            potential] </properties>
    </output>
    <prng>
       <seed>18885</seed>
    </prng>
    <system>
-     <bias><force>bias</force></bias>
-     <forces> <force name="driver" >driver</force> </forces>
-     <!-- <forces> <force name="driver" weight=".5" >driver</force> <force weight=".5">bias</force> </forces> -->
-     <!-- <forces> <force name="driver">bias</force></forces> -->
+      <forces> <force name="driver">driver</force></forces>
       <initialize nbeads="1">
         <file mode="xyz" units="angstrom">./zundel.xyz</file>
         <cell>

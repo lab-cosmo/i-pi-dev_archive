@@ -1,4 +1,4 @@
 DISTANCE ATOMS=1,2 LABEL=oo
 
-RESTRAINT ARG=oo AT=0.8 KAPPA=5000.0 LABEL=restraint
-PRINT ARG=oo,restraint.bias
+RESTRAINT ARG=oo AT=0.3 KAPPA=200.0 LABEL=restraint
+#PRINT ARG=oo,restraint.bias
