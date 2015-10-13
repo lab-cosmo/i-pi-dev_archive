@@ -237,7 +237,7 @@ class Properties(dobject):
                        "func": (lambda: self.ensemble.temp) },
       "bias_potential":  {  "dimension": "energy",
                        "help" : "The bias energy",
-                       "func": (lambda: 0 if self.ensemble.bias is None else self.ensemble.bias.pot  ) },
+                       "func": (lambda bead="-1": self.forces.pot/self.beads.nbeads if int(bead)<0 else self.forces.pots[int(bead)])},
       "ensemble_logweight":  {  "dimension": "",
                        "help" : "The (log) weight of the configuration in the biassed ensemble",
                        "func": (lambda: 0 if self.ensemble.bias is None else self.ensemble.bias.pot/(Constants.kb*self.ensemble.temp)) },
