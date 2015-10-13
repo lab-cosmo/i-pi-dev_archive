@@ -33,7 +33,7 @@ Hamiltonian = DFTB{
    } 
    SCC = Yes 
    SlaterKosterFiles = Type2FileNames{ 
-      Prefix = ../dftb/dftb-param/ 
+      Prefix = ../dftb-param/ 
       Separator = "-" 
       Suffix = ".skf" 
    } 
