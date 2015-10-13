@@ -7,7 +7,7 @@ prepares them for output.
 # See the "licenses" directory for full license information.
 
 
-import os, threading
+import os
 
 import numpy as np
 
@@ -237,7 +237,7 @@ class Properties(dobject):
                        "func": (lambda: self.ensemble.temp) },
       "bias_potential":  {  "dimension": "energy",
                        "help" : "The bias energy",
-                       "func": (lambda bead="-1": self.forces.pot/self.beads.nbeads if int(bead)<0 else self.forces.pots[int(bead)])},
+                       "func": (lambda bead="-1": 0 if self.ensemble.bias is None else self.ensemble.bias.pot/self.beads.nbeads if int(bead)<0 else self.forces.pots[int(bead)]) },
       "ensemble_logweight":  {  "dimension": "",
                        "help" : "The (log) weight of the configuration in the biassed ensemble",
                        "func": (lambda: 0 if self.ensemble.bias is None else self.ensemble.bias.pot/(Constants.kb*self.ensemble.temp)) },
@@ -451,13 +451,13 @@ class Properties(dobject):
                           "size" : 3,
                           'func': self.get_chin_correction,
                           "help": "The weighting factor in Suzuki-Chin 4th-order PI expansion.",
-                          "longhelp" : """The 3 numbers output are 1) the logarithm of the weighting factor -beta_P delta H,
+                          "longhelp" : """The 3 numbers output are 1) the logarithm of the weighting factor -\beta_P \delta H,
                       2) the square of the logarithm, and 3) the weighting factor""" } ,
        "ti_weight":  {"dimension" : "undefined",
                           "size" : 3,
                           'func': self.get_ti_correction,
                           "help": "The weighting factor in Takahashi-Imada 4th-order PI expansion.",
-                          "longhelp" : """The 3 numbers output are 1) the logarithm of the weighting factor -beta_P delta H,
+                          "longhelp" : """The 3 numbers output are 1) the logarithm of the weighting factor -\beta_P \delta H,
                       2) the square of the logarithm, and 3) the weighting factor""" } ,
        "ti_pot":  {"dimension" : "undefined",
                           "size" : 1,
@@ -510,7 +510,6 @@ class Properties(dobject):
       self.dbeads = system.beads.copy()
       self.dforces = Forces()
       self.dforces.bind(self.dbeads, self.cell,  system.fproto, self.simul.fflist)
-      self._threadlock = threading.Lock()
 
    def __getitem__(self, key):
       """Retrieves the item given by key.
@@ -542,20 +541,10 @@ class Properties(dobject):
       #pkey["func"](*arglist,**kwarglist) gives the value of the property
       #in atomic units. unit_to_user() returns the value in the user
       #specified units.
-      
-      # ensures thread safety - only one property per system can be computed at a given time
-      if self.simul.threaded:
-         self._threadlock.acquire()
-         try:
-            pval = pkey["func"](*arglist,**kwarglist)
-         finally:
-            self._threadlock.release()
-      else: pval = pkey["func"](*arglist,**kwarglist)
-      
       if "dimension" in pkey and unit != "":
-         return unit_to_user(pkey["dimension"], unit, pval)
+         return unit_to_user(pkey["dimension"], unit, pkey["func"](*arglist,**kwarglist))
       else:
-         return pval
+         return pkey["func"](*arglist,**kwarglist)
 
    def tensor2vec(self, tensor):
       """Takes a 3*3 symmetric tensor and returns it as a 1D array,
@@ -1053,7 +1042,7 @@ class Properties(dobject):
 
          if (fd_delta < 0 and abs((vplus + vminus)/(v0*2) - 1.0) > self._DEFAULT_FDERROR and dbeta > self._DEFAULT_MINFID):
             dbeta *= 0.5
-            warning("Reducing displacement in Yamamoto kinetic estimator", verbosity.low)
+            info("Reducing displacement in Yamamoto kinetic estimator", verbosity.low)
             continue
          else:
             eps = ((1.0 + dbeta)*vplus - (1.0 - dbeta)*vminus)/(2*dbeta)
