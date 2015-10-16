@@ -1,0 +1,52 @@
+Geometry = GenFormat { 
+     <<< "zundel.gen"
+} 
+ 
+# Driver = Ipi {
+# 	Port=37016
+#  	Host="dftb-zundel"
+# 	isUnix = Yes
+# 	Verbosity = 1
+#    }
+Driver = Socket {
+    File = "dftb-zundel"
+    Verbosity = 0 # quiet
+    Protocol = i-PI {} # i-PI interface
+    MaxSteps = 100000 # Terminate this instance fairly quickly
+}
+
+
+Hamiltonian = DFTB{ 
+   ReadInitialCharges = No
+   MaxSCCIterations = 500
+   Charge = 1 
+   DampXH = Yes 
+   DampXHExponent = 4.0 
+   Eigensolver = RelativelyRobust{} 
+   HubbardDerivs = { 
+      H = -0.1857 
+      O = -0.1492
+   } 
+   MaxAngularMomentum = { 
+      H = "s" 
+      O = "p"
+   } 
+   SCC = Yes 
+   SlaterKosterFiles = Type2FileNames{ 
+      Prefix = ../dftb-param/ 
+      Separator = "-" 
+      Suffix = ".skf" 
+   } 
+   ThirdOrderFull = Yes 
+   Filling = Fermi{
+	Temperature[K] = 300
+	}
+   KPointsAndWeights[absolute] = {
+      0.0 0.0 0.0 1.0
+   }
+} 
+Options { 
+   WriteResultsTag = No
+   WriteDetailedOut = No
+#   WriteBandOut = No
+} 

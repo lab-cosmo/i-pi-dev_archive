@@ -1,0 +1,2 @@
+The output_?.x always return the ? number for all forces and the same number for the potential energy. 
+This stuff is used only for debugging purposes.
