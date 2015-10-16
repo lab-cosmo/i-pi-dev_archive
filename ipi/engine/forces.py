@@ -275,7 +275,7 @@ class ForceComponent(dobject):
          Depends on each replica's ufvx list.
    """
 
-   def __init__(self, ffield="", nbeads=0, weight=1.0, name=""):
+   def __init__(self, ffield="", nbeads=0, weight=1.0, name="", paratemp_bias=False):
       """Initializes ForceComponent
 
       Args:
@@ -293,6 +293,10 @@ class ForceComponent(dobject):
       self.name = name
       self.nbeads = nbeads
       self.weight = weight
+      print('PARATEMP_BIAS:', paratemp_bias)
+      if paratemp_bias:
+         print('DENTRO!!!')
+         dset(self, "weight",  depend_value(name="system_bias", value=weight ))
 
    def bind(self, beads, cell, fflist):
       """Binds beads, cell and force to the forcefield.
@@ -454,7 +458,7 @@ class Forces(dobject):
       vir: The sum of the virial tensor of the replicas.
    """
 
-   def bind(self, beads, cell, force_proto, fflist):
+   def bind(self, beads, cell, force_proto, fflist, paratemp_bias=False):
       """Binds beads, cell and forces to the forcefield.
 
 
@@ -472,6 +476,7 @@ class Forces(dobject):
       self.natoms = beads.natoms
       self.nbeads = beads.nbeads
       self.nforces = len(force_proto)
+      self.paratemp = paratemp_bias
 
       # fflist should be a dictionary of forcefield objects
       self.mforces = []      
@@ -492,7 +497,7 @@ class Forces(dobject):
          # if the number of beads for this force component is unspecified,
          # assume full force evaluation
          if newb == 0: newb = beads.nbeads
-         newforce = ForceComponent(ffield=fc.ffield, name=fc.name, nbeads=newb, weight=fc.weight)
+         newforce = ForceComponent(ffield=fc.ffield, name=fc.name, nbeads=newb, weight=fc.weight, paratemp_bias=paratemp_bias)
          newbeads = Beads(beads.natoms, newb)
          newrpc = nm_rescale(beads.nbeads, newb)
 

@@ -232,8 +232,6 @@ class NVEEnsemble(Ensemble):
       self.beads.p += depstrip(self.forces.f)*(self.dt*0.5)
       # also adds the bias force
       self.beads.p += depstrip(self.bias.f)*(self.dt*0.5)
-      print('BBBBB', self.bias.f, self.bias.mforces[0].weight)
-      print('CCCCC', self.forces.f, self.forces.mforces[0].weight)
 
    def qcstep(self):
       """Velocity Verlet centroid position propagator."""
@@ -358,6 +356,8 @@ class NVTEnsemble(NVEEnsemble):
       self.thermostat.step()
       self.pconstraints()
       self.ttime += time.time()
+
+      print ('KKKK', self, self.bias.mforces[0].weight, self.bias.pot)
 
    def get_econs(self):
       """Calculates the conserved energy quantity for constant temperature

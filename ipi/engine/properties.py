@@ -241,7 +241,16 @@ class Properties(dobject):
                        "func": (lambda bead="-1": 0 if self.ensemble.bias is None else self.ensemble.bias.pot/self.beads.nbeads if int(bead)<0 else self.forces.pots[int(bead)]) },
       "ensemble_logweight":  {  "dimension": "",
                        "help" : "The (log) weight of the configuration in the biassed ensemble",
-                       "func": (lambda bead="-1": 0 if self.ensemble.bias is None else self.ensemble.bias.pot/self.beads.nbeads/(Constants.kb*self.ensemble.temp) if int(bead)<0 else self.forces.pots[int(bead)]/(Constants.kb*self.ensemble.temp)) },
+                       "func": (lambda bead="-1": 0 if self.ensemble.bias is None else self.ensemble.bias.pot/self.beads.nbeads/(Constants.kb*self.ensemble.temp) if int(bead)<0 else self.ensemble.bias.pots[int(bead)]/(Constants.kb*self.ensemble.temp)) },
+      "atom_b": {     "dimension" : "force",
+                      "help": "The bias force (x,y,z) acting on a particle given its index.",
+                      "longhelp": """The bias force (x,y,z) acting on a particle given its index. Takes arguments index
+                      and bead (both zero based). If bead is not specified, refers to the centroid.""",
+                      "size" : 3,
+                      "func" : (lambda atom="", bead="-1": self.get_atom_vec(self.ensemble.bias.f, atom=atom, bead=bead))},
+      "bias_w": {       "dimension": "",
+                      "help": "Weight of bias.",
+                      'func': (lambda: self.ensemble.bias.mforces[0].weight)},
       "pot_component": {  "dimension" : "energy",
                       "help": "The contribution to the system potential from one of the force components. ",
                        "longhelp":  """The contribution to the system potential from one of the force components. Takes one mandatory 

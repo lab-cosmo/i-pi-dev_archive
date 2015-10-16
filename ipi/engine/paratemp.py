@@ -101,9 +101,10 @@ class ParaTemp(dobject):
          dget(s.ensemble,"temp").add_dependency(dget(self,"system_temp"))
          dget(s.ensemble,"temp")._func = make_tempgetter(isys)
          for mforce in s.bias.mforces:
-            print 'AAA', mforce
-         dget(mforce, "weight").add_dependency(dget(self,"system_bias"))
-         dget(mforce,"weight")._func = make_biasgetter(isys)
+            print 'AAA', mforce.weight
+            dget(mforce, "weight").add_dependency(dget(self,"system_bias"))
+            dget(mforce,"weight")._func = make_biasgetter(isys)
+            print 'AAA1', mforce.weight
          isys+=1
          
       self.parafile=open("PARATEMP", "a")

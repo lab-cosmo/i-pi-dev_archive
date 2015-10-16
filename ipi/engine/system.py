@@ -26,7 +26,6 @@ from ipi.utils.softexit import softexit
 from ipi.engine.atoms import *
 from ipi.engine.cell import *
 from ipi.engine.forces import Forces
-from ipi.engine.bias import Bias
 from ipi.engine.properties import Properties, Trajectories
 
 
@@ -87,7 +86,7 @@ class System(dobject):
       self.forces = Forces()
 
       self.bproto = bias_proto
-      self.bias = Bias()
+      self.bias = Forces()
       
       self.properties = Properties()
       self.trajs = Trajectories()
