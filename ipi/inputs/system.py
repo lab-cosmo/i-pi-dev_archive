@@ -19,6 +19,7 @@ from ipi.utils.io     import *
 from ipi.utils.io.inputs.io_xml import *
 from ipi.utils.messages import verbosity
 from ipi.inputs.forces import InputForces
+from ipi.inputs.bias import InputBias
 from ipi.inputs.beads import InputBeads
 from ipi.inputs.cell import InputCell
 from ipi.inputs.ensembles import InputEnsemble
@@ -60,7 +61,7 @@ class InputSystem(Input):
              "initialize" : (InputInitializer, { "help" : InputInitializer.default_help,
                                                 "default" : input_default(factory=Initializer) } ),
              "forces" :   (InputForces,    { "help"  : InputForces.default_help }),
-             "bias" :   (InputForces,    { "help"  : InputForces.default_help, 
+             "bias" :   (InputBias,    { "help"  : InputForces.default_help, 
                                            "default" : [] }),
              "ensemble": (InputEnsemble, { "help"  : InputEnsemble.default_help } ),
              "beads" :   (InputBeads, { "help"     : InputBeads.default_help,

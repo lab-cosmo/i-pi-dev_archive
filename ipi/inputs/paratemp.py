@@ -23,6 +23,8 @@ class InputParaTemp(Input):
       temp_list: The list of temperatures for the replicas. Must match
           the size of the system list.
       stride: How often -- on average -- an exchange should be made.
+      bias_list: Weights for the bias on the different replicas. Must
+          match the size of the system list.
    """
 
 
@@ -38,6 +40,11 @@ class InputParaTemp(Input):
                                       "default"      : 0.0,
                                       "help"         : "Every how often to try exchanges (on average)."
                                       }),
+           "bias_list" : (InputArray, {"dtype": float,
+                                       "default" : input_default(factory=np.zeros, args=(0,)),
+                                       "help"    : "List of weights to apply to the bias in the replicas"
+                                      }),
+                                       
          }
 
    default_help = "Contains all the options for a parallel tempering simulation."
@@ -57,9 +64,10 @@ class InputParaTemp(Input):
       self.temp_list.store(pt.temp_list)
       self.temp_index.store(pt.temp_index)
       self.stride.store(pt.stride)
+      self.bias_list.store(pt.bias_list)
 
 
    def fetch(self):
       """Creates a ParaTemp object based on the input parameters."""
 
-      return ParaTemp(self.temp_list.fetch(), self.temp_index.fetch(), self.stride.fetch())
+      return ParaTemp(self.temp_list.fetch(), self.temp_index.fetch(), self.stride.fetch(), self.bias_list.fetch())

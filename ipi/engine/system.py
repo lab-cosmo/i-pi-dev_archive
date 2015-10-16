@@ -26,6 +26,7 @@ from ipi.utils.softexit import softexit
 from ipi.engine.atoms import *
 from ipi.engine.cell import *
 from ipi.engine.forces import Forces
+from ipi.engine.bias import Bias
 from ipi.engine.properties import Properties, Trajectories
 
 
@@ -86,12 +87,11 @@ class System(dobject):
       self.forces = Forces()
 
       self.bproto = bias_proto
-      self.bias = Forces()
-
-
+      self.bias = Bias()
+      
       self.properties = Properties()
       self.trajs = Trajectories()
-
+      
    def bind(self, simul):
       """Calls the bind routines for all the objects in the system."""
 
@@ -100,7 +100,7 @@ class System(dobject):
       # binds important computation engines
       self.nm.bind(self.beads, self.ensemble)
       self.forces.bind(self.beads, self.cell, self.fproto, self.simul.fflist)
-      self.bias.bind(self.beads, self.cell, self.bproto, self.simul.fflist)
+      self.bias.bind(self.beads, self.cell, self.bproto, self.simul.fflist, paratemp_bias=True)
       self.ensemble.bind(self.beads, self.nm, self.cell, self.forces, self.bias, self.prng)
 
       self.init.init_stage2(self)

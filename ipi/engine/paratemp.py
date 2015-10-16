@@ -40,12 +40,13 @@ class ParaTemp(dobject):
       system_temp: The actual temperatures of the various systems
    """
 
-   def __init__(self, tlist=None, ilist=None, stride=0.0):
+   def __init__(self, tlist=None, ilist=None, stride=0.0, blist=None):
       """Initializes ParaTemp object.
 
       Parameters:
          tlist: List of temperatures to be copied in temp_list
          stride: Exchange stride, to be copied in stride
+         blist: Weights of the bias to be copied in bias_list
       """
 
       self.stride = stride
@@ -53,16 +54,24 @@ class ParaTemp(dobject):
          tlist = []
       if ilist is None or len(ilist)==0:
          ilist = range(len(tlist))   # defaults to normal ordering of temperatures
-
+      if blist is None:
+         blist = np.zeros_like(tlist)
+         
       if len(ilist)!= len(tlist):
          raise ValueError("Temperature list and index list have mismatching sizes.")
+      if len(blist)!= len(tlist):
+         raise ValueError("Bias list and index list have mismatching sizes.")
 
       dset(self, "temp_index",depend_array(name="temp_index", value=np.asarray(ilist, int).copy()) )
       self.temp_list = np.asarray(tlist, float).copy()
+      self.bias_list = np.asarray(blist, float).copy()
 
       dset(self,"system_temp",depend_array(name="system_temp", value=np.asarray(tlist).copy(), func=self.get_stemp,
                   dependencies=[dget(self,"temp_index")]))
 
+      dset(self,"system_bias",depend_array(name="system_bias", value=np.asarray(blist).copy(), func=self.get_sbias,
+                  dependencies=[dget(self,"temp_index")]))
+      
       self.parafile = None
 
    def bind(self, slist, prng):
@@ -72,6 +81,9 @@ class ParaTemp(dobject):
 
       self.prng=prng
       self.slist = slist
+      # Retrieve the list of all the bias from the system list
+      self.blist = map(lambda x: x.bias, self.slist)
+      print(self.blist)
       if len(slist)!=len(self.temp_list):
          raise ValueError("Number of systems does not match size of list of temperatures.")
 
@@ -80,13 +92,20 @@ class ParaTemp(dobject):
       def make_tempgetter(k):
          return lambda: self.system_temp[k]
 
+      def make_biasgetter(k):
+         return lambda: self.system_bias[k]
+
       # every time system_temp is changed the temperatures of individual systems will be updated
       isys=0
       for s in self.slist:
          dget(s.ensemble,"temp").add_dependency(dget(self,"system_temp"))
          dget(s.ensemble,"temp")._func = make_tempgetter(isys)
+         for mforce in s.bias.mforces:
+            print 'AAA', mforce
+         dget(mforce, "weight").add_dependency(dget(self,"system_bias"))
+         dget(mforce,"weight")._func = make_biasgetter(isys)
          isys+=1
-
+         
       self.parafile=open("PARATEMP", "a")
 
    def get_stemp(self):
@@ -94,12 +113,20 @@ class ParaTemp(dobject):
 
       return np.asarray([ self.temp_list[self.temp_index[i]] for i in range(len(self.temp_list))])
 
+   def get_sbias(self):
+      """ Returns the bias weight of the various systems. """
+
+      return np.asarray([ self.bias_list[self.temp_index[i]] for i in range(len(self.bias_list))])
+
    def swap(self, step=-1):
       """ Tries a PT swap move. """
 
+      print self.bias_list
       if self.stride <= 0.0: return
 
       syspot  = [ s.forces.pot for s in self.slist ]
+      sysbiaspot = [ s.bias.pot for s in self.slist ]
+#      sysbiaswgt = [ s.bias.weight for s in self.slist ]
       # spring potential in a form that can be easily used further down (no temperature included!)
       syspath = [ s.beads.vpath/Constants.hbar**2 for s in self.slist ]
 
@@ -116,10 +143,10 @@ class ParaTemp(dobject):
 
 
             pxc = np.exp(
-              (betai * syspot[i] + syspath[i]/betai +
-               betaj * syspot[j] + syspath[j]/betaj) -
-              (betai * syspot[j] + syspath[j]/betai +
-               betaj * syspot[i] + syspath[i]/betaj)
+              (betai * (syspot[i] + sysbiaspot[i]) + syspath[i]/betai +
+               betaj * (syspot[j] + sysbiaspot[j]) + syspath[j]/betaj) -
+              (betai * (syspot[j] + sysbiaspot[j]) + syspath[j]/betai +
+               betaj * (syspot[i] + sysbiaspot[i]) + syspath[i]/betaj)
               )
 
             if (pxc > self.prng.u): # really does the exchange
@@ -143,7 +170,6 @@ class ParaTemp(dobject):
                   self.slist[j].ensemble.thermostat.s *= np.sqrt(betaj/betai)
 
                swp=self.temp_index[j];  self.temp_index[j]=self.temp_index[i];  self.temp_index[i]=swp
-
 
    def softexit(self):
       if not self.parafile is None:

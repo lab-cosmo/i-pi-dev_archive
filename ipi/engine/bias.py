@@ -25,11 +25,11 @@ from ipi.utils.nmtransform import nm_rescale
 from ipi.engine.beads import Beads
 
 
-__all__ = ['Forces', 'ForceComponent']
+__all__ = ['Bias', 'BiasComponent']
 
 
 fbuid = 0
-class ForceBead(dobject):
+class BiasBead(dobject):
    """Base force helper class.
 
    This is the object that computes forces for a single bead. This is the last
@@ -67,7 +67,7 @@ class ForceBead(dobject):
    """
 
    def __init__(self):
-      """Initialises ForceBead."""
+      """Initialises BiasBead."""
 
       # ufvx is a list [ u, f, vir, extra ]  which stores the results of the force calculation
       dset(self,"ufvx", depend_value(name="ufvx", func=self.get_all))
@@ -76,7 +76,7 @@ class ForceBead(dobject):
       self._getallcount = 0
 
    def bind(self, atoms, cell, ff):
-      """Binds atoms, cell and a forcefield template to the ForceBead object.
+      """Binds atoms, cell and a forcefield template to the BiasBead object.
 
       Args:
          atoms: The Atoms object from which the atom positions are taken.
@@ -133,7 +133,7 @@ class ForceBead(dobject):
    def queue(self):
       """Sends the job to the interface queue directly.
 
-      Allows the ForceBead object to ask for the ufvx list of each replica
+      Allows the BiasBead object to ask for the ufvx list of each replica
       directly without going through the get_all function. This allows
       all the jobs to be sent at once, allowing them to be parallelized.
       """
@@ -246,7 +246,7 @@ class ForceBead(dobject):
       return self.ufvx[3]
 
 
-class ForceComponent(dobject):
+class BiasComponent(dobject):
    """Computes one component (e.g. bonded interactions) of the force.
 
    Deals with splitting the bead representation into
@@ -275,8 +275,8 @@ class ForceComponent(dobject):
          Depends on each replica's ufvx list.
    """
 
-   def __init__(self, ffield="", nbeads=0, weight=1.0, name=""):
-      """Initializes ForceComponent
+   def __init__(self, ffield="", nbeads=0, weight=1.0, name="", paratemp_bias=False):
+      """Initializes BiasComponent
 
       Args:
          ffield: A model to be used to create the forcefield objects for all
@@ -293,6 +293,11 @@ class ForceComponent(dobject):
       self.name = name
       self.nbeads = nbeads
       self.weight = weight
+      print(paratemp_bias)
+      if paratemp_bias:
+         print('DENTRO!!!')
+         dset(self, "weight",  depend_value(name="system_bias", value=weight ))
+      
 
    def bind(self, beads, cell, fflist):
       """Binds beads, cell and force to the forcefield.
@@ -313,18 +318,18 @@ class ForceComponent(dobject):
       # stores a copy of the number of atoms and of beads
       self.natoms = beads.natoms
       if (self.nbeads != beads.nbeads):
-         raise ValueError("Binding together a Beads and a ForceBeads objects with different numbers of beads")
+         raise ValueError("Binding together a Beads and a BiasBeads objects with different numbers of beads")
 
       # creates an array of force objects, which are bound to the beads
       #and the cell
       if not self.ffield in fflist:
-         raise ValueError("Force component name '" + self.ffield + "' is not in the forcefields list")
+         raise ValueError("Bias component name '" + self.ffield + "' is not in the forcefields list")
 
       self.ff = fflist[self.ffield]
 
       self._forces = [];
       for b in range(self.nbeads):
-         new_force = ForceBead()
+         new_force = BiasBead()
          new_force.bind(beads[b], cell, self.ff)
          self._forces.append(new_force)
 
@@ -426,7 +431,7 @@ class ForceComponent(dobject):
       return vir
 
 
-class Forces(dobject):
+class Bias(dobject):
    """Class that gathers all the forces together.
 
    Collects many forcefield instances and parallelizes getting the forces
@@ -435,7 +440,7 @@ class Forces(dobject):
    Attributes:
       natoms: An integer giving the number of atoms.
       nbeads: An integer giving the number of beads.
-      nforces: An integer giving the number of ForceBeads objects.
+      nforces: An integer giving the number of BiasBeads objects.
       mforces: A list of all the forcefield objects.
       mbeads: A list of all the beads objects. Some of these may be contracted
          ring polymers, with a smaller number of beads than of the simulation.
@@ -454,7 +459,7 @@ class Forces(dobject):
       vir: The sum of the virial tensor of the replicas.
    """
 
-   def bind(self, beads, cell, force_proto, fflist):
+   def bind(self, beads, cell, force_proto, fflist, paratemp_bias=False):
       """Binds beads, cell and forces to the forcefield.
 
 
@@ -472,6 +477,7 @@ class Forces(dobject):
       self.natoms = beads.natoms
       self.nbeads = beads.nbeads
       self.nforces = len(force_proto)
+      self.paratemp = paratemp_bias
 
       # fflist should be a dictionary of forcefield objects
       self.mforces = []      
@@ -492,7 +498,7 @@ class Forces(dobject):
          # if the number of beads for this force component is unspecified,
          # assume full force evaluation
          if newb == 0: newb = beads.nbeads
-         newforce = ForceComponent(ffield=fc.ffield, name=fc.name, nbeads=newb, weight=fc.weight)
+         newforce = BiasComponent(ffield=fc.ffield, name=fc.name, nbeads=newb, weight=fc.weight, paratemp_bias=self.paratemp)
          newbeads = Beads(beads.natoms, newb)
          newrpc = nm_rescale(beads.nbeads, newb)
 
