@@ -76,6 +76,7 @@ def read_json(filedesc, **kwargs):
     atoms.q = np.asarray(line[8])
     atoms.names = np.asarray(line[9], dtype='|S4')
     atoms.m = np.asarray(map(Elements.mass, atoms.names))
+    comment = line[7]
 
     a = float(line[1])
     b = float(line[2])
@@ -89,7 +90,7 @@ def read_json(filedesc, **kwargs):
     return {
         "atoms": atoms,
         "cell": cell,
-        "comment": ""
+        "comment": comment
     }
 
 
