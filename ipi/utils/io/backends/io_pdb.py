@@ -111,9 +111,12 @@ def read_pdb(filedesc, readcell=False):
     """
 
     header = filedesc.readline()
-    if "TITLE" in header:
-        # skip the comment field
+    if header.startswith("TITLE"):
+        # read the comment field
         header = filedesc.readline()
+        comment = header.strip("TITLE   ").rstrip("\n")
+    else:
+        comment = ""
     if header == "":
         raise EOFError("End of file or empty header in PDB file")
 
@@ -156,6 +159,7 @@ def read_pdb(filedesc, readcell=False):
     return {
         "atoms": atoms,
         "cell": cell,
+        "comment": comment
     }
 
 

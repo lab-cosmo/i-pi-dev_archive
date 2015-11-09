@@ -47,21 +47,26 @@ def print_xyz_path(beads, cell, filedesc=sys.stdout):
             filedesc.write("%8s %12.5e %12.5e %12.5e\n" % (lab[i], qs[j][3*i], qs[j][3*i+1], qs[j][3*i+2]))
 
 
-def print_xyz(atoms, cell, filedesc=sys.stdout, title=""):
+def print_xyz(atoms, cell, filedesc=sys.stdout, title="", append_title=True):
     """Prints an atomic configuration into an XYZ formatted file.
 
     Args:
         atoms: An atoms object giving the centroid positions.
         cell: A cell object giving the system box.
         filedesc: An open writable file object. Defaults to standard output.
-        title: This gives a string to be appended to the comment line.
+        title: This gives a string to be (possibly) appended to the comment line.
+        append_title: If True, title is appended, otherwise it is the whole comment.
     """
 
     a, b, c, alpha, beta, gamma = mt.h2abc_deg(cell.h)
 
     natoms = atoms.natoms
-    fmt_header = "%d\n# CELL(abcABC): %10.5f  %10.5f  %10.5f  %10.5f  %10.5f  %10.5f  %s\n"
-    filedesc.write(fmt_header % (natoms, a, b, c, alpha, beta, gamma, title))
+    if append_title:
+        fmt_header = "%d\n# CELL(abcABC): %10.5f  %10.5f  %10.5f  %10.5f  %10.5f  %10.5f  %s\n"
+        filedesc.write(fmt_header % (natoms, a, b, c, alpha, beta, gamma, title))
+    else:
+        fmt_header = "%d\n%s\n"
+        filedesc.write(fmt_header % title)
     # direct access to avoid unnecessary slow-down
     qs = depstrip(atoms.q)
     lab = depstrip(atoms.names)
@@ -70,7 +75,7 @@ def print_xyz(atoms, cell, filedesc=sys.stdout, title=""):
 
 
 def read_xyz(filedesc, **kwargs):
-    """Readss an XYZ-style file with i-pi style comments and creates an Atoms and Cell object
+    """Reads an XYZ-style file with i-PI style comments and creates an Atoms and Cell object
 
     Args:
         filedesc: An open readable file object from a xyz formatted file with i-PI header comments.
@@ -84,7 +89,7 @@ def read_xyz(filedesc, **kwargs):
     if natoms == "":
         raise EOFError("The file descriptor hit EOF.")
     natoms = int(natoms)
-    comment = filedesc.readline()
+    comment = filedesc.readline().rstrip("\n")
     reabc = re.compile('# CELL.abcABC.: (.*) Traj').search(comment)
     regenh = re.compile('# CELL.GENH.: (.*) Traj').search(comment)
     reh = re.compile('# CELL.H.: (.*) Traj').search(comment)
@@ -153,6 +158,7 @@ def read_xyz(filedesc, **kwargs):
     return {
         "atoms": atoms,
         "cell": cell,
+        "comment": comment
     }
 
 
@@ -168,7 +174,7 @@ def iter_xyz(filedesc):
     """
 
     try:
-        while 1:
+        while True:
             yield read_xyz(filedesc)
     except EOFError:
         pass

@@ -58,7 +58,7 @@ def print_json(atoms, cell, filedesc=sys.stdout, title=""):
 
 
 def read_json(filedesc, **kwargs):
-    """Reads a JSON-style file with i-pi style comments and creates an Atoms and Cell object.
+    """Reads a JSON-style file with i-PI style comments and creates an Atoms and Cell object.
 
     Args:
         filedesc: An open readable file object from a json formatted file with i-PI header comments.
@@ -88,7 +88,8 @@ def read_json(filedesc, **kwargs):
 
     return {
         "atoms": atoms,
-        "cell": cell
+        "cell": cell,
+        "comment": ""
     }
 
 
