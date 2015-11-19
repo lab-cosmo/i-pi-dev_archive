@@ -66,7 +66,7 @@ def print_xyz(atoms, cell, filedesc=sys.stdout, title="", append_title=True):
         filedesc.write(fmt_header % (natoms, a, b, c, alpha, beta, gamma, title))
     else:
         fmt_header = "%d\n%s\n"
-        filedesc.write(fmt_header % title)
+        filedesc.write(fmt_header % (natoms, title))
     # direct access to avoid unnecessary slow-down
     qs = depstrip(atoms.q)
     lab = depstrip(atoms.names)
