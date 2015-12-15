@@ -72,7 +72,8 @@ def test_print_pdb():
                 atoms = ret["atoms"]
                 assert len(atoms) == 3
                 assert_equal(pos*(num+1), atoms.q)
-                print_file("xyz", atoms, ret["cell"], filedesc=out)
+                print_file("xyz", atoms, ret["cell"], filedesc=out,
+                           title=ret["comment"])
 
     assert filecmp.cmp(local("test.pos_0.xyz"), local("test.pos_1.xyz"))
     os.unlink(local("test.pos_1.xyz"))
@@ -144,7 +145,8 @@ def test_print_pdb2():
                 atoms = ret["atoms"]
                 assert len(atoms) == 3
                 assert_equal(pos*(num+1), atoms.q)
-                print_file("xyz", atoms, ret["cell"], filedesc=out)
+                print_file("xyz", atoms, ret["cell"], filedesc=out,
+                           title=ret["comment"])
 
     assert filecmp.cmp(local("test.pos_0.xyz"), local("test.pos_1.xyz"))
     os.unlink(local("test.pos_1.xyz"))
