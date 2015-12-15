@@ -369,12 +369,18 @@ class BaroRGB(Barostat):
       # we use a synchronizer to achieve that
 
       sync_baro = synchronizer()
-      dset(self,"p6", depend_array(name='p6', value=np.zeros(6,float),
-          synchro=sync_baro, func={"p" : self.get_3x3to6}
+      dset(self,"p3", depend_array(name='p3', value=np.zeros(3,float),  #HK
+          synchro=sync_baro, func={"p" : self.get_3x3to3}
          ))
       dset(self,"p", depend_array(name='p', value=np.zeros((3,3),float),
-            synchro=sync_baro, func={"p6" : self.get_6to3x3}
-         ))
+            synchro=sync_baro, func={"p3" : self.get_3to3x3}
+         )) #HK
+#        dset(self,"p6", depend_array(name='p6', value=np.zeros(6,float),
+#            synchro=sync_baro, func={"p" : self.get_3x3to6}
+#           ))
+#        dset(self,"p", depend_array(name='p', value=np.zeros((3,3),float),
+#              synchro=sync_baro, func={"p6" : self.get_6to3x3}
+#           ))
 
       if not p is None:
          self.p = p
@@ -417,6 +423,10 @@ class BaroRGB(Barostat):
                                  func=(lambda:np.asarray([self.tau**2*self.beads.natoms*Constants.kb*self.temp])),
                                  dependencies=[ dget(self,"tau"), dget(self,"temp") ] ))
 
+      dset(self,"m3", depend_array(name='m3', value=np.zeros(3,float),
+                                 func=(lambda:np.asarray([1,1,1])*self.m[0]),
+                                 dependencies=[ dget(self,"m")] ))
+
       dset(self,"m6", depend_array(name='m6', value=np.zeros(6,float),
                                  func=(lambda:np.asarray([1,1,1,1,1,1])*self.m[0]),
                                  dependencies=[ dget(self,"m")] ))
@@ -428,7 +438,8 @@ class BaroRGB(Barostat):
                dget(self.h0,"V"), dget(self.h0,"ih"), dget(self,"stressext") ]))
 
       # binds the thermostat to the piston degrees of freedom
-      self.thermostat.bind(pm=[ self.p6, self.m6], prng=prng)
+      #self.thermostat.bind(pm=[ self.p6, self.m6], prng=prng)
+      self.thermostat.bind(pm=[ self.p3, self.m3], prng=prng) #HK
       
       dset(self,"kin",depend_value(name='kin',
             func=(lambda:0.5*np.trace(np.dot(self.p.T,self.p))/self.m[0]),
@@ -439,6 +450,21 @@ class BaroRGB(Barostat):
                            dependencies=[ dget(self, "kin"), dget(self, "pot"),
                            dget(self.cell, "h"), dget(self, "temp"),
                            dget(self.thermostat,"ethermo")] ))
+
+   def get_6to3(self): #HK
+      rp=np.zeros(3,float)
+      rp[0]=self.p6[0]; rp[1]=self.p6[1]; rp[2]=self.p6[2];
+      return rp
+
+   def get_3to3x3(self): #HK
+      rp=np.zeros((3,3),float)
+      rp[0,0]=self.p3[0]; rp[1,1]=self.p3[1]; rp[2,2]=self.p3[2];
+      return rp
+
+   def get_3x3to3(self): #HK
+      rp=np.zeros(3,float)
+      rp[0]=self.p[0,0]; rp[1]=self.p[1,1]; rp[2]=self.p[2,2];
+      return rp
 
    def get_3x3to6(self):
       rp=np.zeros(6,float)
@@ -451,6 +477,7 @@ class BaroRGB(Barostat):
       rp[0,0]=self.p6[0]; rp[1,1]=self.p6[1]; rp[2,2]=self.p6[2];
       rp[0,1]=self.p6[3]; rp[0,2]=self.p6[4]; rp[1,2]=self.p6[5];
       return rp
+
 
    def get_pot(self):
       """Calculates the elastic strain energy of the cell."""
@@ -483,7 +510,6 @@ class BaroRGB(Barostat):
       # This differs from the BZP thermostat in that it uses just one kT in the propagator.
       # This leads to an ensemble equaivalent to Martyna-Hughes-Tuckermann for both fixed and moving COM
       # Anyway, it is a small correction so whatever.
-
       self.p += dthalf*( self.cell.V* np.triu( self.stress - self.beads.nbeads*pi_ext ) +
                            Constants.kb*self.temp*L)
 
@@ -513,4 +539,5 @@ class BaroRGB(Barostat):
          self.nm.qnm[0,3*i:3*(i+1)] += np.dot(np.dot(invert_ut3x3(v),(expq-expp)/(2.0)),depstrip(self.nm.pnm)[0,3*i:3*(i+1)]/m[i])
          self.nm.pnm[0,3*i:3*(i+1)] = np.dot(expp, self.nm.pnm[0,3*i:3*(i+1)])
 
-      self.cell.h = np.dot(expq,self.cell.h)
+      #self.cell.h = np.dot(expq,self.cell.h)
+      self.cell.h = np.diag(np.diag(np.dot(expq,self.cell.h))) #HK: fix to xyz change only
