@@ -9,7 +9,7 @@
     <properties stride='100' filename='mom'> [time, displacedpath(ux=2.0)] </properties>
   </output>
   <system>
-    <initialize nbeads='4'>
+    <initialize nbeads='1'>
       <file mode='pdb'> our_ref.pdb </file>
       <velocities mode='thermal' units='kelvin'>3683.412077</velocities>
     </initialize>

@@ -30,7 +30,7 @@ endef
 
 harmonic:
 	$(IPI) input.xml & sleep 5; \
-	$(call run_driver,4) \
+	$(call run_driver,1) \
 	wait
 
 clean:
