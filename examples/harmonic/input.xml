@@ -6,7 +6,7 @@
   </ffsocket>
   <output prefix='harm'>
     <properties stride='5' filename='out'>  [ step, time{picosecond}, conserved{kelvin}, temperature{kelvin}, kinetic_cv{kelvin}, potential{kelvin}, pressure_cv{megapascal}] </properties>
-    <properties stride='100' filename='mom'> [time, displacedpath(ux=2.0)] </properties>
+<!--    <properties stride='100' filename='mom'> [time, displacedpath(ux=2.0)] </properties> -->
   </output>
   <system>
     <initialize nbeads='1'>
@@ -22,6 +22,7 @@
       </thermostat>
       <timestep units='femtosecond'>0.003</timestep>
       <temperature units='kelvin'>3683.412077</temperature>
+      <fixcom> False </fixcom>
    </ensemble>
   </system>
 </simulation>
