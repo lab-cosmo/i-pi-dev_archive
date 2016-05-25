@@ -178,7 +178,7 @@ class GradientMapper(object):
         g = - self.dforces.f   # Gradient
         counter.count()        # counts number of function evaluations
         return e, g
-
+blablabla
 class DummyOptimizer(dobject):
     """ Dummy class for all optimization classes """
     
