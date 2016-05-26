@@ -195,6 +195,7 @@ class GradientCellMapper(object):
         self.d = None
         self.xold = None
         self.strain = None
+        self.oldcell = None
         
     def bind(self, dumop):
         self.dbeads = dumop.beads.copy()
@@ -202,21 +203,25 @@ class GradientCellMapper(object):
         self.dforces = dumop.forces.copy(self.dbeads, self.dcell)
     
     def transform(self, x):
-        oldcell = self.dcell.h
+        self.oldcell = self.dcell.h.copy()
+        print self.dcell.V
         jacobian = self.dcell.V**(1.0/3.0)*self.dbeads.natoms**(1.0/6.0)
         norm_stress = self.dcell.V/jacobian
         natoms = self.dbeads.natoms
         self.dbeads.q = x[0:natoms*3]
         eps_vec = x[natoms*3:]/jacobian
-        eps = eps_vec.reshape(3,3)
-        unit = np.eye(3)
-        self.dcell.h = np.dot(oldcell, unit + eps)
+        eps = np.reshape(eps_vec, (3,3))
+        print eps
+        #eps = eps_vec.reshape(3,3)
+        unit = np.eye(3,dtype=float)
+        self.dcell.h = np.dot(self.oldcell, unit + eps)
         self.strain = eps_vec
+        return natoms, norm_stress
         
     def __call__(self,x):
         """computes energy and gradient for optimization step"""
-        
-        transform(x)
+
+        natoms, norm_stress = self.transform(x)
         e = self.dforces.pot   # Energy
         g = np.zeros((natoms + 3)*3, float)
         g[0:natoms*3] = - self.dforces.f
@@ -280,7 +285,24 @@ class DummyOptimizer(dobject):
                 self.invhessian = np.eye(self.beads.q.size, self.beads.q.size, 0, float)
             else:
                 raise ValueError("Inverse Hessian size does not match system size")
-        '''        
+        ''' 
+        
+        if self.old_f.shape != self.beads.q.size+9:
+            if self.old_f.size == 0:
+                self.old_f = np.zeros(self.beads.q.size+9, float)
+            else:
+                raise ValueError("Conjugate gradient force size does not match system size")
+        if self.old_d.size != self.beads.q.size+9:
+            if self.old_d.size == 0:
+                self.old_d = np.zeros(self.beads.q.size+9, float)
+            else:
+                raise ValueError("Conjugate gradient direction size does not match system size")
+        if self.invhessian.size != ((self.beads.q.size+9) * (self.beads.q.size+9)):
+            if self.invhessian.size == 0:
+                self.invhessian = np.eye(self.beads.q.size+9, self.beads.q.size+9, 0, float)
+            else:
+                raise ValueError("Inverse Hessian size does not match system size")
+          
     def exitstep(self, fx, u0, x):
         """ Exits the simulation step. Computes time, checks for convergence. """
         
@@ -309,7 +331,7 @@ class DummyOptimizer(dobject):
                 and ((np.amax(np.absolute(forces)) <= self.tolerances["force"])
                     or (np.sqrt(np.dot(forces.flatten() - self.old_f.flatten(),
                         forces.flatten() - self.old_f.flatten())) == 0.0))\
-                and (x <= self.tolerances["position"]):
+                and (x <= self.tolerances["position"]) and (self.strain <= self.tolerances["position"]):
             info("Total number of function evaluations: %d" % counter.func_eval, verbosity.debug)
             softexit.trigger("Geometry optimization converged. Exiting simulation")
 
@@ -332,6 +354,7 @@ class BFGSCellOptimizer(DummyOptimizer):
         
         natoms = self.beads.natoms
         jacobian = self.cell.V**(1.0/3.0)*natoms**(1.0/6.0)
+        print jacobian
         norm_stress = self.cell.V/jacobian
         
         # Initialize approximate Hessian inverse to the identity and direction
@@ -348,7 +371,7 @@ class BFGSCellOptimizer(DummyOptimizer):
             self.gmc.xold[0:natoms*3] = self.beads.q.copy()
             h=self.cell.h.copy()
             self.gmc.xold[natoms*3:] = h.flatten()
-            self.strain = np.zeros((3,3), float)
+            self.strain = np.zeros(9, float)
             
         # Current energy and forces
         u0 = self.forces.pot.copy()
@@ -359,9 +382,10 @@ class BFGSCellOptimizer(DummyOptimizer):
 
         # Store previous forces
         self.old_f[:] = forces
-        oldcell[:] = self.cell.h
+        self.gmc.oldcell = np.zeros((3,3),float)
+        self.gmc.oldcell = self.cell.h.copy()
         
-        qcell = zeros((natoms+3)*3, float)
+        qcell = np.zeros((natoms+3)*3, float)
         qcell[0:natoms*3] = self.beads.q #COPY?
         qcell[natoms*3:] = self.strain
         
@@ -373,16 +397,16 @@ class BFGSCellOptimizer(DummyOptimizer):
                 itmax=self.ls_options["iter"])
                 
         # x = current position - previous position; use for exit tolerance
-        x = np.amax(np.absolute(np.subtract(qcell, self.gmc.xold)))
+        x = np.amax(np.absolute(np.subtract(qcell[0:natoms*3], self.gmc.xold[0:natoms*3])))
         
         
         self.beads.q = qcell[0:natoms*3]
         eps_vec = qcell[natoms*3:]/jacobian
-        eps = eps_vec.reshape(3,3)
-        unit = np.eye(3)
-        self.dcell.h = np.dot(oldcell, unit + eps)
+        eps = np.reshape(eps_vec, (3,3))
+        #eps = eps_vec.reshape(3,3)
+        unit = np.eye(3, dtype=float)
+        self.cell.h = np.dot(self.gmc.oldcell, unit + eps)
         self.strain = eps_vec
-        self.cell.h = h.reshape(3,3)
         
         # Store old position
         self.gmc.xold[:] = qcell
