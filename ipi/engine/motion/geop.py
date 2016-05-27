@@ -215,6 +215,7 @@ class GradientCellMapper(object):
         #eps = eps_vec.reshape(3,3)
         unit = np.eye(3,dtype=float)
         self.dcell.h = np.dot(self.oldcell, unit + eps)
+        print unit + eps, self.oldcell
         self.strain = eps_vec
         return natoms, norm_stress
         
@@ -331,7 +332,7 @@ class DummyOptimizer(dobject):
                 and ((np.amax(np.absolute(forces)) <= self.tolerances["force"])
                     or (np.sqrt(np.dot(forces.flatten() - self.old_f.flatten(),
                         forces.flatten() - self.old_f.flatten())) == 0.0))\
-                and (x <= self.tolerances["position"]) and (self.strain <= self.tolerances["position"]):
+                and (x <= self.tolerances["position"]) and (np.amax(np.absolute(self.strain)) <= self.tolerances["position"]):
             info("Total number of function evaluations: %d" % counter.func_eval, verbosity.debug)
             softexit.trigger("Geometry optimization converged. Exiting simulation")
 
@@ -369,8 +370,8 @@ class BFGSCellOptimizer(DummyOptimizer):
             # store actual position to previous position
             self.gmc.xold = np.zeros((natoms+3)*3, float)
             self.gmc.xold[0:natoms*3] = self.beads.q.copy()
-            h=self.cell.h.copy()
-            self.gmc.xold[natoms*3:] = h.flatten()
+            #h=self.cell.h.copy()
+            #self.gmc.xold[natoms*3:] = h.flatten()
             self.strain = np.zeros(9, float)
             
         # Current energy and forces
@@ -399,7 +400,7 @@ class BFGSCellOptimizer(DummyOptimizer):
         # x = current position - previous position; use for exit tolerance
         x = np.amax(np.absolute(np.subtract(qcell[0:natoms*3], self.gmc.xold[0:natoms*3])))
         
-        
+        #NECESSARY? stays the same?
         self.beads.q = qcell[0:natoms*3]
         eps_vec = qcell[natoms*3:]/jacobian
         eps = np.reshape(eps_vec, (3,3))
