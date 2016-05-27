@@ -204,18 +204,16 @@ class GradientCellMapper(object):
     
     def transform(self, x):
         self.oldcell = self.dcell.h.copy()
-        print self.dcell.V
         jacobian = self.dcell.V**(1.0/3.0)*self.dbeads.natoms**(1.0/6.0)
         norm_stress = self.dcell.V/jacobian
         natoms = self.dbeads.natoms
         self.dbeads.q = x[0:natoms*3]
         eps_vec = x[natoms*3:]/jacobian
         eps = np.reshape(eps_vec, (3,3))
-        print eps
         #eps = eps_vec.reshape(3,3)
         unit = np.eye(3,dtype=float)
         self.dcell.h = np.dot(self.oldcell, unit + eps)
-        print unit + eps, self.oldcell
+        #print 'UNIT + EPSILON', unit + eps, 'OLDCELL', self.oldcell
         self.strain = eps_vec
         return natoms, norm_stress
         
@@ -227,6 +225,7 @@ class GradientCellMapper(object):
         g = np.zeros((natoms + 3)*3, float)
         g[0:natoms*3] = - self.dforces.f
         g[natoms*3:] = - self.dforces.vir.flatten()*norm_stress
+        print 'GradientMapper', g[natoms*3:]
         counter.count()        # counts number of function evaluations
         return e, g          
 
@@ -326,6 +325,7 @@ class DummyOptimizer(dobject):
         info(" @GEOP: Updating bead positions", verbosity.debug)
         
         self.qtime += time.time()
+        print 'BLUB'
         
         # Determine conditions for converged relaxation
         if ((fx - u0) / (self.beads.natoms+3) <= self.tolerances["energy"])\
@@ -355,7 +355,7 @@ class BFGSCellOptimizer(DummyOptimizer):
         
         natoms = self.beads.natoms
         jacobian = self.cell.V**(1.0/3.0)*natoms**(1.0/6.0)
-        print jacobian
+        print 'Jacobian', jacobian
         norm_stress = self.cell.V/jacobian
         
         # Initialize approximate Hessian inverse to the identity and direction
@@ -379,6 +379,7 @@ class BFGSCellOptimizer(DummyOptimizer):
         forces = np.zeros((natoms+3)*3,float)
         forces[0:natoms*3] = self.forces.f
         forces[natoms*3:] = self.forces.vir.flatten()*norm_stress
+        print 'Gradient', -forces[natoms*3:]
         du0 = - forces
 
         # Store previous forces
@@ -399,12 +400,13 @@ class BFGSCellOptimizer(DummyOptimizer):
                 
         # x = current position - previous position; use for exit tolerance
         x = np.amax(np.absolute(np.subtract(qcell[0:natoms*3], self.gmc.xold[0:natoms*3])))
-        
+
         #NECESSARY? stays the same?
+        #print 'QCELL', qcell
         self.beads.q = qcell[0:natoms*3]
         eps_vec = qcell[natoms*3:]/jacobian
         eps = np.reshape(eps_vec, (3,3))
-        #eps = eps_vec.reshape(3,3)
+        eps = eps_vec.reshape(3,3)
         unit = np.eye(3, dtype=float)
         self.cell.h = np.dot(self.gmc.oldcell, unit + eps)
         self.strain = eps_vec
