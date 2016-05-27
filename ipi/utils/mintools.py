@@ -537,13 +537,11 @@ def BFGS(x0, d0, fdf, fdf0=None, invhessian=None, big_step=100, tol=1.0e-6, itma
         invhessian = invhessian + np.outer(xi, xi) * fac - np.outer(hdg, hdg) * fad + np.outer(dg, dg) * fae        
         info(" @MINIMIZE: Updated hessian", verbosity.debug)
     else:
-        print 'direction x gradient insufficient'
         info(" @MINIMIZE: Skipped hessian update; direction x gradient insufficient", verbosity.debug)
     
     # Update direction
     xi = np.dot(invhessian, -g)
     info(" @MINIMIZE: Updated search direction", verbosity.debug)
-    print 'NOW'
     return (x, fx, xi, invhessian)
 
 # L-BFGS algorithm with approximate line search

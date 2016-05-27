@@ -207,6 +207,7 @@ class GradientCellMapper(object):
         jacobian = self.dcell.V**(1.0/3.0)*self.dbeads.natoms**(1.0/6.0)
         norm_stress = self.dcell.V/jacobian
         natoms = self.dbeads.natoms
+        print 'X during optimization', x
         self.dbeads.q = x[0:natoms*3]
         eps_vec = x[natoms*3:]/jacobian
         eps = np.reshape(eps_vec, (3,3))
@@ -225,7 +226,6 @@ class GradientCellMapper(object):
         g = np.zeros((natoms + 3)*3, float)
         g[0:natoms*3] = - self.dforces.f
         g[natoms*3:] = - self.dforces.vir.flatten()*norm_stress
-        print 'GradientMapper', g[natoms*3:]
         counter.count()        # counts number of function evaluations
         return e, g          
 
@@ -379,7 +379,6 @@ class BFGSCellOptimizer(DummyOptimizer):
         forces = np.zeros((natoms+3)*3,float)
         forces[0:natoms*3] = self.forces.f
         forces[natoms*3:] = self.forces.vir.flatten()*norm_stress
-        print 'Gradient', -forces[natoms*3:]
         du0 = - forces
 
         # Store previous forces
@@ -397,7 +396,7 @@ class BFGSCellOptimizer(DummyOptimizer):
                 self.gmc.d, self.gmc, fdf0=(u0, du0), invhessian=self.invhessian,
                 big_step=self.big_step, tol=self.ls_options["tolerance"],
                 itmax=self.ls_options["iter"])
-                
+        
         # x = current position - previous position; use for exit tolerance
         x = np.amax(np.absolute(np.subtract(qcell[0:natoms*3], self.gmc.xold[0:natoms*3])))
 
