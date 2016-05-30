@@ -499,8 +499,7 @@ def BFGS(x0, d0, fdf, fdf0=None, invhessian=None, big_step=100, tol=1.0e-6, itma
     big_step = big_step * max(np.sqrt(linesum), n)
 
     # Perform approximate line minimization in direction d0
-    x, fx, dfx = min_approx(fdf, x0, fdf0, xi, big_step, tol, itmax) 
-
+    x, fx, dfx = min_approx(fdf, x0, fdf0, xi, big_step, tol, itmax)
     info(" @MINIMIZE: Started BFGS", verbosity.debug)
 
     # Update line direction (xi) and current point (x0)
@@ -542,6 +541,7 @@ def BFGS(x0, d0, fdf, fdf0=None, invhessian=None, big_step=100, tol=1.0e-6, itma
     # Update direction
     xi = np.dot(invhessian, -g)
     info(" @MINIMIZE: Updated search direction", verbosity.debug)
+    print 'x BFGS', x[0]
     return (x, fx, xi, invhessian)
 
 # L-BFGS algorithm with approximate line search
