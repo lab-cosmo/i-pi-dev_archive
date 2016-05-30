@@ -406,7 +406,6 @@ def min_approx(fdf, x0, fdf0=None, d0=None, big_step=100.0, tol=1.0e-6, itmax=10
         x = np.add(x0, (alam * d0))
         fx, dfx = fdf(x)
         info(" @MINIMIZE: Calculated energy", verbosity.debug)
-        
         # Check for convergence on change in x
         if alam < alamin:
             x = x0
