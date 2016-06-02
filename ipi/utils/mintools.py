@@ -395,7 +395,8 @@ def min_approx(fdf, x0, fdf0=None, d0=None, big_step=100.0, tol=1.0e-6, itmax=10
         info(" @MINIMIZE: Warning -- gradient is >= 0 (%f)" % slope, verbosity.low)
 
     test = np.amax(np.divide(np.absolute(d0.flatten()), np.maximum(np.absolute(x0.flatten()), np.ones(n))))
-
+    #test2 = np.divide(np.absolute(d0.flatten()), np.maximum(np.absolute(x0.flatten()), np.ones(n)))
+    #test = np.amax(test2[0:-9])
     # Setup to try Newton step first
     alamin = tol / test
     alam = 1.0
@@ -408,15 +409,16 @@ def min_approx(fdf, x0, fdf0=None, d0=None, big_step=100.0, tol=1.0e-6, itmax=10
         info(" @MINIMIZE: Calculated energy", verbosity.debug)
         # Check for convergence on change in x
         if alam < alamin:
+            print 'BLA'
             x = x0
             info(" @MINIMIZE: Convergence in position, exited line search", verbosity.debug)
             return (x, fx, dfx)
-
+            
         # Sufficient function decrease
-        elif fx <= (f0 + alf * alam * slope):
+        elif fx <= (f0 +alf * alam * slope):
             info(" @MINIMIZE: Sufficient function decrease, exited line search", verbosity.debug)
+            print 'BLUB'
             return (x, fx, dfx)
-
         # No convergence; backtrack
         else:
             info(" @MINIMIZE: No convergence on step; backtrack to find point", verbosity.debug)
