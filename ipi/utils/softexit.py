@@ -100,7 +100,6 @@ class Softexit(object):
 
       sys.exit()
 
-
    def start(self, timeout=0.0):
       """Starts the softexit monitoring loop.
 
@@ -120,6 +119,19 @@ class Softexit(object):
       self._kill[signal.SIGTERM] = signal.signal(signal.SIGTERM, self._kill_handler)
       self._thread.start()
       self.register_thread(self._thread, self._doloop)
+
+   def check_exit_file(self, fn_exit="EXIT"):
+      """Trigger an early exit if the exit file `fn_exit` exists."""
+
+      if os.path.exists(fn_exit):
+         os.remove(fn_exit)
+         self.trigger(" @SOFTEXIT: Exit file detected: {:s}".format(fn_exit))
+
+   def check_timeout(self):
+      """Trigger an early exit if maximum wall clock run time has elapsed."""
+
+      if (self.timeout > 0) and (self.timeout < time.time()):
+         self.trigger(" @SOFTEXIT: Maximum wallclock time elapsed.")
 
    def _kill_handler(self, signal, frame):
       """Deals with handling a kill call gracefully.
@@ -149,13 +161,8 @@ class Softexit(object):
 
       while self._doloop[0]:
          time.sleep(SOFTEXITLATENCY)
-         if os.path.exists("EXIT"):
-            self.trigger(" @SOFTEXIT: EXIT file detected.")
-            break
-
-         if (self.timeout>0 and self.timeout<time.time()):
-            self.trigger(" @SOFTEXIT: Maximum wallclock time elapsed.")
-            break
+         self.check_exit_file()
+         self.check_timeout()
 
 
 softexit = Softexit()

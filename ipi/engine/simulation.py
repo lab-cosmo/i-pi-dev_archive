@@ -311,12 +311,11 @@ class Simulation(dobject):
                 #info(" # MD diagnostics: V: %10.5e    Kcv: %10.5e   Ecns: %10.5e" %
                 #     (self.properties["potential"], self.properties["kinetic_cv"], self.properties["conserved"] ) )
 
-            if os.path.exists("EXIT"):
-                info(" # EXIT file detected! Bye bye!", verbosity.low)
-                break
-
-            if (self.ttime > 0) and (time.time() - simtime > self.ttime):
-                info(" # Wall clock time expired! Bye bye!", verbosity.low)
-                break
+            # Check for exit files also here. This can have shorter latency
+            # than the regular check and also can stop at specific step.
+            # TODO: This does not continue smoothly from the RESTART when EXIT
+            # is found, but EXIT_step seems fine.
+            softexit.check_exit_file()
+            softexit.check_exit_file("EXIT_{:d}".format(self.step))
 
         self.rollback = False
