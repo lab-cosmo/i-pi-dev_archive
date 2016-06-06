@@ -17,5 +17,5 @@ fix  1 all ipi driver 1234 unix
 thermo_style custom step temp press cpu pxx pyy pzz pxy pxz pyz ke pe etotal vol lx ly lz atoms
 thermo_modify flush yes
 thermo 1
-run 100
+run 1999999999
 #log /dev/stdout

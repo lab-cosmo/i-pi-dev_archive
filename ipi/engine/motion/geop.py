@@ -171,11 +171,10 @@ class GradientMapper(object):
         self.dcell = dumop.cell.copy()
         self.dforces = dumop.forces.copy(self.dbeads, self.dcell)
         
-    def __call__(self,x,y):
+    def __call__(self,x):
         """computes energy and gradient for optimization step"""
         
         self.dbeads.q = x
-        self.dcell.h = y
         e = self.dforces.pot   # Energy
         g = - self.dforces.f   # Gradient
         counter.count()        # counts number of function evaluations
@@ -226,6 +225,23 @@ class GradientCellMapper(object):
         print 'Strain during BFGS steps', self.strain
         return natoms
         
+    def transformcell(self, x):
+        self.oldcell = self.dcell.h.copy()
+        natoms = self.dbeads.natoms
+        self.dqcell = x
+        eps_vec = x/self.jacobian
+        eps = np.reshape(eps_vec, (3,3))
+        #print eps
+        #eps = np.array([[1.0 + eps_vec[0], 0.5 * eps_vec[1], 0.5 * eps_vec[2]],
+        #                [0.5 * eps_vec[1], 1.0 + eps_vec[4], 0.5 * eps_vec[5]],
+        #                [0.5 * eps_vec[2], 0.5 * eps_vec[5], 1.0 + eps_vec[8]]])
+        unit = np.eye(3,dtype=float)
+        self.dcell.h = np.dot(self.oldcell, unit + eps)
+        #self.dcell.h = np.dot(self.oldcell, eps)
+        self.strain = eps_vec
+        print 'Strain during BFGS steps', self.strain
+        return natoms
+            
     def __call__(self,x):
         """computes energy and gradient for optimization step"""
         
@@ -237,8 +253,8 @@ class GradientCellMapper(object):
         stresscomp[1,0] = stresscomp[0,1]
         stresscomp[2,0] = stresscomp[0,2]
         stresscomp[2,1] = stresscomp[1,2]
-        g[natoms*3:] = -stresscomp.flatten()*self.norm_stress
-        #g[natoms*3:] = - self.dforces.vir.flatten()*self.norm_stress
+        g[natoms*3:] = -stresscomp.flatten()/self.dcell.V*self.norm_stress
+        #g[natoms*3:] = - self.dforces.vir.flatten()*self.norm_stress/self.dcell.V
         counter.count()        # counts number of function evaluations
         return e, g          
 
@@ -280,7 +296,6 @@ class DummyOptimizer(dobject):
         self.qcell = geop.qcell
         self.jacobian = self.cell.V**(1.0/3.0)*self.beads.natoms**(1.0/6.0)
         self.norm_stress = -self.cell.V/self.jacobian
-        #self.norm_stress = -1.0/self.jacobian
 
         self.lm.bind(self)
         self.gm.bind(self)
@@ -304,7 +319,7 @@ class DummyOptimizer(dobject):
             else:
                 raise ValueError("Inverse Hessian size does not match system size")
         ''' 
-        
+
         if self.old_f.shape != self.beads.q.size+9:
             if self.old_f.size == 0:
                 self.old_f = np.zeros(self.beads.q.size+9, float)
@@ -320,7 +335,23 @@ class DummyOptimizer(dobject):
                 self.invhessian = np.eye(self.beads.q.size+9, self.beads.q.size+9, 0, float)
             else:
                 raise ValueError("Inverse Hessian size does not match system size")
-          
+        '''
+        if self.old_f.shape != 9:
+            if self.old_f.size == 0:
+                self.old_f = np.zeros(9, float)
+            else:
+                raise ValueError("Conjugate gradient force size does not match system size")
+        if self.old_d.size != 9:
+            if self.old_d.size == 0:
+                self.old_d = np.zeros(9, float)
+            else:
+                raise ValueError("Conjugate gradient direction size does not match system size")
+        if self.invhessian.size != (9 * 9):
+            if self.invhessian.size == 0:
+                self.invhessian = np.eye(9, 9, 0, float)
+            else:
+                raise ValueError("Inverse Hessian size does not match system size")
+        '''
     def exitstep(self, fx, u0, x):
         """ Exits the simulation step. Computes time, checks for convergence. """
         
@@ -343,14 +374,13 @@ class DummyOptimizer(dobject):
         info(" @GEOP: Updating bead positions", verbosity.debug)
         
         self.qtime += time.time()
-        
         # Determine conditions for converged relaxation
         if ((fx - u0) / (self.beads.natoms+3) <= self.tolerances["energy"])\
                 and ((np.amax(np.absolute(forces)) <= self.tolerances["force"])
                     or (np.sqrt(np.dot(forces.flatten() - self.old_f.flatten(),
                         forces.flatten() - self.old_f.flatten())) == 0.0))\
-                and (x <= self.tolerances["position"]) and (np.amax(np.absolute(self.gmc.strain)) <= self.tolerances["position"]):
-            info("Total number of function evaluations: %d" % counter.func_eval, verbosity.debug)
+                and (x <= self.tolerances["position"]): #and (np.amax(np.absolute(self.gmc.strain)) <= self.tolerances["position"])
+            info("Total number of function evaluations: %d" % counter.func_eval, verbosity.low)
             softexit.trigger("Geometry optimization converged. Exiting simulation")
 
 
@@ -376,8 +406,151 @@ class TestVirial(DummyOptimizer):
                 
         softexit.trigger('Blablabla')
        
-'''        
+
+
+class TestBFGS(DummyOptimizer):
+    
+    def step(self, step=None):
         
+        self.ptime = 0.0
+        self.ttime = 0.0
+        self.qtime = -time.time()
+        
+        natoms = self.beads.natoms
+        print 'step', step
+        if step == 0:
+            forces = np.zeros((natoms+3)*3, float)
+            forces[natoms*3] = 1.0*self.norm_stress
+            g = -forces
+            self.gmc.strain = np.zeros(9, float)
+            self.gmc.xold = np.zeros((natoms+3)*3, float)
+            self.gmc.xold[0:natoms*3] = self.beads.q.copy()
+            self.gmc.oldcell = self.cell.h.copy()
+            
+        print 'qcell', self.qcell, 'cell', self.cell.h, 'strain', self.gmc.strain
+        
+        if step > 0:
+            forces = np.zeros((natoms+3)*3, float)
+            #forces[natoms*3:] = self.forces.vir.copy()/self.cell.V
+            stresscomp = self.forces.vir.copy()/self.cell.V
+            stresscomp[1,0] = stresscomp[0,1]
+            stresscomp[2,0] = stresscomp[0,2]
+            stresscomp[2,1] = stresscomp[1,2]
+            forces[natoms*3:] = stresscomp.flatten()*self.norm_stress
+            g = -forces/ np.sqrt(np.dot(forces.flatten(), forces.flatten()))
+         
+        self.qcell[0:natoms*3] = self.beads.q
+        self.qcell[natoms*3:] = self.gmc.strain*self.jacobian
+        
+        alam = 1.0
+        self.qcell = self.qcell + alam*g
+        self.beads.q = self.qcell[0:natoms*3]
+        eps_vec = self.qcell[natoms*3:]/self.jacobian
+        unit = np.eye(3, dtype=float)
+        eps = np.reshape(eps_vec, (3,3))
+        self.cell.h = np.dot(self.gmc.oldcell,unit+eps)
+        self.gmc.strain = eps_vec
+        
+        self.gmc.xold[:] = self.qcell
+        self.gmc.oldcell = self.cell.h.copy()
+        
+        print self.beads.q, self.gmc.strain
+        print 'newcell', self.cell.h
+        
+        self.qtime += time.time()
+        
+        if step == 2:
+            softexit.trigger('Teststep')
+'''
+       
+class CellOptimizer(DummyOptimizer):
+
+    def step(self, step=None):
+        """ Does one simulation time step.
+            Attributes:
+            ptime: The time taken in updating the velocities.
+            qtime: The time taken in updating the positions.
+            ttime: The time taken in applying the thermostat steps.
+        """
+
+        self.ptime = 0.0
+        self.ttime = 0.0
+        self.qtime = -time.time()
+
+        info("\nMD STEP %d" % step, verbosity.debug)
+        # Initialize approximate Hessian inverse to the identity and direction
+        # to the steepest descent direction
+                
+        if step == 0:   # or np.sqrt(np.dot(self.gm.d, self.gm.d)) == 0.0: this part for restarting at claimed minimum (optional)
+            info(" @GEOP: Initializing BFGS", verbosity.debug)
+            
+            natoms = self.beads.natoms
+            # new force vector with forces and transformed stress tensor
+            stresscomp = self.forces.vir.copy()/self.cell.V*self.norm_stress
+            stresscomp[1,0] = stresscomp[0,1]
+            stresscomp[2,0] = stresscomp[0,2]
+            stresscomp[2,1] = stresscomp[1,2]
+            stress = stresscomp.flatten()
+            # gradient direction
+            self.gmc.d = stress/ np.sqrt(np.dot(stress, stress))
+            # store actual position to previous position, initial strain is zero
+            self.gmc.xold = np.zeros(9, float)
+            self.gmc.oldcell = self.cell.h.copy()
+            self.gmc.strain = np.zeros(9, float)
+            
+        natoms = self.beads.natoms
+        # Current energy and forces
+        u0 = self.forces.pot.copy()
+        # new force vector with forces and transformed stress tensor
+        stresscomp = self.forces.vir.copy()/self.cell.V*self.norm_stress
+        stresscomp[1,0] = stresscomp[0,1]
+        stresscomp[2,0] = stresscomp[0,2]
+        stresscomp[2,1] = stresscomp[1,2]
+        stress = stresscomp.flatten()
+        #forces = self.forces.vir.flatten()*self.norm_stress/self.cell.V
+        du0 = - stress
+        print du0
+        print 'Strain', self.gmc.strain
+
+        # Store previous forces
+        self.old_f[:] = stress
+        #print 'before BFGS', self.gmc.xold[0], self.gmc.oldcell[0,0]
+        
+        self.qcell = self.gmc.strain*self.jacobian
+        
+        # Do one iteration of BFGS, return new point, function value,
+        # move direction, and current Hessian to use for next iteration
+        self.qcell, fx, self.gmc.d, self.invhessian = BFGS(self.qcell,
+                self.gmc.d, self.gmc, fdf0=(u0, du0), invhessian=self.invhessian,
+                big_step=self.big_step, tol=self.ls_options["tolerance"],
+                itmax=self.ls_options["iter"])
+        
+        eps_vec = self.qcell/self.jacobian
+        eps = np.reshape(eps_vec, (3,3))
+        #eps = np.array([[1.0 + eps_vec[0], 0.5 * eps_vec[1], 0.5 * eps_vec[2]],
+        #                [0.5 * eps_vec[1], 1.0 + eps_vec[4], 0.5 * eps_vec[5]],
+         #               [0.5 * eps_vec[2], 0.5 * eps_vec[5], 1.0 + eps_vec[8]]])
+        unit = np.eye(3, dtype=float)
+        self.cell.h = np.dot(self.gmc.oldcell, unit + eps)
+        #self.cell.h = np.dot(self.gmc.oldcell, eps)
+        print 'Cell', self.cell.h
+        self.gmc.strain = eps_vec
+        
+        print 'strain', self.gmc.strain
+        
+        x = np.amax(np.absolute(self.gmc.strain))
+        print 'x', x
+        # Store old position
+        self.gmc.xold[:] = self.qcell
+        self.gmc.oldcell = self.cell.h.copy()
+                
+        stresscomp = self.forces.vir.copy()/self.cell.V*self.norm_stress
+        stresscomp[1,0] = stresscomp[0,1]
+        stresscomp[2,0] = stresscomp[0,2]
+        stresscomp[2,1] = stresscomp[1,2]
+        
+        # Exit simulation step
+        self.exitstep2(fx, u0, x, stresscomp)
         
 class BFGSCellOptimizer(DummyOptimizer):
     """ BFGS Minimization """
@@ -405,9 +578,9 @@ class BFGSCellOptimizer(DummyOptimizer):
             # new force vector with forces and transformed stress tensor
             forces = np.zeros((natoms+3)*3, float)
             forces[0:natoms*3] = self.forces.f
-            forces[natoms*3:] = self.forces.vir.flatten()*self.norm_stress
+            forces[natoms*3:] = self.forces.vir.flatten()*self.norm_stress/self.cell.V
             # gradient direction
-            self.gmc.d = depstrip(forces) / np.sqrt(np.dot(forces.flatten(), forces.flatten()))
+            self.gmc.d = forces/ np.sqrt(np.dot(forces.flatten(), forces.flatten()))
             # store actual position to previous position, initial strain is zero
             self.gmc.xold = np.zeros((natoms+3)*3, float)
             self.gmc.xold[0:natoms*3] = self.beads.q.copy()
@@ -420,12 +593,12 @@ class BFGSCellOptimizer(DummyOptimizer):
         # new force vector with forces and transformed stress tensor
         forces = np.zeros((natoms+3)*3,float)
         forces[0:natoms*3] = self.forces.f
-        stresscomp = self.forces.vir.copy()
+        stresscomp = self.forces.vir.copy()/self.cell.V
         stresscomp[1,0] = stresscomp[0,1]
         stresscomp[2,0] = stresscomp[0,2]
         stresscomp[2,1] = stresscomp[1,2]
         forces[natoms*3:] = stresscomp.flatten()*self.norm_stress
-        #forces[natoms*3:] = self.forces.vir.flatten()*self.norm_stress
+        #forces[natoms*3:] = self.forces.vir.flatten()*self.norm_stress/self.cell.V
         du0 = - forces
         
         print 'Stress', forces[natoms*3:]
@@ -462,6 +635,15 @@ class BFGSCellOptimizer(DummyOptimizer):
         # Store old position
         self.gmc.xold[:] = self.qcell
         self.gmc.oldcell = self.cell.h.copy()
+        print 'cell', self.cell.h
+        
+        forces = np.zeros((natoms+3)*3,float)
+        forces[0:natoms*3] = self.forces.f
+        stresscomp = self.forces.vir.copy()/self.cell.V
+        stresscomp[1,0] = stresscomp[0,1]
+        stresscomp[2,0] = stresscomp[0,2]
+        stresscomp[2,1] = stresscomp[1,2]
+        forces[natoms*3:] = stresscomp.flatten()*self.norm_stress
         
         # Exit simulation step
         self.exitstep2(fx, u0, x, forces)

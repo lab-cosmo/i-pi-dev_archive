@@ -3,7 +3,7 @@
       <properties stride='1' filename='out'>  [ step, potential{electronvolt}] </properties>
       <trajectory stride='1' filename='pos'>  positions{angstrom}  </trajectory>
    </output>
-   <total_steps> 1 </total_steps>
+   <total_steps> 1000 </total_steps>
    <ffsocket name="lmp" mode="unix" pbc="true">
       <address> driver </address>  <latency> 1e-4</latency>
    </ffsocket>
