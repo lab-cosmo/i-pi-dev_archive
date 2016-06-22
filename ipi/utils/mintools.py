@@ -493,7 +493,6 @@ def BFGS(x0, d0, fdf, fdf0=None, invhessian=None, big_step=100, tol=1.0e-6, itma
     x = np.zeros(n)
     linesum = np.dot(x0.flatten(), x0.flatten())
     
-    print 'initial', f0, d0
     # Initial line direction (negative gradient at x0)
     xi = d0
 
