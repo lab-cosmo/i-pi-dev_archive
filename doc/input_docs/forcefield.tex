@@ -1,0 +1,23 @@
+\section{FORCEFIELD}
+\label{FORCEFIELD}
+\begin{ipifield}{}%
+{Base forcefield class that deals with the assigning of force calculation jobs and collecting the data.}%
+{}%
+{\ipiitem{name}%
+{Mandatory. The name by which the forcefield will be identified in the System forces section.}%
+{data type: string; }%
+\ipiitem{pbc}%
+{Applies periodic boundary conditions to the atoms coordinates before passing them on to the driver code.}%
+{default:  True ; data type: boolean; }%
+}
+\begin{ipifield}{latency}%
+{The number of seconds the polling thread will wait between exhamining the list of requests.}%
+{default:  0.01 ; data type: float; }%
+{}
+\end{ipifield}
+\begin{ipifield}{parameters}%
+{The parameters of the force field}%
+{default:  \{ \} ; data type: dictionary; }%
+{}
+\end{ipifield}
+\end{ipifield}

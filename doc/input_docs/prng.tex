@@ -1,0 +1,35 @@
+\section{PRNG}
+\label{PRNG}
+\begin{ipifield}{}%
+{Deals with the pseudo-random number generator.}%
+{}%
+{}
+\begin{ipifield}{set\_pos}%
+{Gives the position in the state array that the random number generator is reading from.}%
+{default:  0 ; data type: integer; }%
+{}
+\end{ipifield}
+\begin{ipifield}{state}%
+{Gives the state vector for the random number generator. Avoid directly modifying this unless you are very familiar with the inner workings of the algorithm used.}%
+{default:  [ ] ; data type: integer; }%
+{\ipiitem{shape}%
+{The shape of the array.}%
+{default:  (0,) ; data type: tuple; }%
+}
+\end{ipifield}
+\begin{ipifield}{has\_gauss}%
+{Determines whether there is a stored gaussian number or not. A value of 0 means there is none stored.}%
+{default:  0 ; data type: integer; }%
+{}
+\end{ipifield}
+\begin{ipifield}{seed}%
+{This is the seed number used to generate the initial state of the random number generator.}%
+{default:  123456 ; data type: integer; }%
+{}
+\end{ipifield}
+\begin{ipifield}{gauss}%
+{The stored Gaussian number.}%
+{default:  0.0 ; data type: float; }%
+{}
+\end{ipifield}
+\end{ipifield}

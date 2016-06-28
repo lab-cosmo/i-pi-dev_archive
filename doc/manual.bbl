@@ -1,0 +1,149 @@
+\begin{thebibliography}{10}
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+
+\bibitem[{Feynman and Hibbs(1964)}]{feyn-hibb65book}
+R.~P. Feynman, A.~R. Hibbs, {Quantum Mechanics and Path Integrals},
+  McGraw-Hill, New York, 1964.
+
+\bibitem[{Ceriotti et~al.({2010})Ceriotti, Parinello, Markland, and
+  E.}]{ceri+10jcp}
+M.~Ceriotti, M.~Parinello, T.~E. Markland, M.~D. E., {Efficient stochastic
+  thermostating of path integral molecular dynamics}, {J. Phys. Chem.} {133}
+  ({2010}) 124101.
+
+\bibitem[{Martyna et~al.({1999})Martyna, Hughes, and Tuckerman}]{mart+99jcp}
+G.~J. Martyna, A.~Hughes, M.~E. Tuckerman, {Molecular dynamics algorithms for
+  path integrals at constant pressure}, {J. Chem. Phys.} {110}~({7}) ({1999})
+  3275.
+
+\bibitem[{Markland and Manolopoulos({2008})}]{mark-mano08jcp}
+T.~E. Markland, D.~E. Manolopoulos, {An efficient ring polymer contraction
+  scheme for imaginary time path integral simulations}, {J. Chem. Phys.} {129}
+  ({2008}) 024105.
+
+\bibitem[{Ceriotti et~al.(2011)Ceriotti, Manolopoulos, and
+  Parinello}]{ceri+11jcp}
+M.~Ceriotti, D.~E. Manolopoulos, M.~Parinello, Accelerating the convergence of
+  path integral dynamics with a generalized langevin equation, J. Chem. Phys.
+  134 (2011) 084104.
+
+\bibitem[{Suzuki(1995)}]{suzu95pla}
+M.~Suzuki, Hybrid exponential product formulas for unbounded operators with
+  possible applications to monte carlo simulations, Phys. Lett. A 201 (1995)
+  425.
+
+\bibitem[{Chin(1997)}]{chin97pla}
+S.~A. Chin, Symplectic integrators from composite operator factorizations,
+  Phys. Lett. A 226 (1997) 344.
+
+\bibitem[{Ceriotti et~al.(2011)Ceriotti, Brain, Riordan, and
+  Manolopoulos}]{ceri+12prsa}
+M.~Ceriotti, G.~a.~R. Brain, O.~Riordan, D.~E. Manolopoulos, {The inefficiency
+  of re-weighted sampling and the curse of system size in high-order path
+  integration}, Proceedings of the Royal Society A: Mathematical, Physical and
+  Engineering Sciences 468~(2137) (2011) 2--17.
+
+\bibitem[{Perez and Tuckerman(2011)}]{pere-tuck11jcp}
+A.~Perez, M.~E. Tuckerman, Improving the convergence of closed and open path
+  integral molecular dynamics via higher order trotter factorization schemes,
+  J. Chem. Phys. 135 (2011) 064104.
+
+\bibitem[{Cao and Voth(1993)}]{cao-voth93jcp}
+J.~Cao, G.~A. Voth, {A new perspective on quantum time correlation functions},
+  J. Chem. Phys. 99~(12) (1993) 10070--10073.
+
+\bibitem[{Cao and Voth(1994)}]{cao-voth94jcp}
+J.~Cao, G.~A. Voth, {The formulation of quantum statistical mechanics based on
+  the Feynman path centroid density. IV. Algorithms for centroid molecular
+  dynamics}, J. Chem. Phys. 101~(7) (1994) 6168--6183.
+
+\bibitem[{Craig and Manolopoulos(2004)}]{crai-mano04jcp}
+I.~R. Craig, D.~E. Manolopoulos, Quantum statistics and classical mechanics:
+  Real time correlation functions from ring polymer molecular dynamics, J.
+  Chem. Phys. 121 (2004) 3368.
+
+\bibitem[{Braams and Manolopoulos(2006)}]{braa-mano06jcp}
+B.~J. Braams, D.~E. Manolopoulos, {On the short-time limit of ring polymer
+  molecular dynamics.}, J. Chem. Phys. 125~(12) (2006) 124105.
+
+\bibitem[{Habershon et~al.(2013)Habershon, Manolopoulos, Markland, and
+  Miller}]{habe+13arpc}
+S.~Habershon, D.~E. Manolopoulos, T.~E. Markland, T.~F. Miller, Ring-polymer
+  molecular dynamics: Quantum effects in chemical dynamics from classical
+  trajectories in an extended phase space, Annu. Rev. Phys. Chem. 64 (2013)
+  387.
+
+\bibitem[{Langevin(1908)}]{plangevin1908cras}
+P.~Langevin, Sur la theorie du mouvement brownien, C. R. Acad. Sci. {146}
+  (1908) 530.
+
+\bibitem[{Bussi and Parrinello({2008})}]{buss-parr08cpc}
+G.~Bussi, M.~Parrinello, {Stochastic thermostats: comparison of local and
+  global schemes}, {Comp. Phys. Comm.} {179} ({2008}) 26.
+
+\bibitem[{Ceriotti et~al.(2009)Ceriotti, Bussi, and Parinello}]{ceri+09jctc}
+M.~Ceriotti, G.~Bussi, M.~Parinello, Colored-noise thermostats a la carte, J.
+  Chem. Theory Comput. 6 (2009) 1170.
+
+\bibitem[{Ceriotti and Manolopoulos(2012)}]{ceri-mano12prl}
+M.~Ceriotti, D.~E. Manolopoulos, Efficient first principles calculation of the
+  quantum kinetic energy and momentum distribution of nuclei, Phys. Rev. Lett.
+  109 (2012) 100604.
+
+\bibitem[{Bussi et~al.({2009})Bussi, Zykova-Timan, and Parinello}]{buss+09jpc}
+G.~Bussi, T.~Zykova-Timan, M.~Parinello, {Isothermal-isobaric molecular
+  dynamics using stochastic velocity rescaling}, {J. Phys. Chem.} {130}
+  ({2009}) 074101.
+
+\bibitem[{Yamamoto({2005})}]{tyamamoto05jcp}
+T.~M. Yamamoto, {Path-integral virial estimator based on the scaling of
+  fluctuation coordinates: Application to quantum clusters with fourth-order
+  propagators}, {J. Chem. Phys.} {123} ({2005}) 104101.
+
+\bibitem[{Lin et~al.({2010})Lin, Morrone, Car, and Parrinello}]{linlin+10prl}
+L.~Lin, J.~A. Morrone, R.~Car, M.~Parrinello, {Displaced Path Integral
+  Formulation for the Momentum Distribution of Quantum Particles}, {Phys. Rev.
+  Lett.} {105} ({2010}) 110602.
+
+\bibitem[{Habershon et~al.(2008)Habershon, Fanourgakis, and
+  Manolopoulos}]{habe+08jcp}
+S.~Habershon, G.~S. Fanourgakis, D.~E. Manolopoulos, Comparison of path
+  integral molecular dynamics methods for the infrared absorption spectrum of
+  liquid water, J. Chem. Phys. 129 (2008) 074501.
+
+\bibitem[{Hone et~al.(2006)Hone, Rossky, and Voth}]{hone+06jcp}
+T.~D. Hone, P.~J. Rossky, G.~A. Voth, A comparitive study of imaginary time
+  path integral based methods for quantum dynamics, J. Chem. Phys. 124 (2006)
+  154103.
+
+\bibitem[{Silvera and Goldman(1978)}]{silv-gold78jcp}
+I.~F. Silvera, V.~V. Goldman, The isotropic intermolecular potential for h2 and
+  d2 in the solid and gas phases, J. Chem. Phys 69 (1978) 4209.
+
+\bibitem[{Verlet({1967})}]{lverlet67pr}
+L.~Verlet, {Computer "Experiments" on Classical Fluids. I. Thermodynamical
+  Properties of Lennard-Jones Molecules}, {Phys. Rev.} {159}~({1}) ({1967}) 98.
+
+\bibitem[{Miller and Manolopoulos({2005})}]{mill-mano05jcp}
+T.~F. Miller, D.~E. Manolopoulos, {Quantum diffusion in liquid para-hydrogen
+  from ring-polymer molecular dynamics}, {J. Chem. Phys.} {122} ({2005})
+  184503.
+
+\bibitem[{Habershon et~al.(2009)Habershon, Markland, and
+  Manolopoulos}]{habe+09jcp}
+S.~Habershon, T.~E. Markland, D.~E. Manolopoulos, Competing quantum effects in
+  the dynamics of a flexible water model, J. Chem. Phys. 131 (2009) 024501.
+
+\bibitem[{Lindsay and Broido(2010)}]{lind-broi10prb}
+L.~Lindsay, D.~A. Broido, Optimized tersoff and brenner empirical potential
+  parameters for lattice dynamics and phonon thermal transport in carbon
+  nanotubes and graphene, Phys. Rev. B 81 (2010) 205441.
+
+\bibitem[{Lindsay and Broido(2010)}]{errlind-broi10prb}
+L.~Lindsay, D.~A. Broido, Erratum: Optimized tersoff and brenner empirical
+  potential parameters for lattice dynamics and phonon thermal transport in
+  carbon nanotubes and graphene, Phys. Rev. B 82 (2010) 209903.
+
+\end{thebibliography}

@@ -1,0 +1,83 @@
+\section{SIMULATION}
+\label{SIMULATION}
+\begin{ipifield}{}%
+{This is the top level class that deals with the running of the simulation, including holding the simulation specific properties such as the time step and outputting the data.}%
+{}%
+{\ipiitem{verbosity}%
+{The level of output on stdout.}%
+{default: `low'; data type: string; options: `quiet', `low', `medium', `high', `debug'; }%
+\ipiitem{mode}%
+{What kind of simulation should be run.}%
+{default: `md'; data type: string; options: `md', `paratemp', `static'; }%
+}
+\begin{ipifield}{total\_time}%
+{The maximum wall clock time (in seconds).}%
+{default:  0 ; data type: float; }%
+{}
+\end{ipifield}
+\begin{ipifield}{step}%
+{The current simulation time step.}%
+{default:  0 ; data type: integer; }%
+{}
+\end{ipifield}
+\begin{ipifield}{\hyperref[PARATEMP]{paratemp}}%
+{Options for a parallel tempering simulation}%
+{}%
+{}
+\end{ipifield}
+\begin{ipifield}{total\_steps}%
+{The total number of steps that will be done. If 'step' is equal to or greater than 'total\_steps', then the simulation will finish.}%
+{default:  1000 ; data type: integer; }%
+{}
+\end{ipifield}
+\begin{ipifield}{\hyperref[OUTPUTS]{output}}%
+{This class defines how properties, trajectories and checkpoints should be output during the simulation. May contain zero, one or many instances of properties, trajectory or checkpoint tags, each giving instructions on how one output file should be created and managed.}%
+{}%
+{\ipiitem{prefix}%
+{A string that will be prepended to each output file name. The file name is given by 'prefix'.'filename' + format\_specifier. The format specifier may also include a number if multiple similar files are output.}%
+{default: `'; data type: string; }%
+}
+\end{ipifield}
+\begin{ipifield}{\hyperref[PRNG]{prng}}%
+{Deals with the pseudo-random number generator.}%
+{}%
+{}
+\end{ipifield}
+\begin{ipifield}{\hyperref[SYSTEM]{system}}%
+{This is the class which holds all the data which represents a single state of the system.}%
+{}%
+{\ipiitem{prefix}%
+{Prepend this string to output files generated for this system. If 'copies' is greater than 1, a trailing number will be appended.}%
+{default: `'; data type: string; }%
+\ipiitem{copies}%
+{Create multiple copies of the system. This is handy for initialising simulations with multiple systems.}%
+{default:  1 ; data type: integer; }%
+}
+\end{ipifield}
+\begin{ipifield}{\hyperref[FFLJ]{fflj}}%
+{Simple, internal LJ evaluator without cutoff, neighbour lists or minimal image convention.
+                   Expects standard LJ parameters, e.g. { eps: 0.1, sigma: 1.0 }. }%
+{}%
+{\ipiitem{name}%
+{Mandatory. The name by which the forcefield will be identified in the System forces section.}%
+{data type: string; }%
+\ipiitem{pbc}%
+{Applies periodic boundary conditions to the atoms coordinates before passing them on to the driver code.}%
+{default:  True ; data type: boolean; }%
+}
+\end{ipifield}
+\begin{ipifield}{\hyperref[FFSOCKET]{ffsocket}}%
+{Deals with the assigning of force calculation jobs to different driver codes, and collecting the data, using a socket for the data communication.}%
+{}%
+{\ipiitem{mode}%
+{Specifies whether the driver interface will listen onto a internet socket [inet] or onto a unix socket [unix].}%
+{default: `inet'; data type: string; options: `unix', `inet'; }%
+\ipiitem{pbc}%
+{Applies periodic boundary conditions to the atoms coordinates before passing them on to the driver code.}%
+{default:  True ; data type: boolean; }%
+\ipiitem{name}%
+{Mandatory. The name by which the forcefield will be identified in the System forces section.}%
+{data type: string; }%
+}
+\end{ipifield}
+\end{ipifield}

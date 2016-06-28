@@ -1,0 +1,108 @@
+\ipiitem{atom\_f}{The force (x,y,z) acting on a particle given its index. Takes arguments index
+                      and bead (both zero based). If bead is not specified, refers to the centroid.}{dimension: force; size: 3; }\ipiitem{atom\_p}{The momentum (x,y,z) of a particle given its index. Takes arguments index
+                      and bead (both zero based). If bead is not specified, refers to the centroid.}{dimension: momentum; size: 3; }\ipiitem{atom\_v}{The velocity (x,y,z) of a particle given its index. Takes arguments index
+                       and bead (both zero based). If bead is not specified, refers to the centroid.}{dimension: velocity; size: 3; }\ipiitem{atom\_x}{The position (x,y,z) of a particle given its index. Takes arguments index
+                       and bead (both zero based). If bead is not specified, refers to the centroid.}{dimension: length; size: 3; }\ipiitem{cell\_abcABC}{The lengths of the cell vectors and the angles between them in degrees as a list of the
+                      form $[$a, b, c, A, B, C$]$, where A is the angle between the sides of length b and c in degrees, and B and C
+                      are defined similarly. Since the output mixes different units, a, b and c can only be output in bohr.}{size: 6; }\ipiitem{cell\_h}{The simulation cell as a matrix. Returns the 6 non-zero components in the form $[$xx, yy, zz, xy, xz, yz$]$.}{dimension: length; size: 6; }\ipiitem{chin\_weight}{The 3 numbers output are 1) the logarithm of the weighting factor -beta\_P delta H,
+                      2) the square of the logarithm, and 3) the weighting factor}{size: 3; }\ipiitem{conserved}{The value of the conserved energy quantity per bead.}{dimension: energy; }\ipiitem{density}{The mass density of the physical system.}{dimension: density; }\ipiitem{displacedpath}{This is the estimator for the end-to-end distribution, that can be used to calculate the
+                      particle momentum distribution as described in in L. Lin, J. A. Morrone, R. Car and M. Parrinello,
+                      105, 110602 (2010), Phys. Rev. Lett. Takes arguments 'ux', 'uy' and 'uz', which are the components of
+                      the path opening vector. Also takes an argument 'atom', which can be either an atom label or index
+                      (zero based) to specify which species to find the end-to-end distribution estimator for. If not
+                      specified, all atoms are used. Note that one atom is computed at a time, and that each path opening
+                      operation costs as much as a PIMD step. Returns the average over the selected atoms of the estimator of
+                      exp(-U(u)) for each frame.}{}\ipiitem{ensemble\_temperature}{The target temperature for the current ensemble}{dimension: temperature; }\ipiitem{forcemod}{The modulus of the force. With the optional argument 'bead'
+                         will print the force associated with the specified bead.}{dimension: force; }\ipiitem{isotope\_scfep}{Returns the (many) terms needed to compute the scaled-coordinates free energy
+                      perturbation scaled mass KE estimator (M. Ceriotti, T. Markland, J. Chem. Phys. 138, 014112 (2013)).
+                      Takes two arguments, 'alpha' and 'atom', which give the
+                      scaled mass parameter and the atom of interest respectively, and default to '1.0' and ''. The
+                      'atom' argument can either be the label of a particular kind of atom, or an index (zero based)
+                      of a specific atom. This property computes, for each atom in the selection, an estimator for
+                      the kinetic energy it would have had if it had the mass scaled by alpha. The 7 numbers output
+                      are the average over the selected atoms of the log of the weights $<$h$>$, the average of the
+                      squares $<$h**2$>$, the average of the un-weighted scaled-coordinates kinetic energies  $<$T\_CV$>$
+                      and of the squares $<$T\_CV**2$>$, the log sum of the weights LW=ln(sum(e**(-h))), the sum of the
+                      re-weighted kinetic energies, stored as a log modulus and sign, LTW=ln(abs(sum(T\_CV e**(-h))))
+                      STW=sign(sum(T\_CV e**(-h))). In practice, the best estimate of the estimator can be computed
+                      as $[$sum\_i exp(LTW\_i)*STW\_i$]$/$[$sum\_i exp(LW\_i)$]$. The other terms can be used to compute diagnostics
+                      for the statistical accuracy of the re-weighting process. Note that evaluating this estimator costs
+                      as much as a PIMD step for each atom in the list. The elements that are output have different
+                      units, so the output can be only in atomic units.}{size: 7; }\ipiitem{isotope\_tdfep}{Returns the (many) terms needed to compute the thermodynamic free energy
+                      perturbation scaled mass KE estimator (M. Ceriotti, T. Markland, J. Chem. Phys. 138, 014112 (2013)).
+                      Takes two arguments, 'alpha' and 'atom', which give the
+                      scaled mass parameter and the atom of interest respectively, and default to '1.0' and ''. The
+                      'atom' argument can either be the label of a particular kind of atom, or an index (zero based)
+                      of a specific atom. This property computes, for each atom in the selection, an estimator for
+                      the kinetic energy it would have had if it had the mass scaled by alpha. The 7 numbers output
+                      are the average over the selected atoms of the log of the weights $<$h$>$, the average of the
+                      squares $<$h**2$>$, the average of the un-weighted scaled-coordinates kinetic energies  $<$T\_CV$>$
+                      and of the squares $<$T\_CV**2$>$, the log sum of the weights LW=ln(sum(e**(-h))), the sum of the
+                      re-weighted kinetic energies, stored as a log modulus and sign, LTW=ln(abs(sum(T\_CV e**(-h))))
+                      STW=sign(sum(T\_CV e**(-h))). In practice, the best estimate of the estimator can be computed
+                      as $[$sum\_i exp(LTW\_i)*STW\_i$]$/$[$sum\_i exp(LW\_i)$]$. The other terms can be used to compute diagnostics
+                      for the statistical accuracy of the re-weighting process. Evaluating this estimator is inexpensive,
+                      but typically the statistical accuracy is worse than with the scaled coordinates estimator.
+                      The elements that are output have different
+                      units, so the output can be only in atomic units.}{size: 7; }\ipiitem{isotope\_zetasc}{Returns the (many) terms needed to directly compute the relative probablity of
+                      isotope substitution in two different systems/phases. Takes four arguments, 'alpha' , which gives the
+                      scaled mass parameter and default to '1.0', and 'atom', which is the label or index of a type of atoms.
+                      The 3 numbers output are 1) the average over the excess potential energy for scaled coordinates $<$sc$>$,
+                      2) the average of the squares of the excess potential energy $<$sc**2$>$, and 3) the average of the exponential
+                      of excess potential energy $<$exp(-beta*sc)$>$}{size: 3; }\ipiitem{isotope\_zetasc\_4th}{Returns the (many) terms needed to compute the scaled-coordinates fourth-order direct estimator.
+					  Takes two arguments, 'alpha' , which gives the scaled mass parameter and default to '1.0', and 'atom',
+					  which is the label or index of a type of atoms.
+                      The 5 numbers output are 1) the average over the excess potential energy for an isotope atom substitution $<$sc$>$,
+                      2) the average of the squares of the excess potential energy $<$sc**2$>$, and 3) the average of the exponential
+                      of excess potential energy $<$exp(-beta*sc)$>$, and 4-5) Suzuki-Chin and Takahashi-Imada 4th-order reweighing term}{size: 5; }\ipiitem{isotope\_zetatd}{Returns the (many) terms needed to directly compute the relative probablity of
+                      isotope substitution in two different systems/phases. Takes two arguments, 'alpha' , which gives the
+                      scaled mass parameter and default to '1.0', and 'atom', which is the label or index of a type of atoms.
+                      The 3 numbers output are 1) the average over the excess spring energy for an isotope atom substitution $<$spr$>$,
+                      2) the average of the squares of the excess spring energy $<$spr**2$>$, and 3) the average of the exponential
+                      of excess spring energy $<$exp(-beta*spr)$>$}{size: 3; }\ipiitem{isotope\_zetatd\_4th}{Returns the (many) terms needed to compute the thermodynamic fourth-order direct estimator.
+					  Takes two arguments, 'alpha' , which gives the scaled mass parameter and default to '1.0', and 'atom',
+					  which is the label or index of a type of atoms.
+                      The 5 numbers output are 1) the average over the excess spring energy for an isotope atom substitution $<$spr$>$,
+                      2) the average of the squares of the excess spring energy $<$spr**2$>$, and 3) the average of the exponential
+                      of excess spring energy $<$exp(-beta*spr)$>$, and 4-5) Suzuki-Chin and Takahashi-Imada 4th-order reweighing term}{size: 5; }\ipiitem{kinetic\_cv}{The centroid-virial quantum kinetic energy of the physical system.
+                      Takes an argument 'atom', which can be either an atom label or index (zero based)
+                      to specify which species to find the kinetic energy of. If not specified, all atoms are used.}{dimension: energy; }\ipiitem{kinetic\_ij}{The centroid-virial off-diagonal quantum kinetic energy tensor of the physical system.
+                      This computes the cross terms between atoms i and atom j, whose average is  $<$p\_i*p\_j/(2*sqrt(m\_i*m\_j))$>$.
+                      Returns the 6 independent components in the form $[$xx, yy, zz, xy, xz, yz$]$. Takes arguments 'i' and 'j',
+                       which give the indices of the two desired atoms.}{dimension: energy; size: 6; }\ipiitem{kinetic\_md}{The kinetic energy of the (extended) classical system.
+                       Takes optional arguments 'atom', 'bead' or 'nm'.  'atom' can be either an
+                       atom label or an index (zero-based) to specify which species or individual atom
+                       to output the kinetic energy of. If not specified, all atoms are used and averaged.
+                       'bead' or 'nm' specify whether the kinetic energy should be computed for a single bead
+                       or normal mode. If not specified, all atoms/beads/nm are used.}{dimension: energy; }\ipiitem{kinetic\_td}{The primitive quantum kinetic energy of the physical system.
+                      Takes an argument 'atom', which can be either an atom label or index (zero based)
+                      to specify which species to find the kinetic energy of. If not specified, all atoms are used.}{dimension: energy; }\ipiitem{kinetic\_tens}{The centroid-virial quantum kinetic energy tensor of the physical system.
+                      Returns the 6 independent components in the form $[$xx, yy, zz, xy, xz, yz$]$. Takes an
+                      argument 'atom', which can be either an atom label or index (zero based) to specify
+                      which species to find the kinetic tensor components of. If not specified, all atoms are used.}{dimension: energy; size: 6; }\ipiitem{kstress\_cv}{The quantum estimator for the kinetic stress tensor of the physical system.
+                      Returns the 6 independent components in the form $[$xx, yy, zz, xy, xz, yz$]$.}{dimension: pressure; size: 6; }\ipiitem{kstress\_md}{The kinetic stress tensor of the (extended) classical system. Returns the 6
+                      independent components in the form $[$xx, yy, zz, xy, xz, yz$]$.}{dimension: pressure; size: 6; }\ipiitem{pot\_component}{The contribution to the system potential from one of the force components. Takes one mandatory
+                         argument index (zero-based) that indicates which component of the potential must be returned. The optional argument 'bead'
+                         will print the potential associated with the specified bead. }{dimension: energy; }\ipiitem{potential}{The physical system potential energy. With the optional argument 'bead'
+                         will print the potential associated with the specified bead.}{dimension: energy; }\ipiitem{pressure\_cv}{The quantum estimator for pressure of the physical system.}{dimension: pressure; }\ipiitem{pressure\_md}{The pressure of the (extended) classical system.}{dimension: pressure; }\ipiitem{r\_gyration}{The average radius of gyration of the selected ring polymers. Takes an
+                      argument 'atom', which can be either an atom label or index (zero based) to specify which
+                      species to find the radius of gyration of. If not specified, all atoms are used and averaged.}{dimension: length; }\ipiitem{scaledcoords}{Returns the estimators that are required to evaluate the scaled-coordinates estimators
+                       for total energy and heat capacity, as described in T. M. Yamamoto,
+                       J. Chem. Phys., 104101, 123 (2005). Returns eps\_v and eps\_v', as defined in that paper.
+                       As the two estimators have a different dimensions, this can only be output in atomic units.
+                       Takes one argument, 'fd\_delta', which gives the value of the finite difference parameter used -
+                       which defaults to -1e-05. If the value of 'fd\_delta' is negative,
+                       then its magnitude will be reduced automatically by the code if the finite difference error
+                       becomes too large.}{size: 2; }\ipiitem{spring}{The total spring potential energy between the beads of all the ring polymers in the system.}{dimension: energy; }\ipiitem{step}{The current simulation time step.}{dimension: number; }\ipiitem{stress\_cv}{The total quantum estimator for the stress tensor of the physical system. Returns the
+                      6 independent components in the form $[$xx, yy, zz, xy, xz, yz$]$.}{dimension: pressure; size: 6; }\ipiitem{stress\_md}{The total stress tensor of the (extended) classical system. Returns the 6
+                      independent components in the form $[$xx, yy, zz, xy, xz, yz$]$.}{dimension: pressure; size: 6; }\ipiitem{temperature}{The current temperature, as obtained from the MD kinetic energy of the (extended)
+                                      ring polymer. Takes optional arguments 'atom', 'bead' or 'nm'.  'atom' can be either an
+                                      atom label or an index (zero-based) to specify which species or individual atom
+                                      to output the temperature of. If not specified, all atoms are used and averaged.
+                                      'bead' or 'nm' specify whether the temperature should be computed for a single bead
+                                      or normal mode.}{dimension: temperature; }\ipiitem{ti\_pot}{The correction potential in Takahashi-Imada 4th-order PI expansion.
+                             Takes an argument 'atom', which can be either an atom label or index (zero based)
+                             to specify which species to find the correction term for. If not specified, all atoms are used.}{dimension: energy; size: 1; }\ipiitem{ti\_weight}{The 3 numbers output are 1) the logarithm of the weighting factor -beta\_P delta H,
+                      2) the square of the logarithm, and 3) the weighting factor}{size: 3; }\ipiitem{time}{The elapsed simulation time.}{dimension: time; }\ipiitem{virial\_cv}{The quantum estimator for the virial stress tensor of the physical system.
+                      Returns the 6 independent components in the form $[$xx, yy, zz, xy, xz, yz$]$.}{dimension: pressure; size: 6; }\ipiitem{virial\_md}{The virial tensor of the (extended) classical system. Returns the 6
+                      independent components in the form $[$xx, yy, zz, xy, xz, yz$]$.}{dimension: pressure; size: 6; }\ipiitem{volume}{The volume of the cell box.}{dimension: volume; }

@@ -1,0 +1,25 @@
+\section{TRAJECTORY}
+\label{TRAJECTORY}
+\begin{ipifield}{}%
+{This class defines how one trajectory file should be output. Between each trajectory tag one string should be given, which specifies what data is to be output.}%
+{data type: string; }%
+{\ipiitem{format}%
+{The output file format.}%
+{default: `xyz'; data type: string; options: `xyz', `pdb'; }%
+\ipiitem{filename}%
+{A string to specify the name of the file that is output. The file name is given by 'prefix'.'filename' + format\_specifier. The format specifier may also include a number if multiple similar files are output.}%
+{default: `traj'; data type: string; }%
+\ipiitem{stride}%
+{The number of steps between successive writes.}%
+{default:  1 ; data type: integer; }%
+\ipiitem{flush}%
+{How often should streams be flushed. 1 means each time, zero means never.}%
+{default:  1 ; data type: integer; }%
+\ipiitem{bead}%
+{Print out only the specified bead. A negative value means print all.}%
+{default:  -1 ; data type: integer; }%
+\ipiitem{cell\_units}%
+{The units for the cell dimensions.}%
+{default: `'; data type: string; }%
+}
+\end{ipifield}

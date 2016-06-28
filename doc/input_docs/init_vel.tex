@@ -1,0 +1,16 @@
+\section{INITVELOCITIES}
+\label{INITVELOCITIES}
+\begin{ipifield}{}%
+{This is the class to initialize velocities.}%
+{data type: string; }%
+{\ipiitem{index}%
+{The index of the atom for which the value will be set. If a negative value is specified, then all atoms are assumed.}%
+{default:  -1 ; data type: integer; }%
+\ipiitem{bead}%
+{The index of the bead for which the value will be set. If a negative value is specified, then all beads are assumed.}%
+{default:  -1 ; data type: integer; }%
+\ipiitem{mode}%
+{The input data format. 'xyz' and 'pdb' stand for xyz and pdb input files respectively. 'chk' stands for initialization from a checkpoint file. 'manual' means that the value to initialize from is giving explicitly as a vector. 'thermal' means that the data is to be generated from a Maxwell-Boltzmann distribution at the given temperature.}%
+{default: `chk'; data type: string; options: `manual', `xyz', `pdb', `chk', `thermal'; }%
+}
+\end{ipifield}

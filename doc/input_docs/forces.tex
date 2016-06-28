@@ -1,0 +1,24 @@
+\section{FORCES}
+\label{FORCES}
+\begin{ipifield}{}%
+{Deals with creating all the necessary forcefield objects.}%
+{}%
+{}
+\begin{ipifield}{\hyperref[FORCECOMPONENT]{force}}%
+{The class that deals with how each forcefield contributes to the overall potential, force and virial calculation.}%
+{}%
+{\ipiitem{forcefield}%
+{Mandatory. The name of the forcefield this force is referring to.}%
+{default: `'; data type: string; }%
+\ipiitem{name}%
+{An optional name to refer to this force component.}%
+{default: `'; data type: string; }%
+\ipiitem{weight}%
+{A scaling factor for this forcefield, to be applied before adding the force calculated by this forcefield to the total force.}%
+{default:  1.0 ; data type: float; }%
+\ipiitem{nbeads}%
+{If the forcefield is to be evaluated on a contracted ring polymer, this gives the number of beads that are used. If not specified, the forcefield will be evaluated on the full ring polymer.}%
+{default:  0 ; data type: integer; }%
+}
+\end{ipifield}
+\end{ipifield}

@@ -1,0 +1,43 @@
+\section{ENSEMBLE}
+\label{ENSEMBLE}
+\begin{ipifield}{}%
+{Holds all the information that is ensemble specific, such as the temperature and the external pressure.}%
+{}%
+{}
+\begin{ipifield}{pressure}%
+{The external pressure.}%
+{dimension: pressure; default:  -1.0 ; data type: float; }%
+{\ipiitem{units}%
+{The units the input data is given in.}%
+{default: `'; data type: string; }%
+}
+\end{ipifield}
+\begin{ipifield}{stress}%
+{The external stress.}%
+{dimension: pressure; default: 
+      [-1. -0. -0. -0. -1. -0. -0. -0. -1.]; data type: float; }%
+{\ipiitem{units}%
+{The units the input data is given in.}%
+{default: `'; data type: string; }%
+\ipiitem{shape}%
+{The shape of the array.}%
+{default:  (3, 3) ; data type: tuple; }%
+}
+\end{ipifield}
+\begin{ipifield}{temperature}%
+{The temperature of the system.}%
+{dimension: temperature; default:  -1.0 ; data type: float; }%
+{\ipiitem{units}%
+{The units the input data is given in.}%
+{default: `'; data type: string; }%
+}
+\end{ipifield}
+\begin{ipifield}{eens}%
+{The ensemble contribution to the conserved quantity.}%
+{dimension: energy; default:  0.0 ; data type: float; }%
+{\ipiitem{units}%
+{The units the input data is given in.}%
+{default: `'; data type: string; }%
+}
+\end{ipifield}
+\end{ipifield}

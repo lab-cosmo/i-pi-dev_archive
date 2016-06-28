@@ -1,0 +1,84 @@
+\section{SYSTEM}
+\label{SYSTEM}
+\begin{ipifield}{}%
+{This is the class which holds all the data which represents a single state of the system.}%
+{}%
+{\ipiitem{prefix}%
+{Prepend this string to output files generated for this system. If 'copies' is greater than 1, a trailing number will be appended.}%
+{default: `'; data type: string; }%
+\ipiitem{copies}%
+{Create multiple copies of the system. This is handy for initialising simulations with multiple systems.}%
+{default:  1 ; data type: integer; }%
+}
+\begin{ipifield}{\hyperref[CELL]{cell}}%
+{Deals with the cell parameters. Takes as array which can be used to initialize the cell vector matrix.}%
+{dimension: length; default: 
+      [ 0.  0.  0.  0.  0.  0.  0.  0.  0.]; data type: float; }%
+{\ipiitem{units}%
+{The units the input data is given in.}%
+{default: `'; data type: string; }%
+\ipiitem{shape}%
+{The shape of the array.}%
+{default:  (3, 3) ; data type: tuple; }%
+}
+\end{ipifield}
+\begin{ipifield}{\hyperref[BEADS]{beads}}%
+{Describes the bead configurations in a path integral simulation.}%
+{}%
+{\ipiitem{natoms}%
+{The number of atoms.}%
+{default:  0 ; data type: integer; }%
+\ipiitem{nbeads}%
+{The number of beads.}%
+{default:  0 ; data type: integer; }%
+}
+\end{ipifield}
+\begin{ipifield}{\hyperref[NORMALMODES]{normal\_modes}}%
+{Deals with the normal mode transformations, including the adjustment of bead masses to give the desired ring polymer normal mode frequencies if appropriate. Takes as arguments frequencies, of which different numbers must be specified and which are used to scale the normal mode frequencies in different ways depending on which 'mode' is specified.}%
+{dimension: frequency; default:  [ ] ; data type: float; }%
+{\ipiitem{units}%
+{The units the input data is given in.}%
+{default: `'; data type: string; }%
+\ipiitem{shape}%
+{The shape of the array.}%
+{default:  (0,) ; data type: tuple; }%
+\ipiitem{mode}%
+{Specifies the technique to be used to calculate the dynamical masses. 'rpmd' simply assigns the bead masses the physical mass. 'manual' sets all the normal mode frequencies except the centroid normal mode manually. 'pa-cmd' takes an argument giving the frequency to set all the non-centroid normal modes to. 'wmax-cmd' is similar to 'pa-cmd', except instead of taking one argument it takes two ([wmax,wtarget]). The lowest-lying normal mode will be set to wtarget for a free particle, and all the normal modes will coincide at frequency wmax. }%
+{default: `rpmd'; data type: string; options: `pa-cmd', `wmax-cmd', `manual', `rpmd'; }%
+\ipiitem{transform}%
+{Specifies whether to calculate the normal mode transform using a fast Fourier transform or a matrix multiplication. For small numbers of beads the matrix multiplication may be faster.}%
+{default: `fft'; data type: string; options: `fft', `matrix'; }%
+}
+\end{ipifield}
+\begin{ipifield}{\hyperref[MOTION]{motion}}%
+{Allow chosing the type of calculation to be performed. Holds all the information that is calculation specific, such as geometry optimization parameters, etc.}%
+{}%
+{\ipiitem{mode}%
+{How atoms should be moved at each step in the simulation. 'replay' means that a simulation is restarted from a previous simulation.}%
+{data type: string; options: `minimize', `replay', `neb', `dynamics', `dummy'; }%
+}
+\end{ipifield}
+\begin{ipifield}{\hyperref[FORCES]{bias}}%
+{Deals with creating all the necessary forcefield objects.}%
+{}%
+{}
+\end{ipifield}
+\begin{ipifield}{\hyperref[FORCES]{forces}}%
+{Deals with creating all the necessary forcefield objects.}%
+{}%
+{}
+\end{ipifield}
+\begin{ipifield}{\hyperref[INITIALIZER]{initialize}}%
+{Specifies the number of beads, and how the system should be initialized.}%
+{}%
+{\ipiitem{nbeads}%
+{The number of beads. Will override any provision from inside the initializer. A ring polymer contraction scheme is used to scale down the number of beads if required. If instead the number of beads is scaled up, higher normal modes will be initialized to zero.}%
+{data type: integer; }%
+}
+\end{ipifield}
+\begin{ipifield}{\hyperref[ENSEMBLE]{ensemble}}%
+{Holds all the information that is ensemble specific, such as the temperature and the external pressure.}%
+{}%
+{}
+\end{ipifield}
+\end{ipifield}

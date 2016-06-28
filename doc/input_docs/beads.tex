@@ -1,0 +1,54 @@
+\section{BEADS}
+\label{BEADS}
+\begin{ipifield}{}%
+{Describes the bead configurations in a path integral simulation.}%
+{}%
+{\ipiitem{natoms}%
+{The number of atoms.}%
+{default:  0 ; data type: integer; }%
+\ipiitem{nbeads}%
+{The number of beads.}%
+{default:  0 ; data type: integer; }%
+}
+\begin{ipifield}{q}%
+{The positions of the beads. In an array of size [nbeads, 3*natoms].}%
+{dimension: length; default:  [ ] ; data type: float; }%
+{\ipiitem{units}%
+{The units the input data is given in.}%
+{default: `'; data type: string; }%
+\ipiitem{shape}%
+{The shape of the array.}%
+{default:  (0,) ; data type: tuple; }%
+}
+\end{ipifield}
+\begin{ipifield}{p}%
+{The momenta of the beads. In an array of size [nbeads, 3*natoms].}%
+{dimension: momentum; default:  [ ] ; data type: float; }%
+{\ipiitem{units}%
+{The units the input data is given in.}%
+{default: `'; data type: string; }%
+\ipiitem{shape}%
+{The shape of the array.}%
+{default:  (0,) ; data type: tuple; }%
+}
+\end{ipifield}
+\begin{ipifield}{m}%
+{The masses of the atoms, in the format [m1, m2, \ldots  ].}%
+{dimension: mass; default:  [ ] ; data type: float; }%
+{\ipiitem{units}%
+{The units the input data is given in.}%
+{default: `'; data type: string; }%
+\ipiitem{shape}%
+{The shape of the array.}%
+{default:  (0,) ; data type: tuple; }%
+}
+\end{ipifield}
+\begin{ipifield}{names}%
+{The names of the atoms, in the format [name1, name2, \ldots  ].}%
+{default:  [ ] ; data type: string; }%
+{\ipiitem{shape}%
+{The shape of the array.}%
+{default:  (0,) ; data type: tuple; }%
+}
+\end{ipifield}
+\end{ipifield}

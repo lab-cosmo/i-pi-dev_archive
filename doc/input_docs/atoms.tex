@@ -1,0 +1,53 @@
+\section{ATOMS}
+\label{ATOMS}
+\begin{ipifield}{}%
+{Deals with a single replica of the system or classical simulations.}%
+{}%
+{}
+\begin{ipifield}{q}%
+{The positions of the atoms, in the format [x1, y1, z1, x2, \ldots  ].}%
+{dimension: length; default:  [ ] ; data type: float; }%
+{\ipiitem{units}%
+{The units the input data is given in.}%
+{default: `'; data type: string; }%
+\ipiitem{shape}%
+{The shape of the array.}%
+{default:  (0,) ; data type: tuple; }%
+}
+\end{ipifield}
+\begin{ipifield}{p}%
+{The momenta of the atoms, in the format [px1, py1, pz1, px2, \ldots  ].}%
+{dimension: momentum; default:  [ ] ; data type: float; }%
+{\ipiitem{units}%
+{The units the input data is given in.}%
+{default: `'; data type: string; }%
+\ipiitem{shape}%
+{The shape of the array.}%
+{default:  (0,) ; data type: tuple; }%
+}
+\end{ipifield}
+\begin{ipifield}{natoms}%
+{The number of atoms.}%
+{default:  0 ; data type: integer; }%
+{}
+\end{ipifield}
+\begin{ipifield}{m}%
+{The masses of the atoms, in the format [m1, m2, \ldots  ].}%
+{dimension: mass; default:  [ ] ; data type: float; }%
+{\ipiitem{units}%
+{The units the input data is given in.}%
+{default: `'; data type: string; }%
+\ipiitem{shape}%
+{The shape of the array.}%
+{default:  (0,) ; data type: tuple; }%
+}
+\end{ipifield}
+\begin{ipifield}{names}%
+{The names of the atoms, in the format [name1, name2, \ldots  ].}%
+{default:  [ ] ; data type: string; }%
+{\ipiitem{shape}%
+{The shape of the array.}%
+{default:  (0,) ; data type: tuple; }%
+}
+\end{ipifield}
+\end{ipifield}

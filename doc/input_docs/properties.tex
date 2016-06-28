@@ -1,0 +1,19 @@
+\section{PROPERTIES}
+\label{PROPERTIES}
+\begin{ipifield}{}%
+{This class deals with the output of properties to one file. Between each property tag there should be an array of strings, each of which specifies one property to be output.}%
+{data type: string; }%
+{\ipiitem{stride}%
+{The number of steps between successive writes.}%
+{default:  1 ; data type: integer; }%
+\ipiitem{shape}%
+{The shape of the array.}%
+{default:  (0,) ; data type: tuple; }%
+\ipiitem{flush}%
+{How often should streams be flushed. 1 means each time, zero means never.}%
+{default:  1 ; data type: integer; }%
+\ipiitem{filename}%
+{A string to specify the name of the file that is output. The file name is given by 'prefix'.'filename' + format\_specifier. The format specifier may also include a number if multiple similar files are output.}%
+{default: `out'; data type: string; }%
+}
+\end{ipifield}

@@ -1,0 +1,109 @@
+\select@language {english}
+\contentsline {chapter}{\numberline {1}About {i-PI}\xspace }{1}{chapter.1}
+\contentsline {section}{\numberline {1.1}Manual structure}{1}{section.1.1}
+\contentsline {section}{\numberline {1.2}Path Integral Molecular Dynamics}{2}{section.1.2}
+\contentsline {section}{\numberline {1.3}Implementation}{3}{section.1.3}
+\contentsline {subsection}{\numberline {1.3.1}Automated evaluation (depend objects)}{3}{subsection.1.3.1}
+\contentsline {subsection}{\numberline {1.3.2}Force evaluation}{3}{subsection.1.3.2}
+\contentsline {subsection}{\numberline {1.3.3}Communication protocol}{5}{subsection.1.3.3}
+\contentsline {subsection}{\numberline {1.3.4}Internal units}{5}{subsection.1.3.4}
+\contentsline {section}{\numberline {1.4}Core features}{6}{section.1.4}
+\contentsline {section}{\numberline {1.5}Licence and credits}{6}{section.1.5}
+\contentsline {subsection}{\numberline {1.5.1}Contributors}{6}{subsection.1.5.1}
+\contentsline {section}{\numberline {1.6}On-line resources}{6}{section.1.6}
+\contentsline {subsection}{\numberline {1.6.1}Python resources}{6}{subsection.1.6.1}
+\contentsline {subsection}{\numberline {1.6.2}Client code resources}{7}{subsection.1.6.2}
+\contentsline {subsection}{\numberline {1.6.3}{i-PI}\xspace resources}{7}{subsection.1.6.3}
+\contentsline {chapter}{\numberline {2}Getting started}{8}{chapter.2}
+\contentsline {section}{\numberline {2.1}Installing {i-PI}\xspace }{8}{section.2.1}
+\contentsline {subsection}{\numberline {2.1.1}Requirements}{8}{subsection.2.1.1}
+\contentsline {subsubsection}{\numberline {2.1.1.1}Using the setup.py module}{8}{subsubsection.2.1.1.1}
+\contentsline {subsection}{\numberline {2.1.2}{i-PI}\xspace download}{9}{subsection.2.1.2}
+\contentsline {subsection}{\numberline {2.1.3}Installing NumPy}{9}{subsection.2.1.3}
+\contentsline {subsection}{\numberline {2.1.4}PyFFTW}{10}{subsection.2.1.4}
+\contentsline {section}{\numberline {2.2}Installing clients}{11}{section.2.2}
+\contentsline {subsection}{\numberline {2.2.1}Patching CP2K}{11}{subsection.2.2.1}
+\contentsline {subsection}{\numberline {2.2.2}Patching Quantum-Espresso}{11}{subsection.2.2.2}
+\contentsline {subsection}{\numberline {2.2.3}Patching LAMMPS}{12}{subsection.2.2.3}
+\contentsline {subsection}{\numberline {2.2.4}Writing a patch}{12}{subsection.2.2.4}
+\contentsline {section}{\numberline {2.3}Running {i-PI}\xspace }{12}{section.2.3}
+\contentsline {subsection}{\numberline {2.3.1}Running the {i-PI}\xspace server}{12}{subsection.2.3.1}
+\contentsline {subsection}{\numberline {2.3.2}Running the client code}{13}{subsection.2.3.2}
+\contentsline {subsubsection}{\numberline {2.3.2.1}Built-in, example client}{13}{subsubsection.2.3.2.1}
+\contentsline {subsubsection}{\numberline {2.3.2.2}CP2K}{13}{subsubsection.2.3.2.2}
+\contentsline {subsubsection}{\numberline {2.3.2.3}Quantum-Espresso}{14}{subsubsection.2.3.2.3}
+\contentsline {subsubsection}{\numberline {2.3.2.4}LAMMPS}{14}{subsubsection.2.3.2.4}
+\contentsline {subsection}{\numberline {2.3.3}Running on a HPC system}{15}{subsection.2.3.3}
+\contentsline {section}{\numberline {2.4}Testing the install}{16}{section.2.4}
+\contentsline {subsection}{\numberline {2.4.1}test the installation with `nose`}{16}{subsection.2.4.1}
+\contentsline {subsection}{\numberline {2.4.2}test cases with input files}{16}{subsection.2.4.2}
+\contentsline {chapter}{\numberline {3}User guide}{18}{chapter.3}
+\contentsline {section}{\numberline {3.1}Input files}{18}{section.3.1}
+\contentsline {subsection}{\numberline {3.1.1}Input file format and structure}{18}{subsection.3.1.1}
+\contentsline {subsubsection}{\numberline {3.1.1.1}Overriding default units}{19}{subsubsection.3.1.1.1}
+\contentsline {subsection}{\numberline {3.1.2}Initialization section}{20}{subsection.3.1.2}
+\contentsline {subsubsection}{\numberline {3.1.2.1}Configuration files}{20}{subsubsection.3.1.2.1}
+\contentsline {subsubsection}{\numberline {3.1.2.2}Initialization from checkpoint files}{21}{subsubsection.3.1.2.2}
+\contentsline {section}{\numberline {3.2}Output files}{21}{section.3.2}
+\contentsline {subsection}{\numberline {3.2.1}Properties}{21}{subsection.3.2.1}
+\contentsline {subsection}{\numberline {3.2.2}Trajectory files}{27}{subsection.3.2.2}
+\contentsline {subsection}{\numberline {3.2.3}Checkpoint files}{28}{subsection.3.2.3}
+\contentsline {subsubsection}{\numberline {3.2.3.1}Soft exit and RESTART}{29}{subsubsection.3.2.3.1}
+\contentsline {section}{\numberline {3.3}Distributed execution}{29}{section.3.3}
+\contentsline {subsection}{\numberline {3.3.1}Communication protocol}{29}{subsection.3.3.1}
+\contentsline {subsection}{\numberline {3.3.2}Parallelization}{30}{subsection.3.3.2}
+\contentsline {subsection}{\numberline {3.3.3}Sockets}{31}{subsection.3.3.3}
+\contentsline {subsection}{\numberline {3.3.4}Running {i-PI}\xspace over the network}{32}{subsection.3.3.4}
+\contentsline {subsubsection}{\numberline {3.3.4.1}Understanding the network layout}{32}{subsubsection.3.3.4.1}
+\contentsline {subsubsection}{\numberline {3.3.4.2}ssh tunnelling}{33}{subsubsection.3.3.4.2}
+\contentsline {chapter}{\numberline {4}Input reference}{35}{chapter.4}
+\contentsline {section}{\numberline {4.1}SIMULATION}{35}{section.4.1}
+\contentsline {section}{\numberline {4.2}FORCEFIELD}{37}{section.4.2}
+\contentsline {section}{\numberline {4.3}FFSOCKET}{37}{section.4.3}
+\contentsline {section}{\numberline {4.4}SYSTEM}{38}{section.4.4}
+\contentsline {section}{\numberline {4.5}MOTION}{40}{section.4.5}
+\contentsline {section}{\numberline {4.6}DYNAMICS}{40}{section.4.6}
+\contentsline {section}{\numberline {4.7}INITIALIZER}{41}{section.4.7}
+\contentsline {section}{\numberline {4.8}INITFILE}{44}{section.4.8}
+\contentsline {section}{\numberline {4.9}INITPOSITIONS}{44}{section.4.9}
+\contentsline {section}{\numberline {4.10}INITMOMENTA}{45}{section.4.10}
+\contentsline {section}{\numberline {4.11}INITVELOCITIES}{45}{section.4.11}
+\contentsline {section}{\numberline {4.12}INITLABELS}{46}{section.4.12}
+\contentsline {section}{\numberline {4.13}INITMASSES}{46}{section.4.13}
+\contentsline {section}{\numberline {4.14}INITCELL}{46}{section.4.14}
+\contentsline {section}{\numberline {4.15}INITTHERMO}{47}{section.4.15}
+\contentsline {section}{\numberline {4.16}ENSEMBLE}{47}{section.4.16}
+\contentsline {section}{\numberline {4.17}FORCES}{47}{section.4.17}
+\contentsline {section}{\numberline {4.18}FORCECOMPONENT}{48}{section.4.18}
+\contentsline {section}{\numberline {4.19}CELL}{49}{section.4.19}
+\contentsline {section}{\numberline {4.20}BEADS}{49}{section.4.20}
+\contentsline {section}{\numberline {4.21}ATOMS}{50}{section.4.21}
+\contentsline {section}{\numberline {4.22}NORMALMODES}{51}{section.4.22}
+\contentsline {section}{\numberline {4.23}BAROSTAT}{51}{section.4.23}
+\contentsline {section}{\numberline {4.24}THERMOSTATS}{52}{section.4.24}
+\contentsline {section}{\numberline {4.25}PRNG}{54}{section.4.25}
+\contentsline {section}{\numberline {4.26}OUTPUTS}{55}{section.4.26}
+\contentsline {section}{\numberline {4.27}CHECKPOINT}{56}{section.4.27}
+\contentsline {section}{\numberline {4.28}PROPERTIES}{57}{section.4.28}
+\contentsline {section}{\numberline {4.29}TRAJECTORY}{57}{section.4.29}
+\contentsline {chapter}{\numberline {5}A simple tutorial}{58}{chapter.5}
+\contentsline {section}{\numberline {5.1}Part 1 - \emph {NVT} Equilibration run}{58}{section.5.1}
+\contentsline {subsection}{\numberline {5.1.1}Client code}{58}{subsection.5.1.1}
+\contentsline {subsection}{\numberline {5.1.2}Creating the xml input file}{59}{subsection.5.1.2}
+\contentsline {subsubsection}{\numberline {5.1.2.1}Initializing the configurations}{60}{subsubsection.5.1.2.1}
+\contentsline {subsubsection}{\numberline {5.1.2.2}Creating the server socket}{62}{subsubsection.5.1.2.2}
+\contentsline {subsubsection}{\numberline {5.1.2.3}Generating the correct dynamics}{63}{subsubsection.5.1.2.3}
+\contentsline {subsubsection}{\numberline {5.1.2.4}Customizing the output}{64}{subsubsection.5.1.2.4}
+\contentsline {subsection}{\numberline {5.1.3}Running the simulation}{68}{subsection.5.1.3}
+\contentsline {subsection}{\numberline {5.1.4}Output data}{68}{subsection.5.1.4}
+\contentsline {section}{\numberline {5.2}Part 2 - \emph {NPT} simulation}{69}{section.5.2}
+\contentsline {subsection}{\numberline {5.2.1}Modifying the RESTART file}{69}{subsection.5.2.1}
+\contentsline {subsection}{\numberline {5.2.2}Initialization from RESTART}{70}{subsection.5.2.2}
+\contentsline {subsection}{\numberline {5.2.3}Running the simulation}{71}{subsection.5.2.3}
+\contentsline {section}{\numberline {5.3}Part 3 - A fully converged simulation}{71}{section.5.3}
+\contentsline {chapter}{\numberline {6}Troubleshooting}{73}{chapter.6}
+\contentsline {section}{\numberline {6.1}Input errors}{73}{section.6.1}
+\contentsline {section}{\numberline {6.2}Initialization errors}{74}{section.6.2}
+\contentsline {section}{\numberline {6.3}Output errors}{76}{section.6.3}
+\contentsline {section}{\numberline {6.4}Socket errors}{77}{section.6.4}
+\contentsline {section}{\numberline {6.5}Mathematical errors}{77}{section.6.5}

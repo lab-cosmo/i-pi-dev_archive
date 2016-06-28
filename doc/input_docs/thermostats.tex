@@ -1,0 +1,72 @@
+\section{THERMOSTATS}
+\label{THERMOSTATS}
+\begin{ipifield}{}%
+{Simulates an external heat bath to keep the velocity distribution at the correct temperature.}%
+{}%
+{\ipiitem{mode}%
+{The style of thermostatting. 'langevin' specifies a white noise langevin equation to be attached to the cartesian representation of the momenta. 'svr' attaches a velocity rescaling thermostat to the cartesian representation of the momenta. Both 'pile\_l' and 'pile\_g' attaches a white noise langevin thermostat to the normal mode representation, with 'pile\_l' attaching a local langevin thermostat to the centroid mode and 'pile\_g' instead attaching a global velocity rescaling thermostat. 'gle' attaches a coloured noise langevin thermostat to the cartesian representation of the momenta, 'nm\_gle' attaches a coloured noise langevin thermostat to the normal mode representation of the momenta and a langevin thermostat to the centroid and 'nm\_gle\_g' attaches a gle thermostat to the normal modes and a svr thermostat to the centroid.  'multiple' is a special thermostat mode, in which one can define multiple thermostats \_inside\_ the thermostat tag.}%
+{data type: string; options: `', `langevin', `svr', `pile\_l', `pile\_g', `gle', `nm\_gle', `nm\_gle\_g', `multi'; }%
+}
+\begin{ipifield}{A}%
+{The friction matrix for GLE thermostats.}%
+{dimension: frequency; default:  [ ] ; data type: float; }%
+{\ipiitem{units}%
+{The units the input data is given in.}%
+{default: `'; data type: string; }%
+\ipiitem{shape}%
+{The shape of the array.}%
+{default:  (0,) ; data type: tuple; }%
+}
+\end{ipifield}
+\begin{ipifield}{tau}%
+{The friction coefficient for white noise thermostats.}%
+{dimension: time; default:  0.0 ; data type: float; }%
+{\ipiitem{units}%
+{The units the input data is given in.}%
+{default: `'; data type: string; }%
+}
+\end{ipifield}
+\begin{ipifield}{C}%
+{The covariance matrix for GLE thermostats.}%
+{dimension: temperature; default:  [ ] ; data type: float; }%
+{\ipiitem{units}%
+{The units the input data is given in.}%
+{default: `'; data type: string; }%
+\ipiitem{shape}%
+{The shape of the array.}%
+{default:  (0,) ; data type: tuple; }%
+}
+\end{ipifield}
+\begin{ipifield}{ethermo}%
+{The initial value of the thermostat energy. Used when the simulation is restarted to guarantee continuity of the conserved quantity.}%
+{dimension: energy; default:  0.0 ; data type: float; }%
+{\ipiitem{units}%
+{The units the input data is given in.}%
+{default: `'; data type: string; }%
+}
+\end{ipifield}
+\begin{ipifield}{s}%
+{Input values for the additional momenta in GLE.}%
+{dimension: ms-momentum; default:  [ ] ; data type: float; }%
+{\ipiitem{units}%
+{The units the input data is given in.}%
+{default: `'; data type: string; }%
+\ipiitem{shape}%
+{The shape of the array.}%
+{default:  (0,) ; data type: tuple; }%
+}
+\end{ipifield}
+\begin{ipifield}{pile\_lambda}%
+{Scaling for the PILE damping relative to the critical damping. (gamma\_k=2*lambda*omega\_k}%
+{default:  1.0 ; data type: float; }%
+{}
+\end{ipifield}
+\begin{ipifield}{\hyperref[THERMOSTATS]{thermostat}}%
+{The thermostat for the atoms, keeps the atom velocity distribution at the correct temperature.}%
+{}%
+{\ipiitem{mode}%
+{The style of thermostatting. 'langevin' specifies a white noise langevin equation to be attached to the cartesian representation of the momenta. 'svr' attaches a velocity rescaling thermostat to the cartesian representation of the momenta. Both 'pile\_l' and 'pile\_g' attaches a white noise langevin thermostat to the normal mode representation, with 'pile\_l' attaching a local langevin thermostat to the centroid mode and 'pile\_g' instead attaching a global velocity rescaling thermostat. 'gle' attaches a coloured noise langevin thermostat to the cartesian representation of the momenta, 'nm\_gle' attaches a coloured noise langevin thermostat to the normal mode representation of the momenta and a langevin thermostat to the centroid and 'nm\_gle\_g' attaches a gle thermostat to the normal modes and a svr thermostat to the centroid.  'multiple' is a special thermostat mode, in which one can define multiple thermostats \_inside\_ the thermostat tag.}%
+{data type: string; options: `', `langevin', `svr', `pile\_l', `pile\_g', `gle', `nm\_gle', `nm\_gle\_g', `multi'; }%
+}
+\end{ipifield}
+\end{ipifield}

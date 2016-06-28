@@ -1,0 +1,46 @@
+\section{FFSOCKET}
+\label{FFSOCKET}
+\begin{ipifield}{}%
+{Deals with the assigning of force calculation jobs to different driver codes, and collecting the data, using a socket for the data communication.}%
+{}%
+{\ipiitem{mode}%
+{Specifies whether the driver interface will listen onto a internet socket [inet] or onto a unix socket [unix].}%
+{default: `inet'; data type: string; options: `unix', `inet'; }%
+\ipiitem{pbc}%
+{Applies periodic boundary conditions to the atoms coordinates before passing them on to the driver code.}%
+{default:  True ; data type: boolean; }%
+\ipiitem{name}%
+{Mandatory. The name by which the forcefield will be identified in the System forces section.}%
+{data type: string; }%
+}
+\begin{ipifield}{latency}%
+{The number of seconds the polling thread will wait between exhamining the list of requests.}%
+{default:  0.01 ; data type: float; }%
+{}
+\end{ipifield}
+\begin{ipifield}{timeout}%
+{This gives the number of seconds before assuming a calculation has died. If 0 there is no timeout.}%
+{default:  0.0 ; data type: float; }%
+{}
+\end{ipifield}
+\begin{ipifield}{parameters}%
+{The parameters of the force field}%
+{default:  \{ \} ; data type: dictionary; }%
+{}
+\end{ipifield}
+\begin{ipifield}{address}%
+{This gives the server address that the socket will run on.}%
+{default: `localhost'; data type: string; }%
+{}
+\end{ipifield}
+\begin{ipifield}{slots}%
+{This gives the number of client codes that can queue at any one time.}%
+{default:  4 ; data type: integer; }%
+{}
+\end{ipifield}
+\begin{ipifield}{port}%
+{This gives the port number that defines the socket.}%
+{default:  65535 ; data type: integer; }%
+{}
+\end{ipifield}
+\end{ipifield}

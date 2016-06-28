@@ -1,0 +1,55 @@
+\section{MOTION}
+\label{MOTION}
+\begin{ipifield}{}%
+{Allow chosing the type of calculation to be performed. Holds all the information that is calculation specific, such as geometry optimization parameters, etc.}%
+{}%
+{\ipiitem{mode}%
+{How atoms should be moved at each step in the simulation. 'replay' means that a simulation is restarted from a previous simulation.}%
+{data type: string; options: `minimize', `replay', `neb', `dynamics', `dummy'; }%
+}
+\begin{ipifield}{fixatoms}%
+{Indices of the atmoms that should be held fixed.}%
+{default:  [ ] ; data type: integer; }%
+{\ipiitem{shape}%
+{The shape of the array.}%
+{default:  (0,) ; data type: tuple; }%
+}
+\end{ipifield}
+\begin{ipifield}{\hyperref[GEOP]{optimizer}}%
+{Option for geometry optimization}%
+{}%
+{\ipiitem{mode}%
+{The geometry optimization algorithm to be used}%
+{default: `lbfgs'; data type: string; options: `sd', `cg', `bfgs', `lbfgs'; }%
+}
+\end{ipifield}
+\begin{ipifield}{\hyperref[INITFILE]{file}}%
+{This describes the location to read a trajectory file from.}%
+{default: `'; data type: string; }%
+{\ipiitem{mode}%
+{The input data format. 'xyz' and 'pdb' stand for xyz and pdb input files respectively. 'chk' stands for initialization from a checkpoint file.}%
+{default: `xyz'; data type: string; options: `xyz', `pdb', `chk'; }%
+}
+\end{ipifield}
+\begin{ipifield}{\hyperref[GEOP]{neb\_optimizer}}%
+{Option for geometry optimization}%
+{}%
+{\ipiitem{mode}%
+{The geometry optimization algorithm to be used}%
+{default: `lbfgs'; data type: string; options: `sd', `cg', `bfgs', `lbfgs'; }%
+}
+\end{ipifield}
+\begin{ipifield}{\hyperref[DYNAMICS]{dynamics}}%
+{Option for (path integral) molecular dynamics}%
+{}%
+{\ipiitem{mode}%
+{The ensemble that will be sampled during the simulation. }%
+{default: `nve'; data type: string; options: `nve', `nvt', `npt', `nst', `mts'; }%
+}
+\end{ipifield}
+\begin{ipifield}{fixcom}%
+{This describes whether the centre of mass of the particles is fixed.}%
+{default:  True ; data type: boolean; }%
+{}
+\end{ipifield}
+\end{ipifield}

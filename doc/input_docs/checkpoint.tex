@@ -1,0 +1,16 @@
+\section{CHECKPOINT}
+\label{CHECKPOINT}
+\begin{ipifield}{}%
+{This class defines how a checkpoint file should be output. Optionally, between the checkpoint tags, you can specify one integer giving the current step of the simulation. By default this integer will be zero.}%
+{data type: integer; }%
+{\ipiitem{stride}%
+{The number of steps between successive writes.}%
+{default:  1 ; data type: integer; }%
+\ipiitem{overwrite}%
+{This specifies whether or not each consecutive checkpoint file will overwrite the old one.}%
+{default:  True ; data type: boolean; }%
+\ipiitem{filename}%
+{A string to specify the name of the file that is output. The file name is given by 'prefix'.'filename' + format\_specifier. The format specifier may also include a number if multiple similar files are output.}%
+{default: `restart'; data type: string; }%
+}
+\end{ipifield}
