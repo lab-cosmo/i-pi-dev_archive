@@ -7,8 +7,16 @@
          <address>zundel</address>
          <activelist> [0,1,2,3,4,5,6] </activelist>
    </ffsocket>
+    <ffsocket mode='unix' name='driver2'>
+         <latency>  1.00000000e-02</latency>
+         <slots>4</slots>
+         <port>20614</port>
+         <timeout>  6.00000000e+02</timeout>
+         <address>zundel2</address>
+         <activelist> [7,8,9,10,11,12,13] </activelist>
+   </ffsocket>
    <total_steps>400</total_steps>
-   <output prefix="data">
+   <output prefix="databoth">
       <trajectory stride="2" filename="pos" cell_units="angstrom">positions{angstrom}</trajectory>
       <trajectory stride="2" filename="xc" format="xyz">x_centroid{angstrom}</trajectory>
       <trajectory stride="2" filename="xc2" format="xyz">x_centroid</trajectory>
@@ -28,9 +36,10 @@
          </thermostat>
      </dynamics>
    </motion>
-      <forces> <force forcefield="driver">driver</force></forces>
+      <forces> <force forcefield="driver">driver</force>
+           <force forcefield="driver2">driver2</force> </forces>
       <initialize nbeads="1">
-        <file mode="xyz" units="angstrom">./h5o2+.xyz</file>
+        <file mode="xyz" units="angstrom">./double.xyz</file>
         <cell>
          [   25.29166, 0, 0, 0, 25.29166, 0, 0, 0, 25.29166 ]
         </cell>

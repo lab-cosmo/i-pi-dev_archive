@@ -348,6 +348,7 @@ class Driver(DriverSocket):
       mvir = np.zeros((3,3),np.float64)
       mvir = self.recvall(mvir)
 
+
       #! Machinery to return a string as an "extra" field. Comment if you are using a old patched driver that does not return anything!
       mlen = np.int32()
       mlen = self.recvall(mlen)
@@ -357,7 +358,6 @@ class Driver(DriverSocket):
          mxtra = "".join(mxtra)
       else:
          mxtra = ""
-
       return [mu, mf, mvir, mxtra]
 
 
@@ -573,7 +573,7 @@ class InterfaceSocket(object):
                   while fc.status & Status.Busy: # waits for initialization to finish. hopefully this is fast
                      fc.poll()
                if fc.status & Status.Ready:
-                  fc.sendpos(r["pos"], r["cell"])
+                  fc.sendpos(r["pos"][r["active"]], r["cell"])
                   r["status"] = "Running"
                   r["start"] = time.time() # sets start time for the request
                   #fc.poll()
@@ -603,8 +603,12 @@ class InterfaceSocket(object):
          if c.status & Status.HasData:
             try:
                r["result"] = c.getforce()
-               if len(r["result"][1]) != len(r["active"]):
+               if len(r["result"][1]) != len(r["pos"][r["active"]]):
                   raise InvalidSize
+               # If only a piece of the system is active, resize forces and reassign   
+               rftemp=r["result"][1]
+               r["result"][1]=np.zeros(len(r["pos"]),dtype=np.float64)
+               r["result"][1][r["active"]]=rftemp
             except Disconnected:
                c.status = Status.Disconnected
                continue

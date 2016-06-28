@@ -143,11 +143,11 @@ class ForceField(dobject):
 
 
         if self.dopbc:
-            cell.array_pbc(pbcpos[activehere])
+            cell.array_pbc(pbcpos)
 
         newreq = ForceRequest({
             "id": reqid,
-            "pos": pbcpos[activehere],
+            "pos": pbcpos,
             "active": activehere,
             "cell": (depstrip(cell.h).copy(), depstrip(cell.ih).copy()),
             "pars": par_str,
@@ -165,10 +165,10 @@ class ForceField(dobject):
 
     def poll(self):
         """Polls the forcefield object to check if it has finished."""
-
+        
         for r in self.requests:
             if r["status"] == "Queued":
-               r["result"] = [0.0, np.zeros(len(r["active"]), float), np.zeros((3,3), float), ""]
+               r["result"] = [0.0, np.zeros(len(r["pos"]), float), np.zeros((3,3), float), ""]
                r["status"] = "Done"
 
     def _poll_loop(self):

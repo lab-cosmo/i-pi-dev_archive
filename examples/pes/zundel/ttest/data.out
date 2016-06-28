@@ -6,300 +6,204 @@
 # column   6     --> potential : The physical system potential energy.
 # column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
 # column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-# column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-# column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-# column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-# column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-# column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-# column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-# column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-# column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-# column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-# column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   # column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-# column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   # column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-# column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   # column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-# column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   # column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   # column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   # column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   # column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   # column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   # column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   # column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   # column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-# column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   # column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   # column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   # column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   # column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   # column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-# column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   # column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   # column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   # column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   # column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   # column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   # column   1     --> step : The current simulation time step.
-# column   2     --> time : The elapsed simulation time.
-# column   3     --> conserved : The value of the conserved energy quantity per bead.
-# column   4     --> temperature{kelvin} : The current temperature, as obtained from the MD kinetic energy.
-# column   5     --> kinetic_cv : The centroid-virial quantum kinetic energy of the physical system.
-# column   6     --> potential : The physical system potential energy.
-# column   7     --> kinetic_cv(H) : The centroid-virial quantum kinetic energy of the physical system.
-# column   8     --> kinetic_cv(O) : The centroid-virial quantum kinetic energy of the physical system.
-    0.00000000e+00     0.00000000e+00   
+    0.00000000e+00     0.00000000e+00     3.87691528e-04     0.00000000e+00     1.99509358e-02     3.87691528e-04     1.42506684e-02     5.70026736e-03   
+    2.00000000e+00     2.06706865e+01     3.87670565e-04     3.86145857e+00     1.99509358e-02     3.84854780e-04     1.42506684e-02     5.70026736e-03   
+    4.00000000e+00     4.13413730e+01     3.87586893e-04     3.98118220e+00     1.99509358e-02     3.74034624e-04     1.42506684e-02     5.70026736e-03   
+    6.00000000e+00     6.20120595e+01     3.87472642e-04     5.58916069e+00     1.99509358e-02     3.57981025e-04     1.42506684e-02     5.70026736e-03   
+    8.00000000e+00     8.26827460e+01     3.87173444e-04     9.30181957e+00     1.99509358e-02     3.14436622e-04     1.42506684e-02     5.70026736e-03   
+    1.00000000e+01     1.03353433e+02     3.86905924e-04     1.55080624e+01     1.99509358e-02     2.75650443e-04     1.42506684e-02     5.70026736e-03   
+    1.20000000e+01     1.24024119e+02     3.86964412e-04     1.49931212e+01     1.99509358e-02     2.80648568e-04     1.42506684e-02     5.70026736e-03   
+    1.40000000e+01     1.44694806e+02     3.87651905e-04     1.71779528e+01     1.99509358e-02     3.64721638e-04     1.42506684e-02     5.70026736e-03   
+    1.60000000e+01     1.65365492e+02     3.88813438e-04     1.91509489e+01     1.99509358e-02     5.15468350e-04     1.42506684e-02     5.70026736e-03   
+    1.80000000e+01     1.86036179e+02     3.90186585e-04     1.84428737e+01     1.99509358e-02     6.87120244e-04     1.42506684e-02     5.70026736e-03   
+    2.00000000e+01     2.06706865e+02     3.91203657e-04     1.57254836e+01     1.99509358e-02     8.11891592e-04     1.42506684e-02     5.70026736e-03   
+    2.20000000e+01     2.27377552e+02     3.90996587e-04     1.95217971e+01     1.99509358e-02     7.88713223e-04     1.42506684e-02     5.70026736e-03   
+    2.40000000e+01     2.48048238e+02     3.89784180e-04     2.34346127e+01     1.99509358e-02     6.48418217e-04     1.42506684e-02     5.70026736e-03   
+    2.60000000e+01     2.68718925e+02     3.87957967e-04     2.92896595e+01     1.99509358e-02     4.26710919e-04     1.42506684e-02     5.70026736e-03   
+    2.80000000e+01     2.89389611e+02     3.86805092e-04     2.82540334e+01     1.99509358e-02     2.87308434e-04     1.42506684e-02     5.70026736e-03   
+    3.00000000e+01     3.10060298e+02     3.86760576e-04     2.86857721e+01     1.99509358e-02     2.82202222e-04     1.42506684e-02     5.70026736e-03   
+    3.20000000e+01     3.30730984e+02     3.87478696e-04     2.99284915e+01     1.99509358e-02     3.75265031e-04     1.42506684e-02     5.70026736e-03   
+    3.40000000e+01     3.51401671e+02     3.88735484e-04     2.76796088e+01     1.99509358e-02     5.49153012e-04     1.42506684e-02     5.70026736e-03   
+    3.60000000e+01     3.72072357e+02     3.90000176e-04     2.43577088e+01     1.99509358e-02     7.40230467e-04     1.42506684e-02     5.70026736e-03   
+    3.80000000e+01     3.92743044e+02     3.90729271e-04     2.68308998e+01     1.99509358e-02     8.68071079e-04     1.42506684e-02     5.70026736e-03   
+    4.00000000e+01     4.13413730e+02     3.90527426e-04     3.37066052e+01     1.99509358e-02     8.69865213e-04     1.42506684e-02     5.70026736e-03   
+    4.20000000e+01     4.34084417e+02     3.90008748e-04     3.75077138e+01     1.99509358e-02     8.32618792e-04     1.42506684e-02     5.70026736e-03   
+    4.40000000e+01     4.54755103e+02     3.89743850e-04     4.32861733e+01     1.99509358e-02     8.12024428e-04     1.42506684e-02     5.70026736e-03   
+    4.60000000e+01     4.75425790e+02     3.89830564e-04     4.73407179e+01     1.99509358e-02     8.14732849e-04     1.42506684e-02     5.70026736e-03   
+    4.80000000e+01     4.96096476e+02     3.90750397e-04     5.05079557e+01     1.99509358e-02     9.08039439e-04     1.42506684e-02     5.70026736e-03   
+    5.00000000e+01     5.16767163e+02     3.91592283e-04     5.14838660e+01     1.99509358e-02     1.00228129e-03     1.42506684e-02     5.70026736e-03   
+    5.20000000e+01     5.37437849e+02     3.91955755e-04     5.51536090e+01     1.99509358e-02     1.04561937e-03     1.42506684e-02     5.70026736e-03   
+    5.40000000e+01     5.58108536e+02     3.91486232e-04     6.50147154e+01     1.99509358e-02     9.70863766e-04     1.42506684e-02     5.70026736e-03   
+    5.60000000e+01     5.78779222e+02     3.90998574e-04     6.70233934e+01     1.99509358e-02     8.56119136e-04     1.42506684e-02     5.70026736e-03   
+    5.80000000e+01     5.99449909e+02     3.90673362e-04     7.56229505e+01     1.99509358e-02     7.54853325e-04     1.42506684e-02     5.70026736e-03   
+    6.00000000e+01     6.20120595e+02     3.90777433e-04     7.71742239e+01     1.99509358e-02     7.27485586e-04     1.42506684e-02     5.70026736e-03   
+    6.20000000e+01     6.40791282e+02     3.90926402e-04     7.63542317e+01     1.99509358e-02     7.42651325e-04     1.42506684e-02     5.70026736e-03   
+    6.40000000e+01     6.61461968e+02     3.91631053e-04     7.46921874e+01     1.99509358e-02     8.41745675e-04     1.42506684e-02     5.70026736e-03   
+    6.60000000e+01     6.82132655e+02     3.92667968e-04     6.65771039e+01     1.99509358e-02     9.85271134e-04     1.42506684e-02     5.70026736e-03   
+    6.80000000e+01     7.02803341e+02     3.93599780e-04     6.17260041e+01     1.99509358e-02     1.12138425e-03     1.42506684e-02     5.70026736e-03   
+    7.00000000e+01     7.23474028e+02     3.94008342e-04     6.23813213e+01     1.99509358e-02     1.18635894e-03     1.42506684e-02     5.70026736e-03   
+    7.20000000e+01     7.44144714e+02     3.93766166e-04     6.81453695e+01     1.99509358e-02     1.16714551e-03     1.42506684e-02     5.70026736e-03   
+    7.40000000e+01     7.64815401e+02     3.92667088e-04     7.39509219e+01     1.99509358e-02     1.03749169e-03     1.42506684e-02     5.70026736e-03   
+    7.60000000e+01     7.85486087e+02     3.90971138e-04     8.18781525e+01     1.99509358e-02     8.34664904e-04     1.42506684e-02     5.70026736e-03   
+    7.80000000e+01     8.06156774e+02     3.89301974e-04     8.37518196e+01     1.99509358e-02     6.44893833e-04     1.42506684e-02     5.70026736e-03   
+    8.00000000e+01     8.26827460e+02     3.89324096e-04     9.16758092e+01     1.99509358e-02     6.58097530e-04     1.42506684e-02     5.70026736e-03   
+    8.20000000e+01     8.47498147e+02     3.90950966e-04     8.97005600e+01     1.99509358e-02     8.47112615e-04     1.42506684e-02     5.70026736e-03   
+    8.40000000e+01     8.68168833e+02     3.93303094e-04     9.08570274e+01     1.99509358e-02     1.10511907e-03     1.42506684e-02     5.70026736e-03   
+    8.60000000e+01     8.88839520e+02     3.95686333e-04     9.58927590e+01     1.99509358e-02     1.38138075e-03     1.42506684e-02     5.70026736e-03   
+    8.80000000e+01     9.09510206e+02     3.96399619e-04     9.05469640e+01     1.99509358e-02     1.49167026e-03     1.42506684e-02     5.70026736e-03   
+    9.00000000e+01     9.30180893e+02     3.95795776e-04     9.11298718e+01     1.99509358e-02     1.47011958e-03     1.42506684e-02     5.70026736e-03   
+    9.20000000e+01     9.50851579e+02     3.93795014e-04     1.00193656e+02     1.99509358e-02     1.28230361e-03     1.42506684e-02     5.70026736e-03   
+    9.40000000e+01     9.71522266e+02     3.91490956e-04     9.95717800e+01     1.99509358e-02     1.04028160e-03     1.42506684e-02     5.70026736e-03   
+    9.60000000e+01     9.92192952e+02     3.89501627e-04     1.13218742e+02     1.99509358e-02     8.31674287e-04     1.42506684e-02     5.70026736e-03   
+    9.80000000e+01     1.01286364e+03     3.88992733e-04     1.13722175e+02     1.99509358e-02     8.19682182e-04     1.42506684e-02     5.70026736e-03   
+    1.00000000e+02     1.03353433e+03     3.89792908e-04     1.23183768e+02     1.99509358e-02     1.00543214e-03     1.42506684e-02     5.70026736e-03   
+    1.02000000e+02     1.05420501e+03     3.92134014e-04     1.14158993e+02     1.99509358e-02     1.40637490e-03     1.42506684e-02     5.70026736e-03   
+    1.04000000e+02     1.07487570e+03     3.94725593e-04     1.12741472e+02     1.99509358e-02     1.84455221e-03     1.42506684e-02     5.70026736e-03   
+    1.06000000e+02     1.09554638e+03     3.96727186e-04     1.06244887e+02     1.99509358e-02     2.20576045e-03     1.42506684e-02     5.70026736e-03   
+    1.08000000e+02     1.11621707e+03     3.97223062e-04     1.18326197e+02     1.99509358e-02     2.34751035e-03     1.42506684e-02     5.70026736e-03   
+    1.10000000e+02     1.13688776e+03     3.96288120e-04     1.19786750e+02     1.99509358e-02     2.28956610e-03     1.42506684e-02     5.70026736e-03   
+    1.12000000e+02     1.15755844e+03     3.94368885e-04     1.20741746e+02     1.99509358e-02     2.09920734e-03     1.42506684e-02     5.70026736e-03   
+    1.14000000e+02     1.17822913e+03     3.91720866e-04     1.25146417e+02     1.99509358e-02     1.82637617e-03     1.42506684e-02     5.70026736e-03   
+    1.16000000e+02     1.19889982e+03     3.89764087e-04     1.35491624e+02     1.99509358e-02     1.66912726e-03     1.42506684e-02     5.70026736e-03   
+    1.18000000e+02     1.21957050e+03     3.90026131e-04     1.28188775e+02     1.99509358e-02     1.77841378e-03     1.42506684e-02     5.70026736e-03   
+    1.20000000e+02     1.24024119e+03     3.92176195e-04     1.35687387e+02     1.99509358e-02     2.08910724e-03     1.42506684e-02     5.70026736e-03   
+    1.22000000e+02     1.26091188e+03     3.95082567e-04     1.28611632e+02     1.99509358e-02     2.48327015e-03     1.42506684e-02     5.70026736e-03   
+    1.24000000e+02     1.28158256e+03     3.96804076e-04     1.34975277e+02     1.99509358e-02     2.73608683e-03     1.42506684e-02     5.70026736e-03   
+    1.26000000e+02     1.30225325e+03     3.96853684e-04     1.32920220e+02     1.99509358e-02     2.80777698e-03     1.42506684e-02     5.70026736e-03   
+    1.28000000e+02     1.32292394e+03     3.95723017e-04     1.35114602e+02     1.99509358e-02     2.76001948e-03     1.42506684e-02     5.70026736e-03   
+    1.30000000e+02     1.34359462e+03     3.93878517e-04     1.50847179e+02     1.99509358e-02     2.64456428e-03     1.42506684e-02     5.70026736e-03   
+    1.32000000e+02     1.36426531e+03     3.92353049e-04     1.45898429e+02     1.99509358e-02     2.52748437e-03     1.42506684e-02     5.70026736e-03   
+    1.34000000e+02     1.38493600e+03     3.92172791e-04     1.40294792e+02     1.99509358e-02     2.53558572e-03     1.42506684e-02     5.70026736e-03   
+    1.36000000e+02     1.40560668e+03     3.93159623e-04     1.42572600e+02     1.99509358e-02     2.70369958e-03     1.42506684e-02     5.70026736e-03   
+    1.38000000e+02     1.42627737e+03     3.94878817e-04     1.51158400e+02     1.99509358e-02     3.00802042e-03     1.42506684e-02     5.70026736e-03   
+    1.40000000e+02     1.44694806e+03     3.97379511e-04     1.40571258e+02     1.99509358e-02     3.42064636e-03     1.42506684e-02     5.70026736e-03   
+    1.42000000e+02     1.46761874e+03     3.99866380e-04     1.46207961e+02     1.99509358e-02     3.79476365e-03     1.42506684e-02     5.70026736e-03   
+    1.44000000e+02     1.48828943e+03     4.01564349e-04     1.54728408e+02     1.99509358e-02     4.03059661e-03     1.42506684e-02     5.70026736e-03   
+    1.46000000e+02     1.50896011e+03     4.01086594e-04     1.52583382e+02     1.99509358e-02     3.94895615e-03     1.42506684e-02     5.70026736e-03   
+    1.48000000e+02     1.52963080e+03     3.99557746e-04     1.63257831e+02     1.99509358e-02     3.71538272e-03     1.42506684e-02     5.70026736e-03   
+    1.50000000e+02     1.55030149e+03     3.98071494e-04     1.70944399e+02     1.99509358e-02     3.50182839e-03     1.42506684e-02     5.70026736e-03   
+    1.52000000e+02     1.57097217e+03     3.97155978e-04     1.71899812e+02     1.99509358e-02     3.34919089e-03     1.42506684e-02     5.70026736e-03   
+    1.54000000e+02     1.59164286e+03     3.96784714e-04     1.71311571e+02     1.99509358e-02     3.26508736e-03     1.42506684e-02     5.70026736e-03   
+    1.56000000e+02     1.61231355e+03     3.96993396e-04     1.75385493e+02     1.99509358e-02     3.26542861e-03     1.42506684e-02     5.70026736e-03   
+    1.58000000e+02     1.63298423e+03     3.97691878e-04     1.81974660e+02     1.99509358e-02     3.34222571e-03     1.42506684e-02     5.70026736e-03   
+    1.60000000e+02     1.65365492e+03     3.97897722e-04     1.70172125e+02     1.99509358e-02     3.37501195e-03     1.42506684e-02     5.70026736e-03   
+    1.62000000e+02     1.67432561e+03     3.98454279e-04     1.70021534e+02     1.99509358e-02     3.45147719e-03     1.42506684e-02     5.70026736e-03   
+    1.64000000e+02     1.69499629e+03     3.97611058e-04     1.65315599e+02     1.99509358e-02     3.38666482e-03     1.42506684e-02     5.70026736e-03   
+    1.66000000e+02     1.71566698e+03     3.96179198e-04     1.68836920e+02     1.99509358e-02     3.29747333e-03     1.42506684e-02     5.70026736e-03   
+    1.68000000e+02     1.73633767e+03     3.95608259e-04     1.77422936e+02     1.99509358e-02     3.30028557e-03     1.42506684e-02     5.70026736e-03   
+    1.70000000e+02     1.75700835e+03     3.97134291e-04     1.77637127e+02     1.99509358e-02     3.51944839e-03     1.42506684e-02     5.70026736e-03   
+    1.72000000e+02     1.77767904e+03     3.99409645e-04     1.77541211e+02     1.99509358e-02     3.83312958e-03     1.42506684e-02     5.70026736e-03   
+    1.74000000e+02     1.79834973e+03     4.01843329e-04     1.82481426e+02     1.99509358e-02     4.15788944e-03     1.42506684e-02     5.70026736e-03   
+    1.76000000e+02     1.81902041e+03     4.03948032e-04     1.92273083e+02     1.99509358e-02     4.46098851e-03     1.42506684e-02     5.70026736e-03   
+    1.78000000e+02     1.83969110e+03     4.05038961e-04     1.91851085e+02     1.99509358e-02     4.63941505e-03     1.42506684e-02     5.70026736e-03   
+    1.80000000e+02     1.86036179e+03     4.04796530e-04     1.87358311e+02     1.99509358e-02     4.57703191e-03     1.42506684e-02     5.70026736e-03   
+    1.82000000e+02     1.88103247e+03     4.04327859e-04     1.97764667e+02     1.99509358e-02     4.43057861e-03     1.42506684e-02     5.70026736e-03   
+    1.84000000e+02     1.90170316e+03     4.03048834e-04     1.97602826e+02     1.99509358e-02     4.16146744e-03     1.42506684e-02     5.70026736e-03   
+    1.86000000e+02     1.92237384e+03     4.01288328e-04     2.10121945e+02     1.99509358e-02     3.84255303e-03     1.42506684e-02     5.70026736e-03   
+    1.88000000e+02     1.94304453e+03     3.98949861e-04     2.20142969e+02     1.99509358e-02     3.51765402e-03     1.42506684e-02     5.70026736e-03   
+    1.90000000e+02     1.96371522e+03     3.97555321e-04     2.29842168e+02     1.99509358e-02     3.40001064e-03     1.42506684e-02     5.70026736e-03   
+    1.92000000e+02     1.98438590e+03     3.98924621e-04     2.30707251e+02     1.99509358e-02     3.61008950e-03     1.42506684e-02     5.70026736e-03   
+    1.94000000e+02     2.00505659e+03     4.02989596e-04     2.19081245e+02     1.99509358e-02     4.02608121e-03     1.42506684e-02     5.70026736e-03   
+    1.96000000e+02     2.02572728e+03     4.05927427e-04     2.20981012e+02     1.99509358e-02     4.25794185e-03     1.42506684e-02     5.70026736e-03   
+    1.98000000e+02     2.04639796e+03     4.04620048e-04     2.18621938e+02     1.99509358e-02     4.09068749e-03     1.42506684e-02     5.70026736e-03   
+    2.00000000e+02     2.06706865e+03     4.00835837e-04     2.20339294e+02     1.99509358e-02     3.74362289e-03     1.42506684e-02     5.70026736e-03   
+    2.02000000e+02     2.08773934e+03     3.96110953e-04     2.18490962e+02     1.99509358e-02     3.28466038e-03     1.42506684e-02     5.70026736e-03   
+    2.04000000e+02     2.10841002e+03     3.94907200e-04     2.13888454e+02     1.99509358e-02     3.13146146e-03     1.42506684e-02     5.70026736e-03   
+    2.06000000e+02     2.12908071e+03     3.96785147e-04     2.10641709e+02     1.99509358e-02     3.30175231e-03     1.42506684e-02     5.70026736e-03   
+    2.08000000e+02     2.14975140e+03     4.00023607e-04     2.08129265e+02     1.99509358e-02     3.71317513e-03     1.42506684e-02     5.70026736e-03   
+    2.10000000e+02     2.17042208e+03     4.03732724e-04     1.94136567e+02     1.99509358e-02     4.28862839e-03     1.42506684e-02     5.70026736e-03   
+    2.12000000e+02     2.19109277e+03     4.06171642e-04     1.79635261e+02     1.99509358e-02     4.75773989e-03     1.42506684e-02     5.70026736e-03   
+    2.14000000e+02     2.21176346e+03     4.07461480e-04     1.72339578e+02     1.99509358e-02     5.03175880e-03     1.42506684e-02     5.70026736e-03   
+    2.16000000e+02     2.23243414e+03     4.06955031e-04     1.73657058e+02     1.99509358e-02     4.94414444e-03     1.42506684e-02     5.70026736e-03   
+    2.18000000e+02     2.25310483e+03     4.05937883e-04     1.61590804e+02     1.99509358e-02     4.71829192e-03     1.42506684e-02     5.70026736e-03   
+    2.20000000e+02     2.27377552e+03     4.03563915e-04     1.63576831e+02     1.99509358e-02     4.27849991e-03     1.42506684e-02     5.70026736e-03   
+    2.22000000e+02     2.29444620e+03     4.00536957e-04     1.74758449e+02     1.99509358e-02     3.81624009e-03     1.42506684e-02     5.70026736e-03   
+    2.24000000e+02     2.31511689e+03     3.97399601e-04     1.91457096e+02     1.99509358e-02     3.44077479e-03     1.42506684e-02     5.70026736e-03   
+    2.26000000e+02     2.33578757e+03     3.97097191e-04     1.88794876e+02     1.99509358e-02     3.48391895e-03     1.42506684e-02     5.70026736e-03   
+    2.28000000e+02     2.35645826e+03     4.01086429e-04     1.85058096e+02     1.99509358e-02     4.01250771e-03     1.42506684e-02     5.70026736e-03   
+    2.30000000e+02     2.37712895e+03     4.06262565e-04     1.80675499e+02     1.99509358e-02     4.51243038e-03     1.42506684e-02     5.70026736e-03   
+    2.32000000e+02     2.39779963e+03     4.10362248e-04     1.68423937e+02     1.99509358e-02     4.87387526e-03     1.42506684e-02     5.70026736e-03   
+    2.34000000e+02     2.41847032e+03     4.08483086e-04     1.79327395e+02     1.99509358e-02     4.76864649e-03     1.42506684e-02     5.70026736e-03   
+    2.36000000e+02     2.43914101e+03     4.02920210e-04     2.03133080e+02     1.99509358e-02     4.44548508e-03     1.42506684e-02     5.70026736e-03   
+    2.38000000e+02     2.45981169e+03     3.99095623e-04     2.08738529e+02     1.99509358e-02     4.21590156e-03     1.42506684e-02     5.70026736e-03   
+    2.40000000e+02     2.48048238e+03     4.00562868e-04     1.87687049e+02     1.99509358e-02     4.36477688e-03     1.42506684e-02     5.70026736e-03   
+    2.42000000e+02     2.50115307e+03     4.04361644e-04     1.76092420e+02     1.99509358e-02     4.72112016e-03     1.42506684e-02     5.70026736e-03   
+    2.44000000e+02     2.52182375e+03     4.07193004e-04     1.72050380e+02     1.99509358e-02     5.12036701e-03     1.42506684e-02     5.70026736e-03   
+    2.46000000e+02     2.54249444e+03     4.08400330e-04     1.71977991e+02     1.99509358e-02     5.46767754e-03     1.42506684e-02     5.70026736e-03   
+    2.48000000e+02     2.56316513e+03     4.08313562e-04     1.72609390e+02     1.99509358e-02     5.63896592e-03     1.42506684e-02     5.70026736e-03   
+    2.50000000e+02     2.58383581e+03     4.08491530e-04     1.72027811e+02     1.99509358e-02     5.72246549e-03     1.42506684e-02     5.70026736e-03   
+    2.52000000e+02     2.60450650e+03     4.08813241e-04     1.82319885e+02     1.99509358e-02     5.64590408e-03     1.42506684e-02     5.70026736e-03   
+    2.54000000e+02     2.62517719e+03     4.07632280e-04     1.96885769e+02     1.99509358e-02     5.28274122e-03     1.42506684e-02     5.70026736e-03   
+    2.56000000e+02     2.64584787e+03     4.04400406e-04     1.93900365e+02     1.99509358e-02     4.69376272e-03     1.42506684e-02     5.70026736e-03   
+    2.58000000e+02     2.66651856e+03     4.00455215e-04     2.03700311e+02     1.99509358e-02     4.13700140e-03     1.42506684e-02     5.70026736e-03   
+    2.60000000e+02     2.68718925e+03     3.98078468e-04     2.12749158e+02     1.99509358e-02     3.83242097e-03     1.42506684e-02     5.70026736e-03   
+    2.62000000e+02     2.70785993e+03     3.98383699e-04     1.99191397e+02     1.99509358e-02     3.82148716e-03     1.42506684e-02     5.70026736e-03   
+    2.64000000e+02     2.72853062e+03     4.01949736e-04     1.94607300e+02     1.99509358e-02     4.08865670e-03     1.42506684e-02     5.70026736e-03   
+    2.66000000e+02     2.74920130e+03     4.07450051e-04     1.73829918e+02     1.99509358e-02     4.45857959e-03     1.42506684e-02     5.70026736e-03   
+    2.68000000e+02     2.76987199e+03     4.11093442e-04     1.70146324e+02     1.99509358e-02     4.62475531e-03     1.42506684e-02     5.70026736e-03   
+    2.70000000e+02     2.79054268e+03     4.07669103e-04     1.80517608e+02     1.99509358e-02     4.18722768e-03     1.42506684e-02     5.70026736e-03   
+    2.72000000e+02     2.81121336e+03     4.00038372e-04     1.85851169e+02     1.99509358e-02     3.38132082e-03     1.42506684e-02     5.70026736e-03   
+    2.74000000e+02     2.83188405e+03     3.95839744e-04     1.92788189e+02     1.99509358e-02     2.87012014e-03     1.42506684e-02     5.70026736e-03   
+    2.76000000e+02     2.85255474e+03     3.96738627e-04     1.94875126e+02     1.99509358e-02     2.84533258e-03     1.42506684e-02     5.70026736e-03   
+    2.78000000e+02     2.87322542e+03     3.99902106e-04     1.87433108e+02     1.99509358e-02     3.17630882e-03     1.42506684e-02     5.70026736e-03   
+    2.80000000e+02     2.89389611e+03     4.02835350e-04     1.87235113e+02     1.99509358e-02     3.68775033e-03     1.42506684e-02     5.70026736e-03   
+    2.82000000e+02     2.91456680e+03     4.04686939e-04     1.82150451e+02     1.99509358e-02     4.14762528e-03     1.42506684e-02     5.70026736e-03   
+    2.84000000e+02     2.93523748e+03     4.06728473e-04     1.68823047e+02     1.99509358e-02     4.63080148e-03     1.42506684e-02     5.70026736e-03   
+    2.86000000e+02     2.95590817e+03     4.08354808e-04     1.68890793e+02     1.99509358e-02     4.96083585e-03     1.42506684e-02     5.70026736e-03   
+    2.88000000e+02     2.97657886e+03     4.08949011e-04     1.61782442e+02     1.99509358e-02     5.09324501e-03     1.42506684e-02     5.70026736e-03   
+    2.90000000e+02     2.99724954e+03     4.07839703e-04     1.63858578e+02     1.99509358e-02     4.96406123e-03     1.42506684e-02     5.70026736e-03   
+    2.92000000e+02     3.01792023e+03     4.05278993e-04     1.76756006e+02     1.99509358e-02     4.65126977e-03     1.42506684e-02     5.70026736e-03   
+    2.94000000e+02     3.03859092e+03     4.01262638e-04     1.89238941e+02     1.99509358e-02     4.14861595e-03     1.42506684e-02     5.70026736e-03   
+    2.96000000e+02     3.05926160e+03     3.98237508e-04     1.82223873e+02     1.99509358e-02     3.78309572e-03     1.42506684e-02     5.70026736e-03   
+    2.98000000e+02     3.07993229e+03     3.98112721e-04     1.87470597e+02     1.99509358e-02     3.74617310e-03     1.42506684e-02     5.70026736e-03   
+    3.00000000e+02     3.10060298e+03     3.99935675e-04     1.94116882e+02     1.99509358e-02     3.83260887e-03     1.42506684e-02     5.70026736e-03   
+    3.02000000e+02     3.12127366e+03     4.03730594e-04     1.98465268e+02     1.99509358e-02     4.02891440e-03     1.42506684e-02     5.70026736e-03   
+    3.04000000e+02     3.14194435e+03     4.07840458e-04     2.04248076e+02     1.99509358e-02     4.20420150e-03     1.42506684e-02     5.70026736e-03   
+    3.06000000e+02     3.16261503e+03     4.08794101e-04     2.19157128e+02     1.99509358e-02     4.10317188e-03     1.42506684e-02     5.70026736e-03   
+    3.08000000e+02     3.18328572e+03     4.04662305e-04     2.31227186e+02     1.99509358e-02     3.60615115e-03     1.42506684e-02     5.70026736e-03   
+    3.10000000e+02     3.20395641e+03     3.99780078e-04     2.49987708e+02     1.99509358e-02     3.05841292e-03     1.42506684e-02     5.70026736e-03   
+    3.12000000e+02     3.22462709e+03     3.97588282e-04     2.43908668e+02     1.99509358e-02     2.76501283e-03     1.42506684e-02     5.70026736e-03   
+    3.14000000e+02     3.24529778e+03     3.98606545e-04     2.45413616e+02     1.99509358e-02     2.86187321e-03     1.42506684e-02     5.70026736e-03   
+    3.16000000e+02     3.26596847e+03     4.02129649e-04     2.46085293e+02     1.99509358e-02     3.40065908e-03     1.42506684e-02     5.70026736e-03   
+    3.18000000e+02     3.28663915e+03     4.06376070e-04     2.36761347e+02     1.99509358e-02     4.19713175e-03     1.42506684e-02     5.70026736e-03   
+    3.20000000e+02     3.30730984e+03     4.10114307e-04     2.13134951e+02     1.99509358e-02     5.01028353e-03     1.42506684e-02     5.70026736e-03   
+    3.22000000e+02     3.32798053e+03     4.12828146e-04     2.02174606e+02     1.99509358e-02     5.68402651e-03     1.42506684e-02     5.70026736e-03   
+    3.24000000e+02     3.34865121e+03     4.13932319e-04     1.94005748e+02     1.99509358e-02     6.08678533e-03     1.42506684e-02     5.70026736e-03   
+    3.26000000e+02     3.36932190e+03     4.11796213e-04     2.00727646e+02     1.99509358e-02     5.94758262e-03     1.42506684e-02     5.70026736e-03   
+    3.28000000e+02     3.38999259e+03     4.08320006e-04     2.03958784e+02     1.99509358e-02     5.61602897e-03     1.42506684e-02     5.70026736e-03   
+    3.30000000e+02     3.41066327e+03     4.04552820e-04     2.00008215e+02     1.99509358e-02     5.28006802e-03     1.42506684e-02     5.70026736e-03   
+    3.32000000e+02     3.43133396e+03     4.01733677e-04     2.07540166e+02     1.99509358e-02     5.12360429e-03     1.42506684e-02     5.70026736e-03   
+    3.34000000e+02     3.45200465e+03     4.01472284e-04     2.02062668e+02     1.99509358e-02     5.27607776e-03     1.42506684e-02     5.70026736e-03   
+    3.36000000e+02     3.47267533e+03     4.06264527e-04     2.00526992e+02     1.99509358e-02     5.80969266e-03     1.42506684e-02     5.70026736e-03   
+    3.38000000e+02     3.49334602e+03     4.11488067e-04     2.04826957e+02     1.99509358e-02     6.16468783e-03     1.42506684e-02     5.70026736e-03   
+    3.40000000e+02     3.51401671e+03     4.13809555e-04     2.01233086e+02     1.99509358e-02     6.19618623e-03     1.42506684e-02     5.70026736e-03   
+    3.42000000e+02     3.53468739e+03     4.10471637e-04     2.08109611e+02     1.99509358e-02     5.75389681e-03     1.42506684e-02     5.70026736e-03   
+    3.44000000e+02     3.55535808e+03     4.04431562e-04     2.15040849e+02     1.99509358e-02     4.95289088e-03     1.42506684e-02     5.70026736e-03   
+    3.46000000e+02     3.57602876e+03     3.99594199e-04     2.17645152e+02     1.99509358e-02     4.09719711e-03     1.42506684e-02     5.70026736e-03   
+    3.48000000e+02     3.59669945e+03     3.97760550e-04     2.33466338e+02     1.99509358e-02     3.52854583e-03     1.42506684e-02     5.70026736e-03   
+    3.50000000e+02     3.61737014e+03     3.98100917e-04     2.32798721e+02     1.99509358e-02     3.29263801e-03     1.42506684e-02     5.70026736e-03   
+    3.52000000e+02     3.63804082e+03     4.00556921e-04     2.22225031e+02     1.99509358e-02     3.48813209e-03     1.42506684e-02     5.70026736e-03   
+    3.54000000e+02     3.65871151e+03     4.03990767e-04     2.14875133e+02     1.99509358e-02     3.94210894e-03     1.42506684e-02     5.70026736e-03   
+    3.56000000e+02     3.67938220e+03     4.07405910e-04     2.06988349e+02     1.99509358e-02     4.44716756e-03     1.42506684e-02     5.70026736e-03   
+    3.58000000e+02     3.70005288e+03     4.08652747e-04     1.98262769e+02     1.99509358e-02     4.65374109e-03     1.42506684e-02     5.70026736e-03   
+    3.60000000e+02     3.72072357e+03     4.08384068e-04     2.07417188e+02     1.99509358e-02     4.64660690e-03     1.42506684e-02     5.70026736e-03   
+    3.62000000e+02     3.74139426e+03     4.06151505e-04     2.34767250e+02     1.99509358e-02     4.40342954e-03     1.42506684e-02     5.70026736e-03   
+    3.64000000e+02     3.76206494e+03     4.01756711e-04     2.43159013e+02     1.99509358e-02     3.99871494e-03     1.42506684e-02     5.70026736e-03   
+    3.66000000e+02     3.78273563e+03     3.96758778e-04     2.61923728e+02     1.99509358e-02     3.70592414e-03     1.42506684e-02     5.70026736e-03   
+    3.68000000e+02     3.80340632e+03     3.94052444e-04     2.64804225e+02     1.99509358e-02     3.80251354e-03     1.42506684e-02     5.70026736e-03   
+    3.70000000e+02     3.82407700e+03     3.97934261e-04     2.45538260e+02     1.99509358e-02     4.60013686e-03     1.42506684e-02     5.70026736e-03   
+    3.72000000e+02     3.84474769e+03     4.07228850e-04     2.15684286e+02     1.99509358e-02     5.76419111e-03     1.42506684e-02     5.70026736e-03   
+    3.74000000e+02     3.86541838e+03     4.15783131e-04     1.99720856e+02     1.99509358e-02     6.76510412e-03     1.42506684e-02     5.70026736e-03   
+    3.76000000e+02     3.88608906e+03     4.16185491e-04     2.07561289e+02     1.99509358e-02     6.95910821e-03     1.42506684e-02     5.70026736e-03   
+    3.78000000e+02     3.90675975e+03     4.09903089e-04     2.23466375e+02     1.99509358e-02     6.38803233e-03     1.42506684e-02     5.70026736e-03   
+    3.80000000e+02     3.92743044e+03     4.02883445e-04     2.35487919e+02     1.99509358e-02     5.39326081e-03     1.42506684e-02     5.70026736e-03   
+    3.82000000e+02     3.94810112e+03     3.98336337e-04     2.47998991e+02     1.99509358e-02     4.45195074e-03     1.42506684e-02     5.70026736e-03   
+    3.84000000e+02     3.96877181e+03     3.96593122e-04     2.60980170e+02     1.99509358e-02     3.82821896e-03     1.42506684e-02     5.70026736e-03   
+    3.86000000e+02     3.98944249e+03     3.98571809e-04     2.70957846e+02     1.99509358e-02     3.75693174e-03     1.42506684e-02     5.70026736e-03   
+    3.88000000e+02     4.01011318e+03     4.03983080e-04     2.44769209e+02     1.99509358e-02     4.28068976e-03     1.42506684e-02     5.70026736e-03   
+    3.90000000e+02     4.03078387e+03     4.09603083e-04     2.39336580e+02     1.99509358e-02     4.92418614e-03     1.42506684e-02     5.70026736e-03   
+    3.92000000e+02     4.05145455e+03     4.13191521e-04     2.33611592e+02     1.99509358e-02     5.26602981e-03     1.42506684e-02     5.70026736e-03   
+    3.94000000e+02     4.07212524e+03     4.13572138e-04     2.37018607e+02     1.99509358e-02     5.10749175e-03     1.42506684e-02     5.70026736e-03   
+    3.96000000e+02     4.09279593e+03     4.10290137e-04     2.43602270e+02     1.99509358e-02     4.44724417e-03     1.42506684e-02     5.70026736e-03   
+    3.98000000e+02     4.11346661e+03     4.03859494e-04     2.52549789e+02     1.99509358e-02     3.47691596e-03     1.42506684e-02     5.70026736e-03   
+    4.00000000e+02     4.13413730e+03     3.95821531e-04     2.65138506e+02     1.99509358e-02     2.52800977e-03     1.42506684e-02     5.70026736e-03   
