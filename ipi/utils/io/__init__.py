@@ -75,16 +75,16 @@ def print_file_path(mode, beads, cell, filedesc=sys.stdout):
     return _get_io_function(mode, "print_path")(beads=beads, cell=cell, filedesc=filedesc)
 
 
-def print_file(mode, atoms, cell, filedesc=sys.stdout, title=""):
+def print_file(mode, atoms, cell, filedesc=sys.stdout, title="", **kwargs):
     """Prints the centroid configurations, into a `mode` formatted file.
 
     Args:
         atoms: An atoms object giving the centroid positions.
         cell: A cell object giving the system box.
         filedesc: An open writable file object. Defaults to standard output.
-        title: This gives a string to be appended to the comment line.
+        title: This gives a string to be (possibly) appended to the comment line.
     """
-    return _get_io_function(mode, "print")(atoms=atoms, cell=cell, filedesc=filedesc, title=title)
+    return _get_io_function(mode, "print")(atoms=atoms, cell=cell, filedesc=filedesc, title=title, **kwargs)
 
 
 def read_file(mode, filedesc, **kwargs):
