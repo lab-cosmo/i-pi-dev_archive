@@ -399,6 +399,7 @@ class DummyOptimizer(dobject):
                 and (x <= self.tolerances["position"]):
             info("Total number of function evaluations: %d" % counter.func_eval, verbosity.low)
             print self.cell.h
+            print self.beads.q
             softexit.trigger("Geometry optimization converged. Exiting simulation")
             
 
