@@ -10,7 +10,7 @@
    <system>
     <initialize nbeads='1'> 
       <file mode='xyz'>  nacl.xyz </file>
-      <cell mode='abcABC'> [1, 2, 3, 90, 90, 90] </cell>
+      <cell mode='abcABC'> [10.635379, 10.635379, 10.635379, 90, 90, 90] </cell>
     </initialize>
     <forces>
      <force forcefield="lmp"> </force>
@@ -19,7 +19,7 @@
       <optimizer mode='bfgs'>
 	<tolerances>
 	  <energy> 1e-8 </energy>
-	  <force> 1e-8 </force>
+	  <force> 1e-16 </force>
 	  <position> 1e-8 </position>
 	  	</tolerances>
 	<biggest_step>

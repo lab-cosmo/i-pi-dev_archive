@@ -410,12 +410,12 @@ def min_approx(fdf, x0, fdf0=None, d0=None, big_step=100.0, tol=1.0e-6, itmax=10
         # Check for convergence on change in x
         if alam < alamin:
             print 'BLA'
-            x = x0
+          #  x = x0
             info(" @MINIMIZE: Convergence in position, exited line search", verbosity.debug)
             return (x, fx, dfx)
             
         # Sufficient function decrease
-        elif fx <= (f0 +alf * alam * slope):
+        if fx <= (f0 +alf * alam * slope):
             info(" @MINIMIZE: Sufficient function decrease, exited line search", verbosity.debug)
             print 'BLUB'
             return (x, fx, dfx)

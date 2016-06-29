@@ -183,7 +183,7 @@ class GradientMapper(object):
 class GradientCellMapper(object):
        
     """Creation of the multi-dimensional function that will be minimized.
-    Used in the BFGS and L-BFGS minimizers.
+    Used in the BFGS and L-BFGS minimizers. Testclass for minimization that also includes the cell parameters.
 
     Attributes:
         x0: initial position
@@ -207,9 +207,9 @@ class GradientCellMapper(object):
         self.norm_stress = dumop.norm_stress
     
     def transform(self, x):
-        self.oldcell = self.dcell.h.copy()
+        '''gets a vector containing the new atomic positions and the transformed strain. Transforms it back to strain and updates positions and cell parameters'''
         natoms = self.dbeads.natoms
-        self.dqcell = x
+        #self.dqcell = x
         self.dbeads.q[-1,:] = x[0:natoms*3]
         eps_vec = x[natoms*3:]/self.jacobian
         #eps = np.reshape(eps_vec, (3,3))
@@ -219,11 +219,16 @@ class GradientCellMapper(object):
                         [0.5 * eps_vec[4], 0.5 * eps_vec[3], 1.0 + eps_vec[2]]])
         #unit = np.eye(3,dtype=float)
         #self.dcell.h = np.dot(self.oldcell, unit + eps)
-        print 'epsilon', eps
         self.dcell.h = np.dot(self.oldcell, eps)
+       # M = np.linalg.solve(self.oldcell, self.dcell.h)
+        #print 'M', M
+        #qresh=np.reshape(x[0:natoms*3],(natoms,3))
+        #for i in range(natoms):
+         #   qresh[i,:]=np.dot(qresh[i,:],M)
+        #self.dbeads.q[-1,:] = qresh.flatten()
+        self.dqcell=x
+        #self.dqcell[0:natoms*3] = self.dbeads.q[-1,:]
         self.strain = eps_vec
-        print 'Strain during BFGS steps', self.strain
-        return natoms
         
     def transformcell(self, x):
         self.oldcell = self.dcell.h.copy()
@@ -236,12 +241,12 @@ class GradientCellMapper(object):
         #self.dcell.h = np.dot(self.oldcell, eps)
         self.strain[:] = eps_vec
         print 'Strain during BFGS steps', self.strain
-        return natoms
             
     def __call__(self,x):
-        """computes energy and gradient for optimization step"""
+        """computes energy and gradient for optimization step and creates vector containing atomic forces and transformed stress """
         
-        natoms = self.transform(x)
+        self.transform(x)
+        natoms = self.dbeads.natoms
         e = self.dforces.pot   # Energy
         print 'energy', e
         g = np.zeros((natoms + 2)*3, float)
@@ -289,12 +294,13 @@ class DummyOptimizer(dobject):
         self.fixcom = geop.fixcom
         self.fixatoms = geop.fixatoms
         self.qcell = geop.qcell
+        #Jacobians to scale the stress (norm_stress) and the strain (jacobian) with the system size and giving them the same units as atomic positions/forces
         self.jacobian = self.cell.V**(1.0/3.0)*self.beads.natoms**(1.0/6.0)
         self.norm_stress = -self.cell.V/self.jacobian
 
         self.lm.bind(self)
         self.gm.bind(self)
-        
+        #vector that contains atomic positions and cell parameters
         self.gmc.bind(self)
         self.qcell = np.zeros(3*(self.beads.natoms+2), float)
         #self.qcell=np.zeros(6,float)
@@ -376,8 +382,25 @@ class DummyOptimizer(dobject):
                     or (np.sqrt(np.dot(forces.flatten() - self.old_f.flatten(),
                         forces.flatten() - self.old_f.flatten())) == 0.0))\
                 and (x <= self.tolerances["position"]): #and (np.amax(np.absolute(self.gmc.strain)) <= self.tolerances["position"])
-            info("Total number of function evaluations: %d" % counter.func_eval, verbosity.low)
+            info("Total number of function evaluations: %d" % counter.func_eval, verbosity.debug)
             softexit.trigger("Geometry optimization converged. Exiting simulation")
+            
+    def exitstepsimple(self, fx, u0, x, forces):
+        """ Exits the simulation step. Computes time, checks for convergence. """
+        
+        info(" @GEOP: Updating bead positions", verbosity.debug)
+        
+        self.qtime += time.time()
+        # Determine conditions for converged relaxation
+        print 'TOLERANCE', np.amax(np.absolute(forces))
+        if ((fx - u0) / (self.beads.natoms+2) <= self.tolerances["energy"])\
+                and ((np.amax(np.absolute(forces)) <= self.tolerances["force"])) or ((np.sqrt(np.dot(forces.flatten() - self.old_f.flatten(),
+                        forces.flatten() - self.old_f.flatten())) == 0.0))\
+                and (x <= self.tolerances["position"]):
+            info("Total number of function evaluations: %d" % counter.func_eval, verbosity.low)
+            print self.cell.h
+            softexit.trigger("Geometry optimization converged. Exiting simulation")
+            
 
 
 '''
@@ -403,8 +426,8 @@ class TestVirial(DummyOptimizer):
         softexit.trigger('Blablabla')
        
 
-'''
-'''
+
+
 class TestBFGS(DummyOptimizer):
     
     def step(self, step=None):
@@ -588,6 +611,7 @@ class BFGSCellOptimizer(DummyOptimizer):
         if step == 0:   # or np.sqrt(np.dot(self.gm.d, self.gm.d)) == 0.0: this part for restarting at claimed minimum (optional)
             info(" @GEOP: Initializing BFGS", verbosity.debug)
             
+            #number of atoms
             natoms = self.beads.natoms
             # new force vector with forces and transformed stress tensor
             forces = np.zeros((natoms+2)*3, float)
@@ -603,7 +627,8 @@ class BFGSCellOptimizer(DummyOptimizer):
             self.gmc.xold[0:natoms*3] = self.beads.q.copy()
             self.gmc.oldcell = self.cell.h.copy()
             self.gmc.strain = np.zeros(6, float)
-            
+        
+        #number of atoms   
         natoms = self.beads.natoms
         # Current energy and forces
         u0 = self.forces.pot.copy()
@@ -617,14 +642,12 @@ class BFGSCellOptimizer(DummyOptimizer):
         forces[natoms*3:] = stressmat*self.norm_stress
         #forces[natoms*3:] = self.forces.vir.flatten()*self.norm_stress/self.cell.V
         du0 = - forces
-        
-        print 'Stress', forces[natoms*3:]
-        print 'Strain', self.gmc.strain
 
         # Store previous forces
         self.old_f[:] = forces
         #print 'before BFGS', self.gmc.xold[0], self.gmc.oldcell[0,0]
         
+        #new vector containing atomic positions and transformed strain
         self.qcell[0:natoms*3] = self.beads.q
         self.qcell[natoms*3:] = self.gmc.strain*self.jacobian
         
@@ -638,6 +661,7 @@ class BFGSCellOptimizer(DummyOptimizer):
         # x = current position - previous position; use for exit tolerance
         x = np.amax(np.absolute(np.subtract(self.qcell[0:natoms*3], self.gmc.xold[0:natoms*3])))
         
+        # updating positions and cell by transforming back
         self.beads.q[-1,:] = self.qcell[0:natoms*3]
         eps_vec = self.qcell[natoms*3:]/self.jacobian
         #eps = np.reshape(eps_vec, (3,3))
@@ -649,10 +673,19 @@ class BFGSCellOptimizer(DummyOptimizer):
         self.cell.h = np.dot(self.gmc.oldcell, eps)
         self.gmc.strain = eps_vec
         
+        #M = np.linalg.solve(self.gmc.oldcell, self.cell.h)
+        #print 'M', M
+        #qresh=np.reshape(self.qcell[0:natoms*3],(natoms,3))
+        #for i in range(natoms):
+        #    qresh[i,:]=np.dot(qresh[i,:],M)
+        #self.beads.q[-1,:] = qresh.flatten()
+        # x = current position - previous position; use for exit tolerance
+        #x = np.amax(np.absolute(np.subtract(self.beads.q[-1,:], self.gmc.xold[0:natoms*3])))
+        
         # Store old position
-        self.gmc.xold[:] = self.qcell
+        self.gmc.xold[0:natoms*3] = self.beads.q.copy()
+        self.gmc.xold[natoms*3:] = self.qcell[natoms*3:]
         self.gmc.oldcell = self.cell.h.copy()
-        print 'cell', self.cell.h
         
         forces = np.zeros((natoms+2)*3,float)
         forces[0:natoms*3] = self.forces.f
@@ -662,7 +695,7 @@ class BFGSCellOptimizer(DummyOptimizer):
         forces[natoms*3:] = stressmat.flatten()*self.norm_stress
         
         # Exit simulation step
-        self.exitstep2(fx, u0, x, forces)
+        self.exitstepsimple(fx, u0, x, forces)
 
 class BFGSOptimizer(DummyOptimizer):
     """ BFGS Minimization """
