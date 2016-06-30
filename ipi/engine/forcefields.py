@@ -131,7 +131,6 @@ class ForceField(dobject):
            fullat=False
 
         if (self.active[0]!=-1 and fullat==False):
-           print "here!"
            temp=np.array([[3*n, 3*n+1, 3*n+2] for n in self.active])
 
         # Reassign active indexes in order to use them
