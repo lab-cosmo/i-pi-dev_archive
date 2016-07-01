@@ -142,7 +142,7 @@ class ForceField(dobject):
 
 
         if self.dopbc:
-            cell.array_pbc(pbcpos)
+            cell.array_pbc(pbcpos[activehere])
 
         newreq = ForceRequest({
             "id": reqid,
