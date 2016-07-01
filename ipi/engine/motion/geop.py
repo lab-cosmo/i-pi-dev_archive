@@ -209,7 +209,7 @@ class GradientCellMapper(object):
     def transform(self, x):
         '''gets a vector containing the new atomic positions and the transformed strain. Transforms it back to strain and updates positions and cell parameters'''
         natoms = self.dbeads.natoms
-        #self.dqcell = x
+        self.dqcell = x
         self.dbeads.q[-1,:] = x[0:natoms*3]
         eps_vec = x[natoms*3:]/self.jacobian
         #eps = np.reshape(eps_vec, (3,3))
@@ -220,13 +220,13 @@ class GradientCellMapper(object):
         #unit = np.eye(3,dtype=float)
         #self.dcell.h = np.dot(self.oldcell, unit + eps)
         self.dcell.h = np.dot(self.oldcell, eps)
-       # M = np.linalg.solve(self.oldcell, self.dcell.h)
+        M = np.linalg.solve(self.oldcell, self.dcell.h)
         #print 'M', M
         #qresh=np.reshape(x[0:natoms*3],(natoms,3))
         #for i in range(natoms):
-         #   qresh[i,:]=np.dot(qresh[i,:],M)
+        #    qresh[i,:]=np.dot(qresh[i,:],M)
         #self.dbeads.q[-1,:] = qresh.flatten()
-        self.dqcell=x
+        #self.dqcell=x
         #self.dqcell[0:natoms*3] = self.dbeads.q[-1,:]
         self.strain = eps_vec
         
@@ -248,7 +248,7 @@ class GradientCellMapper(object):
         self.transform(x)
         natoms = self.dbeads.natoms
         e = self.dforces.pot   # Energy
-        print 'energy', e
+        #print 'energy', e
         g = np.zeros((natoms + 2)*3, float)
         g[0:natoms*3] = - self.dforces.f
         stress = self.dforces.vir.flatten()
@@ -297,6 +297,7 @@ class DummyOptimizer(dobject):
         #Jacobians to scale the stress (norm_stress) and the strain (jacobian) with the system size and giving them the same units as atomic positions/forces
         self.jacobian = self.cell.V**(1.0/3.0)*self.beads.natoms**(1.0/6.0)
         self.norm_stress = -self.cell.V/self.jacobian
+
 
         self.lm.bind(self)
         self.gm.bind(self)
@@ -377,13 +378,18 @@ class DummyOptimizer(dobject):
         
         self.qtime += time.time()
         # Determine conditions for converged relaxation
+        print '1', np.amax(np.absolute(forces))
+        print '2', (np.sqrt(np.dot(forces - self.old_f.flatten(),
+                        forces - self.old_f.flatten())))
         if ((fx - u0) / (self.beads.natoms+2) <= self.tolerances["energy"])\
-                and ((np.amax(np.absolute(forces)) <= self.tolerances["force"])
-                    or (np.sqrt(np.dot(forces.flatten() - self.old_f.flatten(),
-                        forces.flatten() - self.old_f.flatten())) == 0.0))\
-                and (x <= self.tolerances["position"]): #and (np.amax(np.absolute(self.gmc.strain)) <= self.tolerances["position"])
+                and (x <= self.tolerances["position"]):
+            print self.beads.q*0.52917721, self.cell.h*0.52917721
             info("Total number of function evaluations: %d" % counter.func_eval, verbosity.debug)
             softexit.trigger("Geometry optimization converged. Exiting simulation")
+            '''                and ((np.amax(np.absolute(forces)) <= self.tolerances["force"])
+                    or (np.sqrt(np.dot(forces - self.old_f.flatten(),
+                        forces - self.old_f.flatten())) == 0.0))\
+                        '''
             
     def exitstepsimple(self, fx, u0, x, forces):
         """ Exits the simulation step. Computes time, checks for convergence. """
@@ -393,13 +399,9 @@ class DummyOptimizer(dobject):
         self.qtime += time.time()
         # Determine conditions for converged relaxation
         print 'TOLERANCE', np.amax(np.absolute(forces))
-        if ((fx - u0) / (self.beads.natoms+2) <= self.tolerances["energy"])\
-                and ((np.amax(np.absolute(forces)) <= self.tolerances["force"])) or ((np.sqrt(np.dot(forces.flatten() - self.old_f.flatten(),
-                        forces.flatten() - self.old_f.flatten())) == 0.0))\
-                and (x <= self.tolerances["position"]):
+        #print forces
+        if  ((np.amax(np.absolute(forces)) <= self.tolerances["force"])):
             info("Total number of function evaluations: %d" % counter.func_eval, verbosity.low)
-            print self.cell.h
-            print self.beads.q
             softexit.trigger("Geometry optimization converged. Exiting simulation")
             
 
@@ -621,6 +623,11 @@ class BFGSCellOptimizer(DummyOptimizer):
             stressmat = np.array([stress[0], stress[4], stress[8],
                         stress[5], stress[2], stress[1]])
             forces[natoms*3:] = stressmat*self.norm_stress
+            #print 'forces', forces[0:natoms*3]*51.422065
+            #print 'stress', stressmat* 183.63153
+            #print 'pos', self.beads.q*0.52917721
+            #print 'cell', self.cell.h*0.52917721
+            #softexit.trigger('aus')
             # gradient direction
             self.gmc.d = forces/ np.sqrt(np.dot(forces.flatten(), forces.flatten()))
             # store actual position to previous position, initial strain is zero
@@ -633,7 +640,6 @@ class BFGSCellOptimizer(DummyOptimizer):
         natoms = self.beads.natoms
         # Current energy and forces
         u0 = self.forces.pot.copy()
-        print 'energy', u0
         # new force vector with forces and transformed stress tensor
         forces = np.zeros((natoms+2)*3,float)
         forces[0:natoms*3] = self.forces.f
@@ -646,21 +652,20 @@ class BFGSCellOptimizer(DummyOptimizer):
 
         # Store previous forces
         self.old_f[:] = forces
-        #print 'before BFGS', self.gmc.xold[0], self.gmc.oldcell[0,0]
         
         #new vector containing atomic positions and transformed strain
         self.qcell[0:natoms*3] = self.beads.q
-        self.qcell[natoms*3:] = self.gmc.strain*self.jacobian
+        self.qcell[natoms*3:] = 0.0#self.gmc.strain*self.jacobian
         
         # Do one iteration of BFGS, return new point, function value,
         # move direction, and current Hessian to use for next iteration
-        self.qcell, fx, self.gmc.d, self.invhessian = BFGS(self.qcell,
+        self.qcell, fx, self.gmc.d, self.invhessian, forces = BFGS(self.qcell,
                 self.gmc.d, self.gmc, fdf0=(u0, du0), invhessian=self.invhessian,
                 big_step=self.big_step, tol=self.ls_options["tolerance"],
                 itmax=self.ls_options["iter"])
         
         # x = current position - previous position; use for exit tolerance
-        x = np.amax(np.absolute(np.subtract(self.qcell[0:natoms*3], self.gmc.xold[0:natoms*3])))
+        x = np.amax(np.absolute(np.subtract(self.qcell, self.gmc.xold)))
         
         # updating positions and cell by transforming back
         self.beads.q[-1,:] = self.qcell[0:natoms*3]
@@ -673,30 +678,30 @@ class BFGSCellOptimizer(DummyOptimizer):
         #self.cell.h = np.dot(self.gmc.oldcell, unit + eps)
         self.cell.h = np.dot(self.gmc.oldcell, eps)
         self.gmc.strain = eps_vec
+        print self.gmc.strain
         
         #M = np.linalg.solve(self.gmc.oldcell, self.cell.h)
         #print 'M', M
         #qresh=np.reshape(self.qcell[0:natoms*3],(natoms,3))
         #for i in range(natoms):
-        #    qresh[i,:]=np.dot(qresh[i,:],M)
+         #   qresh[i,:]=np.dot(qresh[i,:],M)
         #self.beads.q[-1,:] = qresh.flatten()
-        # x = current position - previous position; use for exit tolerance
-        #x = np.amax(np.absolute(np.subtract(self.beads.q[-1,:], self.gmc.xold[0:natoms*3])))
-        
+
         # Store old position
-        self.gmc.xold[0:natoms*3] = self.beads.q.copy()
-        self.gmc.xold[natoms*3:] = self.qcell[natoms*3:]
+        self.gmc.xold = self.qcell.copy()
         self.gmc.oldcell = self.cell.h.copy()
         
-        forces = np.zeros((natoms+2)*3,float)
-        forces[0:natoms*3] = self.forces.f
-        stress = self.forces.vir.flatten()/self.cell.V
-        stressmat = np.array([[stress[0], stress[4], stress[8]],
-                        [stress[5], stress[2], stress[1]]])
-        forces[natoms*3:] = stressmat.flatten()*self.norm_stress
+        #forces = np.zeros((natoms+2)*3,float)
+        #forces[0:natoms*3] = self.forces.f
+        #stress = self.forces.vir.flatten()/self.cell.V
+        #stressmat = np.array([[stress[0], stress[4], stress[8]],
+         #               [stress[5], stress[2], stress[1]]])
+        #forces[natoms*3:] = stressmat.flatten()*self.norm_stress
         
+        if step == 20:
+            softexit.trigger('step2')
         # Exit simulation step
-        self.exitstepsimple(fx, u0, x, forces)
+        self.exitstep2(fx, u0, x, forces)
 
 class BFGSOptimizer(DummyOptimizer):
     """ BFGS Minimization """

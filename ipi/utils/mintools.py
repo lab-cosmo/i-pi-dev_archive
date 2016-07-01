@@ -410,7 +410,7 @@ def min_approx(fdf, x0, fdf0=None, d0=None, big_step=100.0, tol=1.0e-6, itmax=10
         # Check for convergence on change in x
         if alam < alamin:
             print 'BLA'
-          #  x = x0
+            x = x0
             info(" @MINIMIZE: Convergence in position, exited line search", verbosity.debug)
             return (x, fx, dfx)
             
@@ -542,7 +542,7 @@ def BFGS(x0, d0, fdf, fdf0=None, invhessian=None, big_step=100, tol=1.0e-6, itma
     # Update direction
     xi = np.dot(invhessian, -g)
     info(" @MINIMIZE: Updated search direction", verbosity.debug)
-    return (x, fx, xi, invhessian)
+    return (x, fx, xi, invhessian, -dfx)
 
 # L-BFGS algorithm with approximate line search
 def L_BFGS(x0, d0, fdf, qlist, glist, fdf0=None, big_step=100, tol=1.0e-6, itmax=100, m=0, k=0):
