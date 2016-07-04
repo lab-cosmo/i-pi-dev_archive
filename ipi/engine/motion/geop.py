@@ -307,6 +307,10 @@ class DummyOptimizer(dobject):
         #vector that contains atomic positions and cell parameters
         self.gmc.bind(self)
         self.qcell = np.zeros(3*(self.beads.natoms+2), float)
+        #for i in range(self.beads.natoms):
+        #    print "Atom('',", "[", self.beads.q[-1,3*i]*0.52917721, ",", self.beads.q[-1,3*i+1]*0.52917721, ",", self.beads.q[-1,3*i+2]*0.52917721, "]),"
+        #print self.beads.q
+
         #self.qcell=np.zeros(6,float)
         '''
         if self.old_f.shape != self.beads.q.size:
@@ -386,9 +390,8 @@ class DummyOptimizer(dobject):
                         forces - self.old_f.flatten())))
         print 'energy', (fx - u0) / self.beads.natoms
         print 'positions', x
-        if ((fx - u0) / self.beads.natoms <= self.tolerances["energy"])\
-                and (x <= self.tolerances["position"]):
-            print self.beads.q*0.52917721, self.cell.h*0.52917721
+        if ((fx - u0) / self.beads.natoms <= self.tolerances["energy"]) and ((np.amax(np.absolute(forces)) <= self.tolerances["force"]) or (np.sqrt(np.dot(forces - self.old_f.flatten(), forces - self.old_f.flatten())) == 0.0)) and (x <= self.tolerances["position"]):
+            print self.forces.pot
             info("Total number of function evaluations: %d" % counter.func_eval, verbosity.debug)
             softexit.trigger("Geometry optimization converged. Exiting simulation")
             '''                 and ((np.amax(np.absolute(forces)) <= self.tolerances["force"])
@@ -699,15 +702,15 @@ class BFGSCellOptimizer(DummyOptimizer):
         self.gmc.xold = self.qcell.copy()
         self.gmc.oldcell = self.cell.h.copy()
         
-        #forces = np.zeros((natoms+2)*3,float)
-        #forces[0:natoms*3] = self.forces.f
-        #stress = self.forces.vir.flatten()/self.cell.V
-        #stressmat = np.array([[stress[0], stress[4], stress[8]],
-         #               [stress[5], stress[2], stress[1]]])
-        #forces[natoms*3:] = stressmat.flatten()*self.norm_stress
+        forces = np.zeros((natoms+2)*3,float)
+        forces[0:natoms*3] = self.forces.f
+        stress = self.forces.vir.flatten()/self.cell.V
+        stressmat = np.array([[stress[0], stress[4], stress[8]],
+                        [stress[5], stress[2], stress[1]]])
+        forces[natoms*3:] = stressmat.flatten()*self.norm_stress
         
-        if step == 25:
-            softexit.trigger('step2')
+        #if step == 25:
+        #    softexit.trigger('step2')
         # Exit simulation step
         self.exitstep2(fx, u0, x, forces)
 
