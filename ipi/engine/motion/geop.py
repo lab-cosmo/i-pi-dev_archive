@@ -310,7 +310,7 @@ class DummyOptimizer(dobject):
         #for i in range(self.beads.natoms):
         #    print "Atom('',", "[", self.beads.q[-1,3*i]*0.52917721, ",", self.beads.q[-1,3*i+1]*0.52917721, ",", self.beads.q[-1,3*i+2]*0.52917721, "]),"
         #print self.beads.q
-
+        print self.cell.h*0.52917721
         #self.qcell=np.zeros(6,float)
         '''
         if self.old_f.shape != self.beads.q.size:
