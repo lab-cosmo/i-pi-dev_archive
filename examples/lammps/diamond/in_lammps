@@ -1,0 +1,21 @@
+# (written by ASE)
+
+units real 
+boundary p p p 
+atom_modify sort 0 0.0 
+
+read_data data_lammps
+
+### interactions 
+pair_style tersoff
+pair_coeff * * C.tersoff C 
+mass * 12.0 
+
+### run
+fix  1 all ipi driver 1234 unix
+
+thermo_style custom step temp press cpu pxx pyy pzz pxy pxz pyz ke pe etotal vol lx ly lz atoms
+thermo_modify flush yes
+thermo 10
+run 199999999
+#log /dev/stdout
