@@ -355,6 +355,40 @@ def min_brent(fdf, fdf0=None, x0=0.0, tol=1.0e-6, itmax=100, init_step=1.0e-3):
     info(" @MINIMIZE: Finished minimization, energy = %f" % fx, verbosity.debug)
     return (x, fx)
 
+
+
+#One dimensional line-search for BFGS
+def dlinmin(fdf, x0, fdf0, xi, tol, itmax):
+    n = len(x0.flatten())
+    if fdf0 is None: fdf0 = fdf(x0)
+    ax = 0.0
+    xx = 1.0
+    one_d = Df1dim()
+    one_d.set_everything(x0, xi, fdf)
+    xmin, fx = min_brent(one_d, fdf0, ax, tol, itmax, xx)
+    xmin = 0.0
+    xi = xmin*xi
+    x = x0 + xi
+    fx, dfx = fdf(x)
+    check = False
+    return x, fx, dfx
+
+class Df1dim(object):
+    def __init(self):
+        self.xi = None
+        self.x0 = None
+        self.fdf = None
+    def set_everything(self, x0, xi, fdf):
+        self.x0 = x0
+        self.xi = xi
+        self.fdf = fdf
+    def __call__(self, x):
+        xt = self.x0 + x* self.xi
+        fx, dfx = self.fdf(xt)
+        df =  np.dot(dfx,self.xi)
+        return fx, df
+    
+
 # Approximate line search
 def min_approx(fdf, x0, fdf0=None, d0=None, big_step=100.0, tol=1.0e-6, itmax=100):
     
@@ -392,12 +426,13 @@ def min_approx(fdf, x0, fdf0=None, d0=None, big_step=100.0, tol=1.0e-6, itmax=10
     slope = np.dot(df0.flatten(), d0.flatten())
 
     if slope >= 0.0:
+        print np.amax(d0), np.amax(df0)
         info(" @MINIMIZE: Warning -- gradient is >= 0 (%f)" % slope, verbosity.low)
 
     test = np.amax(np.divide(np.absolute(d0.flatten()), np.maximum(np.absolute(x0.flatten()), np.ones(n))))
-    #test2 = np.divide(np.absolute(d0.flatten()), np.maximum(np.absolute(x0.flatten()), np.ones(n)))
-    #test = np.amax(test2[0:-9])
+
     # Setup to try Newton step first
+    f0, df0 = fdf0
     alamin = tol / test
     alam = 1.0
 
@@ -406,6 +441,7 @@ def min_approx(fdf, x0, fdf0=None, d0=None, big_step=100.0, tol=1.0e-6, itmax=10
     while i < itmax:
         x = np.add(x0, (alam * d0))
         fx, dfx = fdf(x)
+
         info(" @MINIMIZE: Calculated energy", verbosity.debug)
         # Check for convergence on change in x
         if alam < alamin:
@@ -413,9 +449,8 @@ def min_approx(fdf, x0, fdf0=None, d0=None, big_step=100.0, tol=1.0e-6, itmax=10
             x = x0
             info(" @MINIMIZE: Convergence in position, exited line search", verbosity.debug)
             return (x, fx, dfx)
-            
         # Sufficient function decrease
-        if fx <= (f0 +alf * alam * slope):
+        elif fx <= (f0 + alf* alam * slope):
             info(" @MINIMIZE: Sufficient function decrease, exited line search", verbosity.debug)
             print 'BLUB'
             return (x, fx, dfx)
@@ -482,7 +517,7 @@ def BFGS(x0, d0, fdf, fdf0=None, invhessian=None, big_step=100, tol=1.0e-6, itma
     
     # Original function value, gradient, other initializations
     # initial guess of inverse Hessian matrix is unit matrix
-    zeps = 1.0e-10
+    zeps =1.0e-10
     if fdf0 is None: fdf0 = fdf(x0)
     f0, df0 = fdf0
     n = len(x0.flatten())
@@ -501,12 +536,13 @@ def BFGS(x0, d0, fdf, fdf0=None, invhessian=None, big_step=100, tol=1.0e-6, itma
 
     # Perform approximate line minimization in direction d0
     x, fx, dfx = min_approx(fdf, x0, fdf0, xi, big_step, tol, itmax)
+    #x, fx, dfx = dlinmin(fdf, x0, fdf0, xi, tol, itmax)
     info(" @MINIMIZE: Started BFGS", verbosity.debug)
 
     # Update line direction (xi) and current point (x0)
     xi = np.subtract(x, x0).flatten()
     x0 = x
-
+    
     # Store old gradient
     dg = g
 
@@ -534,7 +570,7 @@ def BFGS(x0, d0, fdf, fdf0=None, invhessian=None, big_step=100, tol=1.0e-6, itma
         # Compute BFGS term
         dg = np.subtract(fac * xi, fad * hdg)
 
-        invhessian = invhessian + np.outer(xi, xi) * fac - np.outer(hdg, hdg) * fad + np.outer(dg, dg) * fae        
+        invhessian = invhessian + np.outer(xi, xi) * fac - np.outer(hdg, hdg) * fad + np.outer(dg, dg) * fae
         info(" @MINIMIZE: Updated hessian", verbosity.debug)
     else:
         info(" @MINIMIZE: Skipped hessian update; direction x gradient insufficient", verbosity.debug)
@@ -584,7 +620,7 @@ def L_BFGS(x0, d0, fdf, qlist, glist, fdf0=None, big_step=100, tol=1.0e-6, itmax
     big_step = big_step * max(np.sqrt(linesum), n)
 
     # Perform approximate line minimization in direction d0
-    x, fx, dfx = min_approx(fdf, x0, fdf0, xi, big_step, tol, itmax)
+    x, fx, dfx, check = min_approx(fdf, x0, fdf0, xi, big_step, tol, itmax, check=False)
 
     info(" @MINIMIZE: Started L-BFGS", verbosity.debug)
 
@@ -662,7 +698,7 @@ def L_BFGS(x0, d0, fdf, qlist, glist, fdf0=None, big_step=100, tol=1.0e-6, itmax
     # Update direction xi #TODO: MOVE THIS TO OUTSIDE OF IF/ELSE SO RUNS EVERY TIME
     xi = -1.0 * xi.reshape(d0.shape)
     info(" @MINIMIZE: Updated search direction", verbosity.debug)
-    return (x, fx, xi, qlist, glist)
+    return (x, fx, xi, qlist, glist, -dfx)
 
 # Bracketing for NEB, TODO: DEBUG THIS IF USING SD OR CG OPTIONS FOR NEB
 def bracket_neb(fdf, fdf0=None, x0=0.0, init_step=1.0e-3): 

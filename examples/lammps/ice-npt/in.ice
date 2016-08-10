@@ -8,13 +8,13 @@ bond_style      class2
 angle_style     harmonic
 kspace_style	ewald 0.0001
 
-read_data	data.ice
+read_data	four_data.ice
 pair_coeff  * * 0 0
 pair_coeff  1  1  0.000295147 5.96946
 
 neighbor	2.0 bin
-
-timestep	0.00025
+thermo_style    one
+thermo          100
 
 #velocity all create 298.0 2345187
 

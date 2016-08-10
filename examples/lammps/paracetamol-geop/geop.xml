@@ -3,7 +3,7 @@
       <properties stride='1' filename='out'>  [ step, potential{electronvolt}] </properties>
       <trajectory stride='1' filename='pos'>  positions{angstrom}  </trajectory>
    </output>
-   <total_steps> 100000000 </total_steps>
+   <total_steps> 1000000 </total_steps>
    <ffsocket name="lmp" mode="unix" pbc="true">
       <address> driver </address>  <latency> 1e-4</latency>
    </ffsocket>
@@ -11,20 +11,23 @@
     <initialize nbeads='1'> 
       <file mode='xyz' units="angstrom">  geop.xyz </file>
       <cell mode='abcABC'> [13.18034026,  17.29206049,  24.21758034, 90.0, 66.14, 90.0] </cell>
+<!--  <cell mode='manual' units="angstrom"> [ 14.031302395, 1.649831166, 1.881507450,0.0, 19.906860726, 1.170241289, 0.0, 0.0, 23.897499137] </cell> -->
     </initialize>
     <forces>
      <force forcefield="lmp"> </force>
     </forces>
     <motion mode='minimize'>
-      <optimizer mode='bfgs'>
+      <optimizer mode='sd'>
 	<tolerances>
-	  <energy> 1e-8 </energy>
-	  <force> 1e-8 </force>
-	  <position> 1e-12 </position>
-	  	</tolerances>
-	<biggest_step>
-	100.0
-	</biggest_step>
+	  <energy> 1e-10 </energy>
+	  <force> 1e-10 </force>
+	  <position> 1e-10 </position>
+ 	</tolerances>
+             <ls_options>
+          <tolerance> 1e-10 </tolerance>
+         <iter> 100 </iter>
+         <step> 1e-3 </step>
+       </ls_options>
 	</optimizer>
     </motion>
    </system>

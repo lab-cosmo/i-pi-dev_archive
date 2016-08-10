@@ -59,6 +59,12 @@ class InputGeop(InputDictionary):
                               "default"  : [ 1e-8, 1e-8, 1e-8 ],
                               "help"     : "Convergence criteria for optimization.",
                               "dimension": [ "energy", "force", "length" ] }),      
+                "optimize_cell" : (InputValue, {"dtype": bool,
+			       "default" : True,
+				"help"   : "Boolean to decide whether cell should be optimized or not."}),
+                "scale_jacobian" : (InputValue, {"dtype": float,
+                                "default" : 1.0,
+                                "help"    : "Scaling factor for the Jacobian in the cell optimization method. Weighting factor - can weight the importance of cell optimization/optimization of the atomic positions"}),
                 "old_force": (InputArray, {"dtype" : float,
                               "default"  : input_default(factory=np.zeros, args = (0,)),
                               "help"     : "The previous force in an optimization step.",
@@ -92,7 +98,9 @@ class InputGeop(InputDictionary):
         if geop == {}: return
         self.ls_options.store(geop.ls_options)
         self.tolerances.store(geop.tolerances)
-        self.mode.store(geop.mode)
+        self.optimize_cell.store(geop.optimize_cell)
+        self.scale_jacobian.store(geop.scale_jacobian)
+	self.mode.store(geop.mode)
         self.old_force.store(geop.old_f)
         self.old_direction_cgsd.store(geop.old_d)
         self.biggest_step.store(geop.big_step)
