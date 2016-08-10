@@ -426,13 +426,11 @@ def min_approx(fdf, x0, fdf0=None, d0=None, big_step=100.0, tol=1.0e-6, itmax=10
     slope = np.dot(df0.flatten(), d0.flatten())
 
     if slope >= 0.0:
-        print np.amax(d0), np.amax(df0)
         info(" @MINIMIZE: Warning -- gradient is >= 0 (%f)" % slope, verbosity.low)
 
     test = np.amax(np.divide(np.absolute(d0.flatten()), np.maximum(np.absolute(x0.flatten()), np.ones(n))))
 
     # Setup to try Newton step first
-    f0, df0 = fdf0
     alamin = tol / test
     alam = 1.0
 
@@ -620,7 +618,7 @@ def L_BFGS(x0, d0, fdf, qlist, glist, fdf0=None, big_step=100, tol=1.0e-6, itmax
     big_step = big_step * max(np.sqrt(linesum), n)
 
     # Perform approximate line minimization in direction d0
-    x, fx, dfx, check = min_approx(fdf, x0, fdf0, xi, big_step, tol, itmax, check=False)
+    x, fx, dfx, = min_approx(fdf, x0, fdf0, xi, big_step, tol, itmax)
 
     info(" @MINIMIZE: Started L-BFGS", verbosity.debug)
 

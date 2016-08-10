@@ -216,7 +216,7 @@ class GradientMapper(Mapper):
             self.dbeads.q = x      # new positions
             forces = self.dforces.f
         e = self.dforces.pot   # Energy
-        g = - forces   # Gradient
+        g = - self.dforces.f   # Gradient
         counter.count()        # counts number of function evaluations
         return e, g
 
@@ -259,6 +259,7 @@ class DummyOptimizer(dobject):
         self.scale_jacobian = geop.scale_jacobian
 
         #Jacobians to scale the stress (norm_stress) and the strain (jacobian) with the system size and giving them the same units as atomic positions/forces
+        # method from http://scitation.aip.org/content/aip/journal/jcp/136/7/10.1063/1.3684549
         self.jacobian = self.scale_jacobian * self.cell.V**(1.0/3.0)*self.beads.natoms**(1.0/6.0)
         self.norm_stress = -self.cell.V/self.jacobian
 
@@ -266,7 +267,7 @@ class DummyOptimizer(dobject):
         self.gm.bind(self)
 
         if self.optimize_cell == True:
-            #vector that contains atomic positions and cell parameters
+            #vector that contains atomic positions and lattice parameters
             self.qcell = np.zeros(3*(self.beads.natoms+2), float)
         else:
             self.qcell = np.zeros(3*(self.beads.natoms), float)
@@ -317,7 +318,8 @@ class DummyOptimizer(dobject):
         print 'real stress',  np.amax(np.absolute(self.forces.vir.flatten()/self.cell.V))
         print 'energy value', self.forces.pot
         print 'dotproduct', np.sqrt(np.dot(forces.flatten() - self.old_f.flatten(), forces.flatten() - self.old_f.flatten()))
-        print 'difference energy', np.absolute(fx - u0) / self.beads.natoms
+        print 'difference energy', np.absolute(fx - u0) / (self.qcell.size/3)
+        print x
         if (np.absolute(fx - u0) / (self.qcell.size/3) <= self.tolerances["energy"]) and ((np.amax(np.absolute(forces)) <= self.tolerances["force"]) or\
         # (np.sqrt(np.dot(forces - self.old_f.flatten(), forces - self.old_f.flatten())) == 0.0)) and (x <= self.tolerances["position"]):
         #changed by Sophie
@@ -379,21 +381,23 @@ class BFGSOptimizer(DummyOptimizer):
                 self.gm.xold[0:natoms*3] = self.beads.q.copy()
                 self.m.strain = np.zeros(6, float)
                 self.gm.oldcell = self.cell.h.copy()
+                forces = self.transform_force()
+                # gradient direction
+                self.gm.d = depstrip(forces) / np.sqrt(np.dot(forces, forces))
             else:
                 # store actual position to previous position
                 self.gm.xold = self.beads.q.copy()
+                # gradient direction
+                self.gm.d = depstrip(self.forces.f.flatten()) / np.sqrt(np.dot(self.forces.f.flatten(), self.forces.f.flatten()))
         
         if self.optimize_cell == True:
             #new vector containing atomic positions and transformed strain, initial strain is zero
-            self.qcell[0:natoms*3] = self.beads.q
+            self.qcell[0:natoms*3] = self.beads.q.copy()
             self.qcell[natoms*3:] = 0.0
             forces = self.transform_force()
         else:
-            self.qcell = self.beads.q
+            self.qcell = self.beads.q.copy()
             forces = self.forces.f.flatten()
-
-        # gradient direction
-        self.gm.d = depstrip(forces) / np.sqrt(np.dot(forces, forces))
 
         # Current energy and forces
         u0 = self.forces.pot.copy()
@@ -415,6 +419,7 @@ class BFGSOptimizer(DummyOptimizer):
             self.gm.oldcell = self.cell.h.copy()
         else:
             self.beads.q = self.qcell
+            forces = self.forces.f.flatten()
 
                 
         # x = current position - previous position; use for exit tolerance
@@ -469,11 +474,11 @@ class LBFGSOptimizer(DummyOptimizer):
 
         if self.optimize_cell == True:
             #new vector containing atomic positions and transformed strain, initial strain is zero
-            self.qcell[0:natoms*3] = self.beads.q
+            self.qcell[0:natoms*3] = self.beads.q.copy()
             self.qcell[natoms*3:] = 0.0
             forces = self.transform_force()
         else:
-            self.qcell = self.beads.q
+            self.qcell = self.beads.q.copy()
             forces = self.forces.f.flatten()
 
         # Current energy and force
@@ -499,6 +504,7 @@ class LBFGSOptimizer(DummyOptimizer):
             self.gm.oldcell = self.cell.h.copy()
         else:
             self.beads.q = self.qcell
+            forces = self.forces.f
 
         # x = current position - old position. Used for convergence tolerance
         x = np.amax(np.absolute(np.subtract(self.qcell, self.gm.xold)))
@@ -534,12 +540,12 @@ class SDOptimizer(DummyOptimizer):
         natoms = self.beads.natoms
 
         if self.optimize_cell == True:
-            self.qcell[0:natoms*3] = self.beads.q
+            self.qcell[0:natoms*3] = self.beads.q.copy()
             self.qcell[natoms*3:] = 0.0
             self.lm.oldcell = self.cell.h.copy() #DOPPEEEEEEEEEEEEEEEEEEEELT
             forces = self.transform_force()
         else:
-            self.qcell = self.beads.q
+            self.qcell = self.beads.q.copy()
             forces = self.forces.f
 
         gradf1 = dq1 = depstrip(forces)
@@ -611,16 +617,16 @@ class CGOptimizer(DummyOptimizer):
         natoms = self.beads.natoms
 
         if self.optimize_cell == True:
-            self.qcell[0:natoms*3] = self.beads.q
+            self.qcell[0:natoms*3] = self.beads.q.copy()
             self.qcell[natoms*3:] = 0.0
-            self.lm.oldcell = self.cell.h.copy() #DOPPEEEEEEEEEEEEEEEEEEEELT
             forces = self.transform_force()
         else:
-            self.qcell = self.beads.q
+            self.qcell = self.beads.q.copy()
             forces = self.forces.f
 
         if step == 0:
             gradf1 = dq1 = depstrip(forces)
+            self.lm.oldcell = self.cell.h.copy()
 
             # Move direction for 1st conjugate gradient step
             dq1_unit = dq1 / np.sqrt(np.dot(gradf1.flatten(), gradf1.flatten()))
