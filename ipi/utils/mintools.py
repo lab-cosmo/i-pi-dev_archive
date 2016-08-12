@@ -576,7 +576,7 @@ def BFGS(x0, d0, fdf, fdf0=None, invhessian=None, big_step=100, tol=1.0e-6, itma
     # Update direction
     xi = np.dot(invhessian, -g)
     info(" @MINIMIZE: Updated search direction", verbosity.debug)
-    return (x, fx, xi, invhessian, -dfx)
+    return (x, fx, xi, invhessian)
 
 # L-BFGS algorithm with approximate line search
 def L_BFGS(x0, d0, fdf, qlist, glist, fdf0=None, big_step=100, tol=1.0e-6, itmax=100, m=0, k=0):
@@ -696,7 +696,7 @@ def L_BFGS(x0, d0, fdf, qlist, glist, fdf0=None, big_step=100, tol=1.0e-6, itmax
     # Update direction xi #TODO: MOVE THIS TO OUTSIDE OF IF/ELSE SO RUNS EVERY TIME
     xi = -1.0 * xi.reshape(d0.shape)
     info(" @MINIMIZE: Updated search direction", verbosity.debug)
-    return (x, fx, xi, qlist, glist, -dfx)
+    return (x, fx, xi, qlist, glist)
 
 # Bracketing for NEB, TODO: DEBUG THIS IF USING SD OR CG OPTIONS FOR NEB
 def bracket_neb(fdf, fdf0=None, x0=0.0, init_step=1.0e-3): 

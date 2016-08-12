@@ -9,7 +9,7 @@
    </ffsocket>
    <system>
     <initialize nbeads='1'> 
-      <file mode='xyz' units='angstrom'>  diamond.xyz </file>
+      <file mode='xyz' units='angstrom'>  diamondase.xyz </file>
      <!-- <cell mode='manual'> [ 6.90673130,-6.70154426e-03, 1.37853015e-03, 0.0, 6.51506357, -1.77985356e-02, 0.0, 0.0, 6.712027 ] </cell> -->
     <cell mode='manual' units="angstrom"> [3.467 ,0,0,0,3.467,0,0,0,3.667 ] </cell>
     </initialize>
@@ -17,7 +17,7 @@
      <force forcefield="lmp"> </force>
     </forces>
     <motion mode='minimize'>
-      <optimizer mode='sd'>
+      <optimizer mode='cg'>
 	<tolerances>
 	  <energy> 1e-12 </energy>
 	  <force> 1e-12 </force>
@@ -27,7 +27,7 @@
           <tolerance> 1e-10 </tolerance>
          <!-- <iter> 5 </iter>-->
 	</ls_options>
-	<optimize_cell> False </optimize_cell>
+	<optimize_cell> False </optimize_cell> -->
       <!--	<scale_jacobian> 100.0 </scale_jacobian> -->
 	<biggest_step>
 	100.0

@@ -64,7 +64,7 @@ class InputGeop(InputDictionary):
 				"help"   : "Boolean to decide whether cell should be optimized or not."}),
                 "scale_jacobian" : (InputValue, {"dtype": float,
                                 "default" : 1.0,
-                                "help"    : "Scaling factor for the Jacobian in the cell optimization method. Weighting factor - can weight the importance of cell optimization/optimization of the atomic positions"}),
+                                "help"    : "Scaling factor for the Jacobian in the cell optimization method. Weighting factor - can relatively weight between atomic and cell motion. scale_jacobian > 1.0 gives the atomic positions more importance."}),
                 "old_force": (InputArray, {"dtype" : float,
                               "default"  : input_default(factory=np.zeros, args = (0,)),
                               "help"     : "The previous force in an optimization step.",

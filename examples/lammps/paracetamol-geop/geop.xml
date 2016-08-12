@@ -16,16 +16,19 @@
      <force forcefield="lmp"> </force>
     </forces>
     <motion mode='minimize'>
-      <optimizer mode='lbfgs'>
+      <optimizer mode='sd'>
 	<tolerances>
-	  <energy> 1e-8 </energy>
-	  <force> 1e-8 </force>
-	  <position> 1e-8 </position>
+	  <energy> 1e-10 </energy>
+	  <force> 1e-10 </force>
+	  <position> 1e-10 </position>
 	  	</tolerances>
 	<biggest_step>
 	100.0
 	</biggest_step>
-	<optimize_cell> False </optimize_cell>
+	<ls_options>
+	<tolerance> 1e-10 </tolerance>
+	</ls_options>
+	<optimize_cell> True </optimize_cell> 
 	</optimizer>
     </motion>
    </system>
