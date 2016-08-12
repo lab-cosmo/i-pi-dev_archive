@@ -280,6 +280,9 @@ class DummyOptimizer(dobject):
 
         #Jacobians to scale the stress (norm_stress) and the strain (jacobian) with the system size and to give them the same units as atomic positions/forces
         # method: http://scitation.aip.org/content/aip/journal/jcp/136/7/10.1063/1.3684549
+        # As the strain tensor, we use the infinitesimal strain tensor
+        # https://en.wikipedia.org/wiki/Infinitesimal_strain_theory
+        # for the strain and the stress we only put six components in the vector (since they are symmetric)
 
         self.jacobian = self.scale_jacobian * self.cell.V**(1.0/3.0)*self.beads.natoms**(1.0/6.0)
         self.norm_stress = -self.cell.V/self.jacobian
@@ -335,7 +338,7 @@ class DummyOptimizer(dobject):
         natoms = self.beads.natoms
         self.beads.q[-1,:] = self.qcell[0:natoms*3]
         self.m.strain = self.qcell[natoms*3:]/self.jacobian #strain vector
-        # we use the Voight strain tensor.
+        # we use the infinitesimal strain tensor.
         #Lower part is set to zero because i-Pi expects lower triangular cell matrix. 
         #Should give the same result (tested with ase) but takes much more optimization steps.
         epsilon =  np.array([[1.0 + self.m.strain[0], 0.5 * self.m.strain[5], 0.5 * self.m.strain[4]],
