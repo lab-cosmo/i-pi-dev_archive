@@ -52,7 +52,7 @@ format: frontpage
 {% endif %}
 
 
-
+{% comment %} I do not want any post in the homepage!
 {% comment %}
 *
 * First check, if there are any posts at all
@@ -111,3 +111,4 @@ format: frontpage
 <div class="row">
     {{ content }}
 </div><!-- /.row -->
+{% endcomment %}
