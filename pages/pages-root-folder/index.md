@@ -50,12 +50,22 @@ homepage: true
 
 About i-PI
 ==========
-i-PI is a universal force engine interface written in Python, designed to be used together
-with an ab-initio evaluation of the interactions between the atoms. The main goal is to
-decouple the problem of evolving the ionic positions to sample the appropriate thermodynamic
-ensemble and the problem of computing the inter-atomic forces.
+i-PI is a universal force engine interface
+written in Python, designed to be used together with an ab-initio
+evaluation of the interactions between the atoms. The main goal is to
+decouple the problem of evolving the ionic positions to sample the
+appropriate thermodynamic ensemble and the problem of computing the
+inter-atomic forces.
 
-The implementation is based on a client-server paradigm, where i-PI acts as the server and
-deals with the propagation of the nuclear motion, whereas the calculation of the potential
-energy, forces and the potential energy part of the pressure virial is delegated to one or
-more instances of an external code, acting as clients.
+The implementation is based on a client-server paradigm, where i-PI
+acts as the server and deals with the propagation of the nuclear
+motion, whereas the calculation of the potential energy, forces and
+the potential energy part of the pressure virial is delegated to one
+or more instances of an external code, acting as clients.
+
+
+i-PI is free software, distributed under a dual MIT/GPLv3 licence. You
+are welcome to dowload, use, modify and redistribute it. If you fin it
+useful for your research, a citation to
+[Ceriotti, More, Manolopoulos, Comp. Phys. Comm. 185, 1019-1026 (2014)](http://dx.doi.org/10.1016/j.cpc.2013.10.027)
+would be appreciated.

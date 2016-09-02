@@ -1,28 +1,30 @@
 - title: About
   url: "/"
   side: left
+  dropdown:
+  - title: "The socket interface"
+    url: /about/interface/
 
 - title: Download
-  url: "/getting-started/"
+  url: "/download/"
   side: left
 
 - title: "Resources"
-  url: "/design/"
   side: left
   dropdown:
   - title: "Documentation"
-    url: "/design/grid/"
-  - title: "Tutorial"
-    url: "/design/typography/typography/"
-  - title: "Vbox Image"
-    url: "/design/page/"
+    url: "/resources/documentation/"
+  - title: "Tutorials"
+    url: "/resources/tutorials/"
+  - title: "Tools"
+    url: "/resources/tools/"
 
 - title: "News&Event"
-  url: "/blog/"
+  url: "/news/"
   side: left
   dropdown:
   - title: "Archive"
-    url: "/blog/archive/"
+    url: "/news/archive/"
 
 - title: "Search"
   url: "/search/"
