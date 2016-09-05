@@ -17,7 +17,7 @@ slogan: 'A socket interface to move atoms'
 description: '»i-PI« is an universal atoms mover.'
 
 # The credits show up in the includes/_footer.html – It would be nice of you to leave a link to Phlow or Feeling Responsive as a thank you :)
-credits: '<p>Created with &hearts; by <a href="http://phlow.de/">Phlow</a> with <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> based on <a href="http://phlow.github.io/feeling-responsive/">Feeling Responsive</a>.</p>'
+credits: '<p>Created by <a href="https://grhawk.github.io">grhawk</a> with <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> based on <a href="http://phlow.github.io/feeling-responsive/">Feeling Responsive</a>.</p>'
 
 # Main author of the website
 # See > authors.yml
@@ -121,7 +121,7 @@ defaults:
       show_meta: true   # Show metadata for all posts
       # sidebar:        # Possible values › left, right › by default there will be no sidebar
       comments: false
-      author: Riccardo Petraglia     # Default author for posts
+      author: Michele Ceriotti     # Default author for posts
 
 
 
@@ -205,7 +205,7 @@ msapplication_tilecolor:                '#fabb00'
 #
 # used in _includes/comments
 
-disqus_shortname: feelingresponsive
+#disqus_shortname: feelingresponsive
 
 
 #      _____
