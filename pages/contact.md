@@ -1,12 +1,22 @@
 ---
 layout: page
 title: "Contact"
-meta_title: "Contact and use our contact form"
-subheadline: "Wufoo-powered contact forms"
-teaser: "Get in touch with me? Use the contact form."
+teaser: "Your feedback are precious for us..."
+show_meta: false
+header:
+   image_fullwidth: "header-homepage.jpg"
 permalink: "/contact/"
 ---
-If you need a fabulous contact form for your website, I suggest you use [Wufoo][1]. You can use three forms for free, you get no spam and if you get more than 100 entries you have to pay.
+
+If you have suggestions, questions, complaints...  you want to
+contribute to the code or just to report a possible bug... you can
+open a [GitHub issue](https://github.com/i-pi/i-pi/issues) or email to
+one of the Main Developers.
 
 
- [1]: http://www.wufoo.com/
+### Main Developers
+[Michele Ceriotti,](https://people.epfl.ch/michele.ceriotti?lang=en)
+Head of the COSMO group at EPFL in Lausanne. Founder and lead
+developer of i-PI 
+
+### Contributors
