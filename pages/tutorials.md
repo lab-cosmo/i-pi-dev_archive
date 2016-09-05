@@ -35,5 +35,6 @@ VirtualBox image and supported with many examples. Among the others:
   * [QuatumEspresso](http://quantum-espresso.org)
   * [Siesta](http://departments.icmab.es/leem/siesta/)
   * [Lammps](http://lammps.sandia.gov/)
+  * [CP2K](https://www.cp2k.org/)
 
 ...and more to come...
