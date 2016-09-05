@@ -5,7 +5,7 @@ subheadline: "How to use i-PI"
 teaser: "Here we need a smart teaser"
 permalink: "/resources/documentation/"
 header:
-    image_fullwidth: "header_roadmap_2.jpg"
+    image_fullwidth: "header-homepage.jpg"
 ---
 
 > It is difficult to free fools from the chains they revere.
@@ -13,6 +13,8 @@ header:
 
 The
 manual included in the development version should document all the new
-keyword. You can compile the manual using the make utility (see the
-README file). The manual for the last release is also available as pdf
-(here)[]. 
+keyword. You can create a pdf version of the manual using the make
+utility (see
+[here](https://github.com/epfl-cosmo/i-pi-dev/blob/master/doc/README)). The
+manual for the last official release is also available as pdf
+[here]({{ site.url }}/assets/pdf/manual.pdf). 
