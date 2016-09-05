@@ -121,7 +121,7 @@ defaults:
       show_meta: true   # Show metadata for all posts
       # sidebar:        # Possible values › left, right › by default there will be no sidebar
       comments: false
-      author: Michele Ceriotti     # Default author for posts
+      author: Riccardo Petraglia     # Default author for posts
 
 
 
