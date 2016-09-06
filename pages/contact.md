@@ -11,12 +11,5 @@ permalink: "/contact/"
 If you have suggestions, questions, complaints...  you want to
 contribute to the code or just to report a possible bug... you can
 open a [GitHub issue](https://github.com/i-pi/i-pi/issues) or email to
-one of the Main Developers.
+one of the [Main Developers](/about/developers).
 
-
-### Main Developers
-[Michele Ceriotti,](https://people.epfl.ch/michele.ceriotti?lang=en)
-Head of the COSMO group at EPFL in Lausanne. Founder and lead
-developer of i-PI 
-
-### Contributors

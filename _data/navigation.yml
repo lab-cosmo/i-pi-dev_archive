@@ -4,6 +4,8 @@
   dropdown:
   - title: "The socket interface"
     url: /about/interface/
+  - title: "Behind the code"
+    url: /about/developers/
 
 - title: Download
   url: "/download/"
@@ -16,8 +18,8 @@
     url: "/resources/documentation/"
   - title: "Tutorials"
     url: "/resources/tutorials/"
-  - title: "Tools"
-    url: "/resources/tools/"
+  - title: "Getting Started"
+    url: "/resources/getting_started/"
 
 - title: "News&Event"
   url: "/news/"
