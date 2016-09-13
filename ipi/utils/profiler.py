@@ -8,22 +8,38 @@ prof_lock = threading.Lock()
 
 profile = {}
 
-def start(name):
-    prof_lock.acquire()
-    if name in profile.keys():
-        profile[name][0] += 1
-        profile[name][1] -= timing()
-    elif name not in profile.keys():
-        profile[name] = [1, -timing(), True]
-    prof_lock.release()
+#~ def start(name):
+    #~ prof_lock.acquire()
+    #~ if name in profile.keys():
+        #~ profile[name][0] += 1
+        #~ profile[name][1] -= timing()
+    #~ elif name not in profile.keys():
+        #~ profile[name] = [1, -timing(), True]
+    #~ prof_lock.release()
 
-def stop(name):
-    prof_lock.acquire()
-    if name in profile.keys():
-        profile[name][1] += timing()
-    else:
-        raise TimerError('@PROFILING: Timer for '+name+' not started!\n Try to stop a non-started clock\n')
-    prof_lock.release()
+#~ def stop(name):
+    #~ prof_lock.acquire()
+    #~ if name in profile.keys():
+        #~ profile[name][1] += timing()
+    #~ else:
+        #~ raise TimerError('@PROFILING: Timer for '+name+' not started!\n Try to stop a non-started clock\n')
+    #~ prof_lock.release()
+
+def Timer:    
+    def __init__(self):
+        self.ncalls = 0
+        self.ntime =0
+        
+    def start(self):
+        prof_lock.acquire()
+        self.ncalls += 1
+        self.ntime -= timing()
+        prof_lock.release()
+
+    def stop(self):
+        prof_lock.acquire()
+        self.ntime += timing()
+        prof_lock.release()
 
 def timethis(func):
     """ Decorator to timing functions.
@@ -35,9 +51,11 @@ def timethis(func):
             fileline = str(code_obj.co_firstlineno)
             funcname = str(code_obj.co_name)
             name = funcname+'@'+filepath+':'+fileline
-            start(name)
+            if not name in profile.keys(): 
+                profile[name] = Timer()
+            profile[name].start()
             result = func(*args, **kwargs)
-            stop(name)
+            profile[name].stop()
             return result
         else:
             pass
