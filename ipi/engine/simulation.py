@@ -21,7 +21,7 @@ from ipi.utils.messages import verbosity, info, warning, banner
 from ipi.utils.softexit import softexit
 import ipi.engine.outputs as eoutputs
 import ipi.inputs.simulation as isimulation
-
+from ipi.utils.profiler import timethis
 
 __all__ = ['Simulation']
 
@@ -195,6 +195,7 @@ class Simulation(dobject):
         print "WRITING CHECKPOINT", self.chk.status.extra
         self.chk.write(store=False)
 
+    @timethis
     def run(self):
         """Runs the simulation.
 

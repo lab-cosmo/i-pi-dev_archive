@@ -13,7 +13,7 @@ import threading
 import signal
 
 from ipi.utils.messages import verbosity, warning
-
+from ipi.utils.profiler import profile
 
 __all__ = ['Softexit', 'softexit']
 
@@ -93,6 +93,8 @@ class Softexit(object):
          for (t, dl) in self.tlist:  # set thread exit flag
             dl[0] = False
 
+      for k,v in profile.items():
+         print k, v
       # wait for all (other) threads to finish
       for (t, dl) in self.tlist:
          if not threading.currentThread() is self._thread:

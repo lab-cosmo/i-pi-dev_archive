@@ -28,7 +28,7 @@ import weakref
 import numpy as np
 
 from ipi.utils.messages import verbosity, warning
-
+from ipi.utils.profiler import timethis
 
 __all__ = ['depend_base', 'depend_value', 'depend_array', 'synchronizer',
            'dobject', 'dget', 'dset', 'depstrip', 'depcopy', 'deppipe', 'depraise']
@@ -45,7 +45,7 @@ class synchronizer(object):
             {"name": depend object}.
         manual: A string containing the name of the object being manually changed.
     """
-
+    @timethis
     def __init__(self, deps=None):
         """Initialises synchronizer.
 
@@ -86,6 +86,7 @@ class depend_base(object):
         _dependants: A list containing all objects dependent on the self.
     """
 
+    @timethis
     def __init__(self, name, synchro=None, func=None, dependants=None, dependencies=None, tainted=None, active=None):
         """Initialises depend_base.
 
@@ -183,6 +184,7 @@ class depend_base(object):
             if tainted:
                 newdep.taint(taintme=True)
 
+    @timethis
     def add_dependency(self, newdep, tainted=True):
         """Adds a dependency.
 
@@ -196,6 +198,7 @@ class depend_base(object):
         if tainted:
             self.taint(taintme=True)
 
+    @timethis
     def taint(self, taintme=True):
         """Recursively sets tainted flag on dependent objects.
 
@@ -227,11 +230,13 @@ class depend_base(object):
         else:
             self._tainted[:] = taintme
 
+    @timethis
     def tainted(self):
         """Returns tainted flag."""
 
         return self._tainted[0]
 
+    @timethis
     def update_auto(self):
         """Automatic update routine.
 
@@ -248,6 +253,7 @@ class depend_base(object):
         else:
             warning(self._name + " probably shouldn't be tainted (value)", verbosity.low)
 
+    @timethis
     def update_man(self):
         """Manual update routine.
 
@@ -285,6 +291,7 @@ class depend_value(depend_base):
         _value: The value associated with self.
     """
 
+    @timethis
     def __init__(self, name, value=None, synchro=None, func=None, dependants=None, dependencies=None, tainted=None, active=None):
         """Initialises depend_value.
 
@@ -306,6 +313,7 @@ class depend_value(depend_base):
         self._value = value
         super(depend_value, self).__init__(name, synchro, func, dependants, dependencies, tainted, active)
 
+    @timethis
     def get(self):
         """Returns value, after recalculating if necessary.
 
@@ -319,11 +327,13 @@ class depend_value(depend_base):
 
         return self._value
 
+    @timethis
     def __get__(self, instance, owner):
         """Overwrites standard get function."""
 
         return self.get()
 
+    @timethis
     def set(self, value, manual=True):
         """Alters value and taints dependencies.
 
@@ -337,6 +347,7 @@ class depend_value(depend_base):
         if manual:
             self.update_man()
 
+    @timethis
     def __set__(self, instance, value):
         """Overwrites standard set function."""
 

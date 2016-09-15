@@ -10,9 +10,11 @@ profile = {}
 function_dict = {}
 
 class Timer(object):    
-    def __init__(self):
+    def __init__(self, name=None):
         self.ncalls = 0
         self.ntime =0
+        if name:
+            profile[name] = self
         
     def start(self):
         prof_lock.acquire()
@@ -24,6 +26,14 @@ class Timer(object):
         prof_lock.acquire()
         self.ntime += timing()
         prof_lock.release()
+
+    def __str__(self):
+        msg = ' \t=>\t '+ str(self.ncalls)
+        if self.ntime > 0:
+            msg += ' \t  '+str(self.ntime)
+        else:
+            msg += ' \t  NA'
+        return msg
 
 def timethis(func):
     """ Decorator to timing functions.
