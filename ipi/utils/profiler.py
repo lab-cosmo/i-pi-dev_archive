@@ -2,30 +2,33 @@
 
 import threading
 import time
+import re
 
-timing = time.clock
-prof_lock = threading.Lock()
+TIMING = time.time
+PROF_LOCK = threading.Lock()
 
 profile = {}
 function_dict = {}
 
-class Timer(object):    
+class Timer(object):
+    """ Class that create a timer and stores timing.
+    """
     def __init__(self, name=None):
         self.ncalls = 0
-        self.ntime =0
+        self.ntime = 0
         if name:
             profile[name] = self
-        
+
     def start(self):
-        prof_lock.acquire()
+        PROF_LOCK.acquire()
         self.ncalls += 1
-        self.ntime -= timing()
-        prof_lock.release()
+        self.ntime -= TIMING()
+        PROF_LOCK.release()
 
     def stop(self):
-        prof_lock.acquire()
-        self.ntime += timing()
-        prof_lock.release()
+        PROF_LOCK.acquire()
+        self.ntime += TIMING()
+        PROF_LOCK.release()
 
     def __str__(self):
         msg = ' \t=>\t '+ str(self.ncalls)
@@ -34,6 +37,8 @@ class Timer(object):
         else:
             msg += ' \t  NA'
         return msg
+
+FILENAME_REGEX = re.compile('.*/(ipi/.*).py')
 
 def timethis(func):
     """ Decorator to timing functions.
@@ -44,7 +49,7 @@ def timethis(func):
                 name = function_dict[func.func_code]
             except KeyError:
                 code_obj = func.func_code
-                filepath = str(code_obj.co_filename)
+                filepath = FILENAME_REGEX.match(str(code_obj.co_filename)).group(1)
                 fileline = str(code_obj.co_firstlineno)
                 funcname = str(code_obj.co_name)
                 name = funcname+'@'+filepath+':'+fileline
@@ -57,12 +62,3 @@ def timethis(func):
         else:
             return func(*args, **kwargs)
     return inner
-
-
-class TimerError(Exception):
-    def __init__(self, msg):
-        self.value = msg
-    def __str__(self):
-        return self.value
-
-
