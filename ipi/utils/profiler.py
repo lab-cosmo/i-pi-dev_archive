@@ -39,7 +39,6 @@ def timethis(func):
                 funcname = str(code_obj.co_name)
                 name = funcname+'@'+filepath+':'+fileline
                 function_dict[func.func_code] = name
-            if not name in profile.keys(): 
                 profile[name] = Timer()
             profile[name].start()
             result = func(*args, **kwargs)
