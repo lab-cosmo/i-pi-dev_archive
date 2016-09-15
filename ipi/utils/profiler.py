@@ -45,7 +45,7 @@ def timethis(func):
             profile[name].stop()
             return result
         else:
-            pass
+            return func(*args, **kwargs)
     return inner
 
 
