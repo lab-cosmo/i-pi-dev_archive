@@ -76,6 +76,9 @@ class Softexit(object):
          message: The message to output to standard output.
       """
 
+      for k,v in profile.items():
+         print k, v
+
       print "SOFTEXIT CALLED FROM THREAD", threading.currentThread(), message
       if not self.triggered:    # avoid double calls from different threads
          self.exiting = True
@@ -93,8 +96,6 @@ class Softexit(object):
          for (t, dl) in self.tlist:  # set thread exit flag
             dl[0] = False
 
-      for k,v in profile.items():
-         print k, v
       # wait for all (other) threads to finish
       for (t, dl) in self.tlist:
          if not threading.currentThread() is self._thread:

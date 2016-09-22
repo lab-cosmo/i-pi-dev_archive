@@ -19,6 +19,7 @@ from ipi.engine.motion import Motion
 from ipi.utils.depend import depstrip, depend_value, dget, dset, dobject, deppipe
 from ipi.engine.thermostats import Thermostat
 from ipi.engine.barostats import Barostat
+from ipi.utils.profiler import timethis
 
 
 #__all__ = ['Dynamics', 'NVEIntegrator', 'NVTIntegrator', 'NPTIntegrator', 'NSTIntegrator', 'SCIntegrator`']
@@ -176,6 +177,7 @@ class Dynamics(Motion):
 
         return self.ensemble.temp * self.beads.nbeads
 
+    @timethis
     def step(self, step=None):
         self.integrator.step(step)
 

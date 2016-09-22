@@ -1,0 +1,35 @@
+<simulation>
+    <ffsocket mode='unix' name='driver'>
+         <latency>  1.00000000e-02</latency>
+         <slots>4</slots>
+         <port>20614</port>
+         <timeout>  6.00000000e+02</timeout>
+         <address>zundel</address>
+   </ffsocket>
+   <total_steps>400</total_steps>
+   <output prefix="data">
+      <trajectory stride="100000" filename="pos" cell_units="angstrom">positions{angstrom}</trajectory>
+      <properties stride="100000"> [ step, time, conserved, temperature{kelvin}, kinetic_cv, 
+            potential, kinetic_cv(H), kinetic_cv(O) ] </properties>
+   </output>
+   <prng>
+      <seed>18885</seed>
+   </prng>
+   <system>
+      <forces> <force forcefield="driver"></force></forces>
+      <initialize nbeads="8">
+        <file mode="xyz" units="angstrom">./h5o2+.xyz</file>
+        <cell>
+         [   25.29166, 0, 0, 0, 25.29166, 0, 0, 0, 25.29166 ]
+        </cell>
+      </initialize>
+      <ensemble>
+         <temperature units="kelvin"> 150.0 </temperature>
+      </ensemble>
+      <motion mode='dynamics'>
+	<dynamics mode='nve'>
+	  <timestep units="femtosecond"> 0.25 </timestep>
+	</dynamics>
+      </motion>
+  </system>
+</simulation>
