@@ -70,7 +70,7 @@ useful for your research, a citation to
 [Ceriotti, More, Manolopoulos, Comp. Phys. Comm. 185, 1019-1026 (2014)](http://dx.doi.org/10.1016/j.cpc.2013.10.027)
 would be appreciated.
 
-As today i-PI can be used in conjunction
+As today, i-PI can be used together
 with
 [CP2K](https://www.cp2k.org/),
 [Lammps](http://lammps.sandia.gov/),
