@@ -4,7 +4,7 @@ title: "Publications"
 show_meta: false
 header:
    image_fullwidth: "header-homepage.jpg"
-permalink: "/publications"
+permalink: "/publications/"
 ---
 
  *  “Accurate molecular dynamics and nuclear quantum effects at low
