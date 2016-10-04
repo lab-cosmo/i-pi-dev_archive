@@ -28,6 +28,10 @@
   - title: "Archive"
     url: "/news/archive/"
 
+- title: Publications
+  url: "/publications/"
+  side: left
+
 - title: "Search"
   url: "/search/"
   side: right

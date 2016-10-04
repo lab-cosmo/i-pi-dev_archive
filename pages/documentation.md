@@ -2,14 +2,10 @@
 layout: page
 title: "Documentation"
 subheadline: "How to use i-PI"
-teaser: "Here we need a smart teaser"
 permalink: "/resources/documentation/"
 header:
     image_fullwidth: "header-homepage.jpg"
 ---
-
-> It is difficult to free fools from the chains they revere.
-> -- <cite>Voltaire</cite>
 
 The
 manual included in the development version should document all the new
