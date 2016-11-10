@@ -5,7 +5,7 @@ teaser: "Starting i-PI is very easy!"
 show_meta: false
 header:
    image_fullwidth: "header-homepage.jpg"
-permalink: "/resources/getting_started"
+permalink: "/resources/getting_started/"
 ---
 
 ### Prerequisites
