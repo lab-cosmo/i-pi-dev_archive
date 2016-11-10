@@ -25,7 +25,7 @@ author: Riccardo Petraglia
 
 # This URL is the main address for absolute links. Don't include a slash at the end.
 #
-url: 'https://epfl-cosmo.github.io'
+url: 'https://epfl-cosmo.github.io/i-pi-dev'
 baseurl: ''
 
 # This is for the editing function in _/includes/improve_content
