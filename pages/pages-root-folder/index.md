@@ -51,8 +51,9 @@ homepage: true
 About i-PI
 ==========
 i-PI is a universal force engine interface
-written in Python, designed to be used together with an ab-initio
-evaluation of the interactions between the atoms. The main goal is to
+written in Python, designed to be used together with an ab-initio (or 
+force-field based) evaluation of the interactions between the atoms. 
+The main goal is to
 decouple the problem of evolving the ionic positions to sample the
 appropriate thermodynamic ensemble and the problem of computing the
 inter-atomic forces.
@@ -63,16 +64,17 @@ motion, whereas the calculation of the potential energy, forces and
 the potential energy part of the pressure virial is delegated to one
 or more instances of an external code, acting as clients.
 
-
 i-PI is free software, distributed under a dual MIT/GPLv3 licence. You
 are welcome to dowload, use, modify and redistribute it. If you find it
 useful for your research, a citation to
 [Ceriotti, More, Manolopoulos, Comp. Phys. Comm. 185, 1019-1026 (2014)](http://dx.doi.org/10.1016/j.cpc.2013.10.027)
 would be appreciated.
 
-As today, i-PI can be used together
-with
+As of today, the following codes provide out-of-the-box an i-PI interface
 [CP2K](https://www.cp2k.org/),
+[DFTB+](http://www.dftb-plus.info/),
 [Lammps](http://lammps.sandia.gov/),
 [QuatumEspresso](http://quantum-espresso.org),
-[Siesta](http://departments.icmab.es/leem/siesta/) 
+[Siesta](http://departments.icmab.es/leem/siesta/).
+If you are interested in interfacing your code to i-PI please get in touch,
+we are always glad to help!
