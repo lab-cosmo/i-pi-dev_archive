@@ -9,22 +9,22 @@ permalink: "/about/developers/"
 ---
 
 ### Main Developers
- - [Michele Ceriotti,](https://people.epfl.ch/michele.ceriotti?lang=en){:target"_blank"}
+ - [Michele Ceriotti,](https://people.epfl.ch/michele.ceriotti?lang=en)
    Head of the Laboratory for Computational Science and Modelling (COSMO)
    at EPFL, Lausanne. 
  - [Joshua More]()
- - [Riccardo Petraglia,](https://people.epfl.ch/riccardo.petraglia?lang=en){:target"_blank"} Scientist
+ - [Riccardo Petraglia,](https://people.epfl.ch/riccardo.petraglia?lang=en) Scientist
    at COSMO.
- - [Mariana Rossi,](http://www.fhi-berlin.mpg.de/~rossi){:target"_blank"}
+ - [Mariana Rossi,](http://www.fhi-berlin.mpg.de/~rossi)
    Group leader at FHI Berlin.
- - [Ondrej Marsalek,](https://github.com/OndrejMarsalek){:target"_blank"} Scientist at
+ - [Ondrej Marsalek,](https://github.com/OndrejMarsalek) Scientist at
    Stanford University.
- - [Venkat Kapil,](https://people.epfl.ch/venkat.kapil?lang=en){:target"_blank"} PhD at
+ - [Venkat Kapil,](https://people.epfl.ch/venkat.kapil?lang=en) PhD at
    COSMO.
 
 ### Contributors
- - [Thomas Spura](https://github.com/tomspur){:target"_blank"}
- - [Igor Poltavski](https://github.com/ipoltavskyi){:target"_blank"}
+ - [Thomas Spura](https://github.com/tomspur)
+ - [Igor Poltavski](https://github.com/ipoltavskyi)
  - [Benjamin Helfrecht]()
  - [Sophie Mutzel]()
 
@@ -38,5 +38,5 @@ support!
 
 Development of i-PI has been directly funded by 
 the European Commission through the [Materials at the 
-Exascale Centre of Excellence](http://www.max-centre.eu/){:target"_blank"}
+Exascale Centre of Excellence](http://www.max-centre.eu/)
 ![MaX Logo]({{ site.url }}/i-pi-dev/images/max-logo.png)
