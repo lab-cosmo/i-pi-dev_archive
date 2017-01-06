@@ -39,4 +39,4 @@ support!
 Development of i-PI has been directly funded by 
 the European Commission through the [Materials at the 
 Exascale Centre of Excellence](http://www.max-centre.eu/)
-![MaX Logo](/images/max-logo.png)
+![MaX Logo]({{ site.url }}/images/max-logo.png)
