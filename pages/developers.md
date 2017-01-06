@@ -1,7 +1,7 @@
 ---
 layout: page
 title: "Behind the code..."
-teaser: "People who make i-PI growing up..."
+teaser: ""
 show_meta: false
 header:
    image_fullwidth: "header-homepage.jpg"
@@ -28,9 +28,15 @@ permalink: "/about/developers/"
  - [Benjamin Helfrecht]()
  - [Sophie Mutzel]()
 
-Apologies if we have forgotten some contributions -- get in touch and we 
-will update this page!
+We try to keep this page up-to-date, reflecting code contributions
+on github. We might however be lagging behind and/or have overlooked
+some contributions, in which case please accept our apologies and get
+in touch so we can give proper recognition to everyone's work and 
+support!
 
 ### Funding
 
-INSERT HERE A MAX LOGO AND A LINK TO THEIR PAGE!
+Development of i-PI has been directly funded by 
+the European Commission through the [Materials at the 
+Exascale Centre of Excellence](http://www.max-centre.eu/)
+[MaX Logo](/images/max-logo.png)
