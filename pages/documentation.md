@@ -3,7 +3,7 @@ layout: page
 title: "Documentation"
 permalink: "/resources/documentation/"
 header:
-    image_fullwidth: "header-homepage.jpg"
+    image_fullwidth: "water-pimd.jpg"
 ---
 
 The

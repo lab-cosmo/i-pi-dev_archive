@@ -4,7 +4,7 @@ title: "Behind the code..."
 teaser: ""
 show_meta: false
 header:
-   image_fullwidth: "header-homepage.jpg"
+   image_fullwidth: "water-pimd.jpg"
 permalink: "/about/developers/"
 ---
 

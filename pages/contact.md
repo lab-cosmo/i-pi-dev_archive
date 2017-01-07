@@ -4,7 +4,7 @@ title: "Contact"
 teaser: "Your feedback are precious for us..."
 show_meta: false
 header:
-   image_fullwidth: "header-homepage.jpg"
+   image_fullwidth: "water-pimd.jpg"
 permalink: "/contact/"
 ---
 

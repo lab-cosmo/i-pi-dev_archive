@@ -3,7 +3,7 @@ layout: page
 show_meta: false
 title: "Download"
 header:
-   image_fullwidth: "header-homepage.jpg"
+   image_fullwidth: "water-pimd.jpg"
 permalink: "/download/"
 ---
 

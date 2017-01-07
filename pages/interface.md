@@ -5,7 +5,7 @@ subheadline: "Extreme parallelization"
 teaser: "Run i-PI and the force calculator over different HPC centers!"
 permalink: "/about/interface/"
 header:
-   image_fullwidth: "header-homepage.jpg"
+   image_fullwidth: "water-pimd.jpg"
 ---
 
 The implementation is based on a client-server paradigm, where i-PI

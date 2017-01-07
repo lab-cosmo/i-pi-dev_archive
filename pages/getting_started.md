@@ -4,7 +4,7 @@ title: "Getting Started"
 teaser: "Starting i-PI is very easy!"
 show_meta: false
 header:
-   image_fullwidth: "header-homepage.jpg"
+   image_fullwidth: "water-pimd.jpg"
 permalink: "/resources/getting_started/"
 ---
 
