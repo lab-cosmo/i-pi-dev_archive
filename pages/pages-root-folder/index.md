@@ -6,7 +6,7 @@
 #
 layout: page
 header:
-  image_fullwidth: header-homepage.jpg
+  image_fullwidth: water-pimd.jpg
 
 #widget1:
 #  title: "Blog & Portfolio"
