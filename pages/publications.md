@@ -3,7 +3,7 @@ layout: page
 show_meta: false
 title: "Publications"
 header:
-   image_fullwidth: "header-homepage.jpg"
+   image_fullwidth: "water-pimd.jpg"
 permalink: "/publications/"
 ---
 
