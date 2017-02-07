@@ -1283,10 +1283,13 @@ class Properties(dobject):
          splus = np.sqrt(1.0 + dbeta)
          sminus = np.sqrt(1.0 - dbeta)
 
+         #change beta
+         self.dforces.omegan2=depstrip(self.forces.omegan2)/(1.0 + dbeta)**2
          for b in range(self.beads.nbeads):
             self.dbeads[b].q = qc*(1.0 - splus) + splus*q[b,:]
          vplus=(self.dforces.pot+self.dforces.potsc)/self.beads.nbeads
 
+         self.dforces.omegan2=depstrip(self.forces.omegan2)/(1.0 - dbeta)**2
          for b in range(self.beads.nbeads):
             self.dbeads[b].q = qc*(1.0 - sminus) + sminus*q[b,:]
          vminus=(self.dforces.pot+self.dforces.potsc)/self.beads.nbeads
