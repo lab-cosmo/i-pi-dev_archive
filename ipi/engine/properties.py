@@ -1269,7 +1269,8 @@ class Properties(dobject):
          scaled down automatically to avoid discontinuities in the potential.
       """
 
-      dbeta = abs(float(fd_delta))
+      fd_delta = float(fd_delta)
+      dbeta = abs(fd_delta)
       beta = 1.0/(Constants.kb*self.ensemble.temp)
       self.dforces.omegan2=self.forces.omegan2
       self.dforces.alpha=self.forces.alpha
