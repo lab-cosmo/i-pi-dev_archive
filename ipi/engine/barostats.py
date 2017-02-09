@@ -333,8 +333,6 @@ class BaroBZP(Barostat):
 
       self.cell.h *= expq
 
-
-
 class BaroSCBZP(Barostat):
    """Suzuki Chin Bussi-Zykova-Parrinello barostat class.
 
@@ -442,23 +440,23 @@ class BaroSCBZP(Barostat):
       dthalf2 = dthalf**2
       dthalf3 = dthalf**3/3.0
 
-
-      #Computes the pressure
+      #Computes the trace of the virial
       press = 0.0
       for b in range(0,self.beads.nbeads,2):
-          press += np.trace(self.forces.virs[b])
-          press -= np.dot((self.beads.q[b] - self.beads.qc), self.forces.f[b])
-      press += np.dot(self.beads.pc/self.beads.m3, self.beads,pc)
-      press = 2.0*press/self.cell.V/3.0/self.bead.nbeads
+          press += 2.0*np.trace(self.forces.virs[b])/self.cell.V/3.0
+        
+      #Computes the kinetic poart of the stress tensor
+      press += np.dot(self.beads.pc/self.beads.m3[-1], self.beads.pc)/self.cell.V/3.0*self.beads.nbeads
+      for b in range(0,self.beads.nbeads,2):
+          press -= 2.0/3.0*np.dot((self.beads.q[b] - self.beads.qc), self.forces.f[b])/self.cell.V
 
-      print press, np.trace(self.stress)/3.0
       # This differs from the BZP thermostat in that it uses just one kT in the propagator.
       # This leads to an ensemble equaivalent to Martyna-Hughes-Tuckermann for both fixed and moving COM
       # Anyway, it is a small correction so whatever.
       self.p += dthalf*3.0*( self.cell.V* ( press - self.beads.nbeads*self.pext ) +
                 Constants.kb*self.temp )
 
-      fc = np.sum(depstrip(self.forces.f),0)/self.beads.nbeads
+      fc = np.sum(depstrip(self.forces.f+ self.forces.fsc),0)/self.beads.nbeads
       if self.bias != None: fc += np.sum(depstrip(self.bias.f),0)/self.beads.nbeads
       m = depstrip(self.beads.m3)[0]
       pc = depstrip(self.beads.pc)
@@ -468,7 +466,7 @@ class BaroSCBZP(Barostat):
       # again, these are tiny tiny terms so whatever.
       self.p += (dthalf2*np.dot(pc,fc/m) + dthalf3*np.dot(fc,fc/m)) * self.beads.nbeads
 
-      self.beads.p += depstrip(self.forces.f)*dthalf
+      self.beads.p += depstrip(self.forces.f + self.forces.fsc)*dthalf
       if self.bias != None: self.beads.p +=depstrip(self.bias.f)*dthalf
 
    def qcstep(self):

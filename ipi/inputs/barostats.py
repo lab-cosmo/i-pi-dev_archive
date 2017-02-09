@@ -99,7 +99,7 @@ class InputBaro(Input):
       if self.mode.fetch() == "isotropic":
          baro = BaroBZP(thermostat=self.thermostat.fetch(), tau=self.tau.fetch())
          if self.p._explicit: baro.p = self.p.fetch()
-      if self.mode.fetch() == "sc-isotropic":
+      elif self.mode.fetch() == "sc-isotropic":
          baro = BaroSCBZP(thermostat=self.thermostat.fetch(), tau=self.tau.fetch())
          if self.p._explicit: baro.p = self.p.fetch()
       elif self.mode.fetch() == "anisotropic":
