@@ -54,7 +54,7 @@ class System(dobject):
       simul: The parent simulation object.
    """
 
-   def __init__(self, init, beads, nm, cell, fcomponents, bcomponents=[], ensemble=None, motion=None, prefix=""):
+   def __init__(self, init, beads, nm, cell, fcomponents, bcomponents=[], ensemble=None, motion=None, prefix="", iobj=None):
       """Initialises System class.
 
       Args:
@@ -80,6 +80,7 @@ class System(dobject):
       self.beads = beads
       self.cell = cell
       self.nm = nm
+      self.iobj = iobj
 
       self.fcomp = fcomponents
       self.forces = Forces()
@@ -103,9 +104,9 @@ class System(dobject):
       self.ensemble.bind(self.beads, self.nm, self.cell, self.forces, self.bias)
       self.motion.bind(self.ensemble, self.beads, self.nm, self.cell, self.forces, self.prng)
 
-         
+
       dpipe(dd(self.nm).omegan2, dd(self.forces).omegan2)
-      
+
       self.init.init_stage2(self)
 
       # binds output management objects

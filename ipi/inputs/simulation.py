@@ -135,21 +135,21 @@ class InputSimulation(Input):
       for fname in simul.fflist:
          ff=simul.fflist[fname]
          if type(ff) is eforcefields.FFSocket:
-            iff = iforcefields.InputFFSocket()
+            iff = ff.iobj
             iff.store(ff)
             self.extra.append(("ffsocket",iff))
          elif type(ff) is eforcefields.FFLennardJones:
-            iff = iforcefields.InputFFLennardJones()
+            iff = ff.iobj
             iff.store(ff)
             self.extra.append(("fflj",iff))
          elif type(ff) is eforcefields.FFDebye:
-            iff = iforcefields.InputFFDebye()
+            iff = ff.iobj
             iff.store(ff)
             self.extra.append(("ffdebye",iff))
 
 
       for s in simul.syslist:
-         isys = InputSystem()
+         isys = s.iobj
          isys.store(s)
          self.extra.append(("system",isys))
 

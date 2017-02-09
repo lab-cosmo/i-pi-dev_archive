@@ -75,7 +75,7 @@ class InputForceField(Input):
 
       super(InputForceField,self).fetch()
 
-      return ForceField(pars = self.parameters.fetch(), name = self.name.fetch(), latency = self.latency.fetch(), dopbc = self.pbc.fetch())
+      return ForceField(pars = self.parameters.fetch(), name = self.name.fetch(), latency = self.latency.fetch(), dopbc = self.pbc.fetch(), iobj=self)
 
 
 class InputFFSocket(InputForceField):
@@ -147,9 +147,14 @@ class InputFFSocket(InputForceField):
          A ForceSocket object with the correct socket parameters.
       """
 
-      return FFSocket(pars = self.parameters.fetch(), name = self.name.fetch(), latency = self.latency.fetch(), dopbc = self.pbc.fetch(),
-              interface=InterfaceSocket(address=self.address.fetch(), port=self.port.fetch(),
-            slots=self.slots.fetch(), mode=self.mode.fetch(), timeout=self.timeout.fetch() ) )
+      return FFSocket(pars=self.parameters.fetch(), name=self.name.fetch(),
+                      latency=self.latency.fetch(), dopbc=self.pbc.fetch(),
+                      interface=InterfaceSocket(address=self.address.fetch(),
+                                                port=self.port.fetch(),
+                                                slots=self.slots.fetch(),
+                                                mode=self.mode.fetch(),
+                                                timeout=self.timeout.fetch()),
+                      iobj=self)
 
 
    def check(self):
@@ -184,26 +189,29 @@ class InputFFLennardJones(InputForceField):
    def fetch(self):
       super(InputFFLennardJones,self).fetch()
 
-      return FFLennardJones(pars = self.parameters.fetch(), name = self.name.fetch(),
-               latency = self.latency.fetch(), dopbc = self.pbc.fetch())
+      return FFLennardJones(pars=self.parameters.fetch(),
+                            name=self.name.fetch(),
+                            latency=self.latency.fetch(),
+                            dopbc=self.pbc.fetch(),
+                            iobj=self)
 
 
 class InputFFDebye(InputForceField):
 
-   fields = { 
-   "hessian" : (InputArray, {"dtype": float, "default"      : input_default(factory=np.zeros, args=(0,)), "help": "Specifies the Hessian of the harmonic potential (atomic units!)"} ), 
+   fields = {
+   "hessian" : (InputArray, {"dtype": float, "default"      : input_default(factory=np.zeros, args=(0,)), "help": "Specifies the Hessian of the harmonic potential (atomic units!)"} ),
    "x_reference" : (InputArray, {"dtype": float, "default"  : input_default(factory=np.zeros, args=(0,)), "help": "Minimum-energy configuration for the harmonic potential", "dimension" : "length"} ),
    "v_reference" : (InputValue, {"dtype": float, "default"  : 0.0, "help": "Zero-value of energy for the harmonic potential", "dimension":"energy"})
    }
-   
+
    fields.update(InputForceField.fields)
-   
+
    attribs = {}
    attribs.update(InputForceField.attribs)
-   
+
    default_help = """Harmonic energy calculator """
    default_label = "FFDEBYE"
-	  
+
    def store(self, ff):
       super(InputFFDebye,self).store(ff)
       self.hessian.store(ff.H)
@@ -213,5 +221,7 @@ class InputFFDebye(InputForceField):
    def fetch(self):
       super(InputFFDebye,self).fetch()
 
-      return FFDebye(H=self.hessian.fetch(), xref=self.x_reference.fetch(), vref=self.v_reference.fetch(), name = self.name.fetch(),
-               latency = self.latency.fetch(), dopbc = self.pbc.fetch() )
+      return FFDebye(H=self.hessian.fetch(), xref=self.x_reference.fetch(),
+                     vref=self.v_reference.fetch(), name=self.name.fetch(),
+                     latency=self.latency.fetch(), dopbc=self.pbc.fetch(),
+                     iobj=self)
