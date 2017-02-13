@@ -817,6 +817,7 @@ class Forces(dobject):
              for k in range(self.nbeads/2): # only compute the elements that will not be set to zero when multiplying by alpha
                  fsc[2*k+1] = 2*(fplusminus[self.nbeads/2+k]-fplusminus[k])/(2.0*delta)
          else:
+             print "for alpha =0 forward difference with delta=", delta, self.mforces[-1].epsilon
              for k in range(self.nbeads/2): # do forward differences only
                  fsc[2*k+1] = 2*(fplusminus[self.nbeads/2+k]-fbase[2*k+1])/delta
       else: 
@@ -833,6 +834,7 @@ class Forces(dobject):
          else:
            fsc[k] = self.f[k]/3.0 + ((1-self.alpha)/self.omegan2/9.0)*fsc[k]
       
+      print "SC FORCE MAG: ", np.sqrt(np.dot(fsc.flatten(),fsc.flatten()))
       return fsc
       
 
