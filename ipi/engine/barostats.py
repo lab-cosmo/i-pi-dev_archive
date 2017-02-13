@@ -431,6 +431,7 @@ class BaroSCBZP(Barostat):
    def get_ebaro(self):
       """Calculates the barostat conserved quantity."""
 
+      print "yada",self.thermostat.ethermo, self.kin, self.pot, np.log(self.cell.V)*Constants.kb*self.temp
       return self.thermostat.ethermo + self.kin + self.pot - np.log(self.cell.V)*Constants.kb*self.temp
 
    def pstep(self):
@@ -445,7 +446,7 @@ class BaroSCBZP(Barostat):
       for b in range(0,self.beads.nbeads,2):
           press += 2.0*np.trace(self.forces.virs[b])/self.cell.V/3.0
         
-      #Computes the kinetic poart of the stress tensor
+      #Computes the kinetic part of the stress tensor
       press += np.dot(self.beads.pc/self.beads.m3[-1], self.beads.pc)/self.cell.V/3.0*self.beads.nbeads
       for b in range(0,self.beads.nbeads,2):
           press -= 2.0/3.0*np.dot((self.beads.q[b] - self.beads.qc), self.forces.f[b])/self.cell.V
@@ -453,18 +454,20 @@ class BaroSCBZP(Barostat):
       # This differs from the BZP thermostat in that it uses just one kT in the propagator.
       # This leads to an ensemble equaivalent to Martyna-Hughes-Tuckermann for both fixed and moving COM
       # Anyway, it is a small correction so whatever.
+      print "#self.p  before Volume", self.p[-1]
       self.p += dthalf*3.0*( self.cell.V* ( press - self.beads.nbeads*self.pext ) +
                 Constants.kb*self.temp )
-
+      print "#self.p  after Volume", self.p[-1]
       fc = np.sum(depstrip(self.forces.f+ self.forces.fsc),0)/self.beads.nbeads
       if self.bias != None: fc += np.sum(depstrip(self.bias.f),0)/self.beads.nbeads
-      m = depstrip(self.beads.m3)[0]
+      m = depstrip(self.beads.m3)[-1]
       pc = depstrip(self.beads.pc)
 
       # I am not 100% sure, but these higher-order terms come from integrating the pressure virial term,
       # so they should need to be multiplied by nbeads to be consistent with the equations of motion in the PI context
       # again, these are tiny tiny terms so whatever.
       self.p += (dthalf2*np.dot(pc,fc/m) + dthalf3*np.dot(fc,fc/m)) * self.beads.nbeads
+      print "#self.p after highorder: ", self.p[-1]
 
       self.beads.p += depstrip(self.forces.f + self.forces.fsc)*dthalf
       if self.bias != None: self.beads.p +=depstrip(self.bias.f)*dthalf
@@ -482,7 +485,6 @@ class BaroSCBZP(Barostat):
       self.nm.pnm[0,:] *= expp
 
       self.cell.h *= expq
-
 
 class BaroRGB(Barostat):
    """Raiteri-Gale-Bussi constant stress barostat class (JPCM 23, 334213, 2011).

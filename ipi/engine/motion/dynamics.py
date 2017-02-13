@@ -426,6 +426,14 @@ class NPTSCIntegrator(NVTIntegrator):
     pressure constant.
     """
 
+    def bind(self, mover):
+        """Binds ensemble beads, cell, bforce, bbias and prng to the dynamics.
+        """
+
+        super(NPTSCIntegrator,self).bind(mover)
+        self.ensemble.add_econs(dget(self.forces, "potsc"))
+
+
     def step(self, step=None):
         """NPT time step.
 
