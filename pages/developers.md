@@ -1,6 +1,6 @@
 ---
 layout: page
-title: "Behind the code..."
+title: "Behind the code"
 teaser: ""
 show_meta: false
 header:
@@ -12,7 +12,6 @@ permalink: "/about/developers/"
  - [Michele Ceriotti,](https://people.epfl.ch/michele.ceriotti?lang=en)
    Head of the Laboratory for Computational Science and Modelling (COSMO)
    at EPFL, Lausanne. 
- - [Joshua More]()
  - [Riccardo Petraglia,](https://people.epfl.ch/riccardo.petraglia?lang=en) Scientist
    at COSMO.
  - [Mariana Rossi,](http://www.fhi-berlin.mpg.de/~rossi)
@@ -21,6 +20,7 @@ permalink: "/about/developers/"
    Stanford University.
  - [Venkat Kapil,](https://people.epfl.ch/venkat.kapil?lang=en) PhD at
    COSMO.
+ - [Joshua More]()
 
 ### Contributors
  - [Thomas Spura](https://github.com/tomspur)
