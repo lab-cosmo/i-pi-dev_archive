@@ -21,17 +21,6 @@
   - title: "Getting Started"
     url: "/resources/getting_started/"
 
-- title: "News&Event"
-  url: "/news/"
-  side: left
-  dropdown:
-  - title: "Archive"
-    url: "/news/archive/"
-
-- title: Publications
-  url: "/publications/"
-  side: left
-
 - title: "Search"
   url: "/search/"
   side: right
