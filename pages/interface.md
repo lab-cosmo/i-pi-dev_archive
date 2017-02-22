@@ -21,4 +21,4 @@ forcefields to perform simple benchmarks and preparatory
 simulations. See more about i-PI implementation in the publication
 that accompanies its release.
 
-![socket-interface scheme]({{ site.imgurl }}/ipi-interface-scheme.png)
+![socket-interface scheme]({{ site.urlimg }}/ipi-interface-scheme.png)
