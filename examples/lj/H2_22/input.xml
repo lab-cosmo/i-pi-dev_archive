@@ -1,0 +1,35 @@
+<simulation verbosity="low">
+    <output prefix="simulation">
+        <properties stride="1" filename="out">  [ step, time{picosecond}, conserved{kelvin}, temperature{kelvin}, kinetic_md{kelvin}, potential{kelvin} ] </properties>
+        <trajectory stride="100" filename="pos">  positions  </trajectory>
+    </output>
+    <total_steps> 40000000 </total_steps>
+    <prng> <seed> 32342 </seed> </prng>
+    <fflj name="lj" pbc="false">
+        <latency> 1e-6 </latency>
+        <parameters> { eps: 0.000, sigma: 5.5935893 } </parameters>
+    </fflj>
+    <ffrestrain name="rs" pbc="false">
+        <latency> 1e-6 </latency>
+        <parameters> { eps: 0.00010830495, Rc: 18.3743572, n:10 } </parameters>
+    </ffrestrain>
+    <system>
+    <initialize nbeads="1">
+        <file mode="chk">  init.chk </file>
+        <velocities mode="thermal" units="kelvin"> 6 </velocities>
+    </initialize>
+    <forces>
+        <force forcefield="lj"> </force>
+        <force forcefield="rs"> </force>
+    </forces>
+    <motion mode="dynamics">
+        <dynamics mode="nve">
+            <timestep units="femtosecond"> 1.00 </timestep>
+        </dynamics>
+        <fixcom> True </fixcom>
+    </motion>
+    <ensemble>
+        <temperature units="kelvin"> 6 </temperature>
+    </ensemble>
+    </system>
+</simulation>
