@@ -190,7 +190,7 @@ class Properties(dobject):
    """
 
    _DEFAULT_FINDIFF = 1e-4
-   _DEFAULT_FDERROR = 1e-6
+   _DEFAULT_FDERROR = 1e-5
    _DEFAULT_MINFID = 1e-7
 
    def __init__(self):
@@ -398,6 +398,9 @@ class Properties(dobject):
       "pressure_cv": {"dimension": "pressure",
                       "help": "The quantum estimator for pressure of the physical system.",
                       "func": (lambda: np.trace(self.forces.vir + self.kstress_cv())/(3.0*self.cell.V*self.beads.nbeads))},
+      "pressure_opsc": {"dimension": "pressure",
+                      "help": "The quantum estimator for pressure of the physical system.",
+                      "func": self.get_pressure_opsc }, 
       "kstress_cv":  {"dimension": "pressure",
                       "size" : 6,
                       "help": "The quantum estimator for the kinetic stress tensor of the physical system.",
@@ -755,6 +758,18 @@ class Properties(dobject):
           else:
               v += 4.0*pots[k]/3.0  + 2.0*(potssc[k]-pots[k]/3.0)
       return v/(k+1)
+
+   def get_pressure_opsc(self):
+      """
+      Calculates the fourth order operator method centroid-virial pressure estimator.
+      """
+      press = 0.0
+      for b in range(0,self.beads.nbeads,2):
+         press += 2.0*np.trace(self.forces.virs[b])/self.cell.V/3.0
+         press -= 2.0/3.0*np.dot((self.beads.q[b] - self.beads.qc), self.forces.f[b])/self.cell.V
+
+      press += 3.0*self.beads.natoms*Constants.kb*self.ensemble.temp/self.cell.V/3.0*self.beads.nbeads
+      return press/self.beads.nbeads
 
    def get_sckinop(self, atom=""):
       """Calculates the Suzuki-Chin quantum centroid virial kinetic energy estimator.
@@ -1339,7 +1354,8 @@ class Properties(dobject):
          scaled down automatically to avoid discontinuities in the potential.
       """
 
-      dbeta = abs(float(fd_delta))
+      fd_delta = float(fd_delta)
+      dbeta = abs(fd_delta)
       beta = 1.0/(Constants.kb*self.ensemble.temp)
       self.dforces.omegan2=self.forces.omegan2
       self.dforces.alpha=self.forces.alpha
