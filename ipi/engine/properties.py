@@ -433,6 +433,18 @@ class Properties(dobject):
                        becomes too large.""",
                       'func': self.get_yama_estimators,
                       "size": 2},
+      "vk_scaledcoords": {   "dimension": "undefined",
+                      "help" : "The scaled coordinates estimators that can be used to compute energy and heat capacity",
+                       "longhelp": """Returns the estimators that are required to evaluate the scaled-coordinates estimators
+                       for total energy and heat capacity, as described in T. M. Yamamoto,
+                       J. Chem. Phys., 104101, 123 (2005). Returns eps_v and eps_v', as defined in that paper.
+                       As the two estimators have a different dimensions, this can only be output in atomic units.
+                       Takes one argument, 'fd_delta', which gives the value of the finite difference parameter used -
+                       which defaults to """+ str(-self._DEFAULT_FINDIFF) + """. If the value of 'fd_delta' is negative,
+                       then its magnitude will be reduced automatically by the code if the finite difference error
+                       becomes too large.""",
+                      'func': self.get_vkyama_estimators,
+                      "size": 2},
       "sc_scaledcoords": {   "dimension": "undefined",
                       "help" : "The scaled coordinates estimators that can be used to compute energy and heat capacity for the Suzuki-Chin propagator",
                        "longhelp": """Returns the estimators that are required to evaluate the scaled-coordinates estimators
@@ -1274,6 +1286,41 @@ class Properties(dobject):
             break
 
       return np.asarray([eps, eps_prime])
+
+   def get_vkyama_estimators(self, fd_delta= - _DEFAULT_FINDIFF):
+      """Calculates the quantum scaled coordinate suzuki-chin kinetic energy estimator for the Suzuki-Chin propagator.
+
+      Uses a finite difference method to calculate the estimators
+      needed to calculate the energy and heat capacity of the system, as
+      shown in Takeshi M. Yamamoto, Journal of Chemical Physics,
+      104101, 123 (2005). Returns both eps_v and eps_v' as defined in
+      the above article. Note that heat capacity is calculated as
+      beta**2*kboltzmann*(<eps_v**2> - <eps_v>**2 - <eps_v'>), and the
+      energy of the system as <eps_v>.
+
+      Args:
+         fd_delta: the relative finite difference in temperature to apply in
+         computing finite-difference quantities. If it is negative, will be
+         scaled down automatically to avoid discontinuities in the potential.
+      """
+
+      r1 = self.get_sckinop() + 2.0/self.beads.nbeads*sum(self.forces.pots[int(k)] for k in range(0,self.beads.nbeads,2))
+
+      eps = abs(float(fd_delta))
+      beta = 1.0/(Constants.kb*self.ensemble.temp)
+      beta2 = beta**2
+      qc = depstrip(self.beads.qc)
+      q = depstrip(self.beads.q)
+      print (q-qc)[::2].shape
+      self.dbeads.q[::2] = self.beads.q[::2] + eps*(q - qc)[::2]
+    
+      vir1 = 1.50*np.dot(((q - qc)[::2]).flatten(), (self.forces.f[::2]).flatten())
+      vir2 = 0.50*np.dot(((q - qc)[::2]).flatten(), ((self.dforces.f - self.forces.f)[::2]).flatten()/eps)
+
+      r2 = 1.5*self.beads.natoms/beta2 + 0.5/beta*(vir1 + vir2)/self.beads.nbeads*2
+
+      return np.asarray([r1, -r2])
+
 
    def get_scyama_estimators(self, fd_delta= - _DEFAULT_FINDIFF):
       """Calculates the quantum scaled coordinate suzuki-chin kinetic energy estimator for the Suzuki-Chin propagator.
