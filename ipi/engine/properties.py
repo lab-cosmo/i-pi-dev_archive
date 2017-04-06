@@ -1364,6 +1364,9 @@ class Properties(dobject):
       q = depstrip(self.beads.q)
 
       v0=(self.forces.pot+self.forces.potsc)/self.beads.nbeads
+      #print "test-this-shit",  self.forces.pot, self.forces.potsc, v0
+      #self.dbeads.q= self.beads.q
+      #print "test-that-shit",  self.dforces.pot, self.dforces.potsc, v0
 
       while True:
          splus = np.sqrt(1.0 + dbeta)
@@ -1381,6 +1384,7 @@ class Properties(dobject):
          vminus=(self.dforces.pot+self.dforces.potsc)/self.beads.nbeads
 
          if (fd_delta < 0 and abs((vplus+vminus-2*v0)/(vplus-vminus)) > self._DEFAULT_FDERROR):
+             print "SOMEWHAT I GOT IN HERE"
              if  dbeta > self._DEFAULT_MINFID :
                 dbeta *= 0.5
                 info("Reducing displacement in scaled coordinates estimator", verbosity.low)
@@ -1391,11 +1395,15 @@ class Properties(dobject):
                 eps_prime = 0.0
                 break
          else:
+             
             eps = ((1.0 + dbeta)*vplus - (1.0 - dbeta)*vminus)/(2*dbeta)
             eps += 0.5*(3*self.beads.natoms)/beta
 
             eps_prime = ((1.0 + dbeta)*vplus + (1.0 - dbeta)*vminus - 2*v0)/(dbeta**2*beta)
+            print "COMPUTING EPS_PRIME", eps_prime, vplus, vminus, v0
             eps_prime -= 0.5*(3*self.beads.natoms)/beta**2
+            print "COMPUTING EPS_PRIME", eps_prime
+            
 
             break
 
