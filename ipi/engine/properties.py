@@ -1326,13 +1326,27 @@ class Properties(dobject):
       beta2 = beta**2
       qc = depstrip(self.beads.qc)
       q = depstrip(self.beads.q)
-      print (q-qc)[::2].shape
       self.dbeads.q[::2] = self.beads.q[::2] + eps*(q - qc)[::2]
-    
+   
+      #vir1 = -3.00*(depstrip(self.get_sckintd()) - 0.5/beta)*self.beads.nbeads
       vir1 = 1.50*np.dot(((q - qc)[::2]).flatten(), (self.forces.f[::2]).flatten())
       vir2 = 0.50*np.dot(((q - qc)[::2]).flatten(), ((self.dforces.f - self.forces.f)[::2]).flatten()/eps)
 
       r2 = 1.5*self.beads.natoms/beta2 + 0.5/beta*(vir1 + vir2)/self.beads.nbeads*2
+
+      fsc = depstrip(self.forces.fsc).copy()
+      vsc = depstrip(self.forces.potssc).copy()
+      f = depstrip(self.forces.f).copy()
+      v = depstrip(self.forces.pots).copy()
+
+      for k in range(self.beads.nbeads):
+         if k%2 == 0:
+           fsc[k] += f[k]/3.0
+           vsc[k] += v[k]/3.0
+         else:
+           fsc[k] += -f[k]/3.0
+           vsc[k] += -v[k]/3.0
+      r2 = r2 + np.dot((q - qc).flatten(), fsc.flatten())/self.beads.nbeads/beta - 6.0*vsc.sum()/self.beads.nbeads/beta
 
       return np.asarray([r1, -r2])
 
