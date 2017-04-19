@@ -151,7 +151,6 @@ class Barostat(dobject):
       """Calculates the quantum centroid virial kinetic stress tensor
       estimator.
       """
-
       kst = np.zeros((3,3),float)
       q = depstrip(self.beads.q)
       qc = depstrip(self.beads.qc)
@@ -159,8 +158,34 @@ class Barostat(dobject):
       m = depstrip(self.beads.m)
       na3 = 3*self.beads.natoms
       fall = depstrip(self.forces.f)
-      if self.bias == None: ball=fall*0.00
-      else: ball = depstrip(self.bias.f)
+      if self.bias == None:
+         ball=fall*0.00
+      else:
+         ball = depstrip(self.bias.f)
+
+      for b in range(self.beads.nbeads):
+         for i in range(3):
+            for j in range(i,3):
+               kst[i,j] -= np.dot(q[b,i:na3:3] - qc[i:na3:3],
+                  fall[b,j:na3:3]+ball[b,j:na3:3])
+      return kst
+
+   def kstress_mts(self, level):
+      """Calculates the quantum centroid virial kinetic stress tensor
+      associated with the forces at a MTS level.
+      """
+
+      kst = np.zeros((3,3),float)
+      q = depstrip(self.beads.q)
+      qc = depstrip(self.beads.qc)
+      pc = depstrip(self.beads.pc)
+      m = depstrip(self.beads.m)
+      na3 = 3*self.beads.natoms
+      fall = depstrip(self.forces.forces_mts(level))
+      if (self.bias == None or level != 0):
+         ball=fall*0.00
+      else:
+         ball = depstrip(self.bias.f)
 
       for b in range(self.beads.nbeads):
          for i in range(3):
@@ -168,12 +193,20 @@ class Barostat(dobject):
                kst[i,j] -= np.dot(q[b,i:na3:3] - qc[i:na3:3],
                   fall[b,j:na3:3]+ball[b,j:na3:3])
 
-      # NOTE: In order to have a well-defined conserved quantity, the Nf kT term in the
-      # diagonal stress estimator must be taken from the centroid kinetic energy.
-
       return kst
 
-   def get_stress(self):
+   def stress_mts(self, level):
+      """Calculates the internal stress tensor
+      associated with the forces at a MTS level.
+      """
+
+      bvir = np.zeros((3,3),float)
+      if (self.bias != None and level == 0): 
+            bvir[:]=self.bias.vir
+
+      return (self.kstress_mts(level)+ self.forces.vir_mts(level) + bvir)/self.cell.V
+ 
+   def get_stress(self, level):
       """Calculates the internal stress tensor."""
 
       bvir = np.zeros((3,3),float)
@@ -290,17 +323,18 @@ class BaroBZP(Barostat):
 
       return self.thermostat.ethermo + self.kin + self.pot - np.log(self.cell.V)*Constants.kb*self.temp
 
-   def pkinstep(self):
+   def pkinstep(self, alpha=1.0, level=0):
       """Propagates the momenta for half a time step."""
 
-      dthalf = self.dt*0.5
+      dthalf = self.dt*0.5/alpha
       dthalf2 = dthalf**2
       dthalf3 = dthalf**3/3.0
 
       pc = depstrip(self.beads.pc)
       m = depstrip(self.beads.m3)[0]
-      fc = np.sum(depstrip(self.forces.f),0)/self.beads.nbeads
-      if self.bias != None: fc += np.sum(depstrip(self.bias.f),0)/self.beads.nbeads
+      fc = np.sum(depstrip(self.forces.forces_mts(level)),0)/self.beads.nbeads
+      if (self.bias != None and level == 0):
+        fc += np.sum(depstrip(self.bias.f),0)/self.beads.nbeads
       m = depstrip(self.beads.m3)[0]
 
       # This differs from the BZP thermostat in that it uses just one kT in the propagator.
@@ -311,18 +345,18 @@ class BaroBZP(Barostat):
       self.p += dthalf*3.0*( np.dot(pc,pc/m)/3.0*self.beads.nbeads  - self.cell.V*self.pext*self.beads.nbeads +
                 Constants.kb*self.temp ) + (dthalf2*np.dot(pc,fc/m) + dthalf3*np.dot(fc,fc/m)) * self.beads.nbeads
 
-   def pvirstep(self):
+   def pvirstep(self, alpha=1.0, level=0):
       """Propagates the momenta for half a time step."""
 
-      dthalf = self.dt*0.5
-      press = np.trace(self.stress)/3.0
+      dthalf = self.dt*0.5/alpha
+      press = np.trace(self.stress_mts(level)/3.0)
       self.p += dthalf*3.0*(self.cell.V*press)
 
-   def qcstep(self):
+   def qcstep(self, alpha=1.0):
       """Propagates the centroid position and momentum and the volume."""
 
       v = self.p[0]/self.m[0]
-      expq, expp = (np.exp(v*self.dt), np.exp(-v*self.dt))
+      expq, expp = (np.exp(v*self.dt/alpha), np.exp(-v*self.dt/alpha))
 
       m = depstrip(self.beads.m3)[0]
 
@@ -430,7 +464,6 @@ class BaroSCBZP(Barostat):
    def get_ebaro(self):
       """Calculates the barostat conserved quantity."""
 
-      print "yada",self.thermostat.ethermo, self.kin, self.pot, np.log(self.cell.V)*Constants.kb*self.temp
       return self.thermostat.ethermo + self.kin + self.pot - np.log(self.cell.V)*Constants.kb*self.temp
 
    def pstep(self):

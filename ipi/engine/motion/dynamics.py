@@ -203,7 +203,7 @@ class DummyIntegrator(dobject):
         self.fixcom = motion.fixcom
         self.fixatoms = motion.fixatoms
         dset(self, "dt", dget(motion, "dt"))
-        if motion.enstype == "mts": self.nmts=motion.nmts
+        if motion.enstype == "mts" or motion.enstype == "npt": self.nmts=motion.nmts
         #mts on sc force in suzuki-chin
         if motion.enstype == "sc":
             if(motion.nmts.size > 1):
@@ -374,6 +374,15 @@ class NPTIntegrator(NVTIntegrator):
     pressure constant.
     """
 
+    def pstep(self, level=0, alpha=1.0):
+        """Velocity Verlet monemtum propagator."""
+        self.beads.p += self.forces.forces_mts(level)*0.5*(self.dt/alpha)
+       
+    def qcstep(self, alpha=1.0):
+        """Velocity Verlet centroid position propagator."""
+        self.nm.qnm[0,:] += depstrip(self.nm.pnm)[0,:]/depstrip(self.beads.m3)[0]*self.dt/alpha
+
+
     def step(self, step=None):
         """NPT time step.
 
@@ -385,28 +394,47 @@ class NPTIntegrator(NVTIntegrator):
         the radius of gyration of the ring polymers.
         """
 
+        nmtslevels = len(self.nmts)
+        mk = self.nmts[1]  # mtslevels starts at level zero, where nmts should be 1 in most cases
+
         self.ttime = -time.time()
         self.thermostat.step()
         self.barostat.thermostat.step()
         self.pconstraints()
         self.ttime += time.time()
 
+        #Outer mts level
         self.ptime = -time.time()
-        self.barostat.pkinstep()
-        self.barostat.pvirstep()
-        self.pstep()
+        self.barostat.pvirstep(alpha=1.0,level=0)
+        self.pstep(alpha=1.0, level=0)
         self.pconstraints()
         self.ptime += time.time()
 
-        self.qtime = -time.time()
-        self.barostat.qcstep()
-        self.nm.free_qstep()
-        self.qtime += time.time()
+        #Inner mts level
+        for x in range(self.nmts[1]):
+            self.ptime = -time.time()
+            self.barostat.pkinstep(alpha=self.nmts[1],level=1)
+            self.barostat.pvirstep(alpha=self.nmts[1],level=1)
+            self.pstep(alpha=self.nmts[1],level=1)
+            self.pconstraints()
+            self.ptime += time.time()
 
-        self.ptime -= time.time()
-        self.barostat.pkinstep()
-        self.barostat.pvirstep()
-        self.pstep()
+            self.qtime = -time.time()
+            self.barostat.qcstep(alpha=self.nmts[1])
+            self.nm.free_qstep()
+            self.qtime += time.time()
+
+            self.ptime -= time.time()
+            self.barostat.pkinstep(alpha=self.nmts[1],level=1)
+            self.barostat.pvirstep(alpha=self.nmts[1],level=1)
+            self.pstep(alpha=self.nmts[1],level=1)
+            self.pconstraints()
+            self.ptime += time.time()
+
+        #Outer mts level
+        self.ptime = -time.time()
+        self.barostat.pvirstep(alpha=1.0,level=0)
+        self.pstep(alpha=1.0, level=0)
         self.pconstraints()
         self.ptime += time.time()
 

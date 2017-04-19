@@ -293,7 +293,7 @@ class ForceComponent(dobject):
             combined to give a total force, the contribution of this forcefield
             will be weighted by this factor.
          name: The name of the forcefield.
-         mts_weights: Weight of forcefield at each mts level.
+         mts_weights: Weight cc forcefield at each mts level.
       """
 
       self.ffield = ffield
@@ -704,6 +704,15 @@ class Forces(dobject):
          if len(self.mforces[index].mts_weights) > level and self.mforces[index].mts_weights[level] != 0  and self.mforces[index].weight > 0:
               fk += self.mforces[index].weight*self.mforces[index].mts_weights[level]*self.mrpc[index].b2tob1(depstrip(self.mforces[index].f))
       return fk
+
+   def vir_mts(self, level):
+      """ Fetches ONLY the total virial associated with a given MTS level."""
+
+      rp = np.zeros((3,3),float)
+      for index in range(len(self.mforces)):
+         if len(self.mforces[index].mts_weights) > level and self.mforces[index].mts_weights[level] != 0  and self.mforces[index].weight > 0:
+              rp += self.mforces[index].weight*self.mforces[index].mts_weights[level]*np.sum(self.mforces[index].virs,axis=0)
+      return rp
 
    def nmtslevels(self):
       """ Returns the total number of mts levels."""
