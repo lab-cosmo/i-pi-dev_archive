@@ -170,8 +170,6 @@ class Barostat(dobject):
 
       # NOTE: In order to have a well-defined conserved quantity, the Nf kT term in the
       # diagonal stress estimator must be taken from the centroid kinetic energy.
-      for i in range(3):
-         kst[i,i] += np.dot(pc[i:na3:3],pc[i:na3:3]/m) *self.beads.nbeads
 
       return kst
 
@@ -292,32 +290,33 @@ class BaroBZP(Barostat):
 
       return self.thermostat.ethermo + self.kin + self.pot - np.log(self.cell.V)*Constants.kb*self.temp
 
-   def pstep(self):
+   def pkinstep(self):
       """Propagates the momenta for half a time step."""
 
       dthalf = self.dt*0.5
       dthalf2 = dthalf**2
       dthalf3 = dthalf**3/3.0
 
-      press = np.trace(self.stress)/3.0
-      # This differs from the BZP thermostat in that it uses just one kT in the propagator.
-      # This leads to an ensemble equaivalent to Martyna-Hughes-Tuckermann for both fixed and moving COM
-      # Anyway, it is a small correction so whatever.
-      self.p += dthalf*3.0*( self.cell.V* ( press - self.beads.nbeads*self.pext ) +
-                Constants.kb*self.temp )
-
+      pc = depstrip(self.beads.pc)
+      m = depstrip(self.beads.m3)[0]
       fc = np.sum(depstrip(self.forces.f),0)/self.beads.nbeads
       if self.bias != None: fc += np.sum(depstrip(self.bias.f),0)/self.beads.nbeads
       m = depstrip(self.beads.m3)[0]
-      pc = depstrip(self.beads.pc)
 
+      # This differs from the BZP thermostat in that it uses just one kT in the propagator.
+      # This leads to an ensemble equaivalent to Martyna-Hughes-Tuckermann for both fixed and moving COM
       # I am not 100% sure, but these higher-order terms come from integrating the pressure virial term,
       # so they should need to be multiplied by nbeads to be consistent with the equations of motion in the PI context
       # again, these are tiny tiny terms so whatever.
-      self.p += (dthalf2*np.dot(pc,fc/m) + dthalf3*np.dot(fc,fc/m)) * self.beads.nbeads
+      self.p += dthalf*3.0*( np.dot(pc,pc/m)/3.0*self.beads.nbeads  - self.cell.V*self.pext*self.beads.nbeads +
+                Constants.kb*self.temp ) + (dthalf2*np.dot(pc,fc/m) + dthalf3*np.dot(fc,fc/m)) * self.beads.nbeads
 
-      self.beads.p += depstrip(self.forces.f)*dthalf
-      if self.bias != None: self.beads.p +=depstrip(self.bias.f)*dthalf
+   def pvirstep(self):
+      """Propagates the momenta for half a time step."""
+
+      dthalf = self.dt*0.5
+      press = np.trace(self.stress)/3.0
+      self.p += dthalf*3.0*(self.cell.V*press)
 
    def qcstep(self):
       """Propagates the centroid position and momentum and the volume."""

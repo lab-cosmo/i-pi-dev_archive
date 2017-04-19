@@ -274,9 +274,6 @@ class NVEIntegrator(DummyIntegrator):
             for i in range(3):
                 pcom[i] = p[:,i:na3:3].sum()
 
-            #print np.dot(pcom, pcom) / (2.0*M*nb)
-            #self.ensemble.eens += np.dot(pcom, pcom) / (2.0*M*nb)
-
             # subtracts COM velocity
             pcom *= 1.0 / (nb*M)
             for i in range(3):
@@ -366,7 +363,6 @@ class NVTIntegrator(NVEIntegrator):
         self.thermostat.step()
         self.pconstraints()
         self.ttime += time.time()
-        # print "PTIME: ", self.ptime, "  TTIME: ", self.ttime, "  QTIME: ", self.qtime
 
 
 class NPTIntegrator(NVTIntegrator):
@@ -396,7 +392,9 @@ class NPTIntegrator(NVTIntegrator):
         self.ttime += time.time()
 
         self.ptime = -time.time()
-        self.barostat.pstep()
+        self.barostat.pkinstep()
+        self.barostat.pvirstep()
+        self.pstep()
         self.pconstraints()
         self.ptime += time.time()
 
@@ -406,7 +404,9 @@ class NPTIntegrator(NVTIntegrator):
         self.qtime += time.time()
 
         self.ptime -= time.time()
-        self.barostat.pstep()
+        self.barostat.pkinstep()
+        self.barostat.pvirstep()
+        self.pstep()
         self.pconstraints()
         self.ptime += time.time()
 
