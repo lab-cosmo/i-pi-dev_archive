@@ -21,7 +21,7 @@ from ipi.engine.thermostats import Thermostat
 from ipi.engine.barostats import Barostat
 
 
-#__all__ = ['Dynamics', 'NVEIntegrator', 'NVTIntegrator', 'NPTIntegrator', 'NPTSCIntegrator', 'NSTIntegrator', 'SCIntegrator`']
+#__all__ = ['Dynamics', 'NVEIntegrator', 'NVTIntegrator', 'NPTIntegrator', 'MTSNPTIntegrator', 'NSTIntegrator', 'SCIntegrator`']
 
 class Dynamics(Motion):
     """self (path integral) molecular dynamics class.
@@ -90,8 +90,8 @@ class Dynamics(Motion):
             self.integrator = MTSIntegrator()
         elif self.enstype == "sc":
             self.integrator = SCIntegrator()
-        elif self.enstype == "sc-npt":
-            self.integrator = NPTSCIntegrator()
+        elif self.enstype == "mts-npt":
+            self.integrator = MTSNPTIntegrator()
         
         else:
             self.integrator = DummyIntegrator()
@@ -203,7 +203,7 @@ class DummyIntegrator(dobject):
         self.fixcom = motion.fixcom
         self.fixatoms = motion.fixatoms
         dset(self, "dt", dget(motion, "dt"))
-        if motion.enstype == "mts" or motion.enstype == "npt": self.nmts=motion.nmts
+        if motion.enstype == "mts" or motion.enstype == "mts-npt": self.nmts=motion.nmts
         #mts on sc force in suzuki-chin
         if motion.enstype == "sc":
             if(motion.nmts.size > 1):
@@ -382,7 +382,6 @@ class NPTIntegrator(NVTIntegrator):
         """Velocity Verlet centroid position propagator."""
         self.nm.qnm[0,:] += depstrip(self.nm.pnm)[0,:]/depstrip(self.beads.m3)[0]*self.dt/alpha
 
-
     def step(self, step=None):
         """NPT time step.
 
@@ -435,61 +434,6 @@ class NPTIntegrator(NVTIntegrator):
         self.ptime = -time.time()
         self.barostat.pvirstep(alpha=1.0,level=0)
         self.pstep(alpha=1.0, level=0)
-        self.pconstraints()
-        self.ptime += time.time()
-
-        self.ttime -= time.time()
-        self.barostat.thermostat.step()
-        self.thermostat.step()
-        self.pconstraints()
-        self.ttime += time.time()
-
-class NPTSCIntegrator(NVTIntegrator):
-    """Integrator object for constant pressure simulations.
-
-    Has the relevant conserved quantity and normal mode propagator for the
-    constant pressure ensemble. Contains a thermostat object containing the
-    algorithms to keep the temperature constant, and a barostat to keep the
-    pressure constant.
-    """
-
-    def bind(self, mover):
-        """Binds ensemble beads, cell, bforce, bbias and prng to the dynamics.
-        """
-
-        super(NPTSCIntegrator,self).bind(mover)
-        self.ensemble.add_econs(dget(self.forces, "potsc"))
-
-
-    def step(self, step=None):
-        """NPT time step.
-
-        Note that the barostat only propagates the centroid coordinates. If this
-        approximation is made a centroid virial pressure and stress estimator can
-        be defined, so this gives the best statistical convergence. This is
-        allowed as the normal mode propagation is approximately unaffected
-        by volume fluctuations as long as the system box is much larger than
-        the radius of gyration of the ring polymers.
-        """
-
-        self.ttime = -time.time()
-        self.thermostat.step()
-        self.barostat.thermostat.step()
-        self.pconstraints()
-        self.ttime += time.time()
-
-        self.ptime = -time.time()
-        self.barostat.pstep()
-        self.pconstraints()
-        self.ptime += time.time()
-
-        self.qtime = -time.time()
-        self.barostat.qcstep()
-        self.nm.free_qstep()
-        self.qtime += time.time()
-
-        self.ptime -= time.time()
-        self.barostat.pstep()
         self.pconstraints()
         self.ptime += time.time()
 
@@ -647,7 +591,78 @@ class SCIntegrator(NVEIntegrator):
       self.pconstraints()
       self.ttime += time.time()
 
+class MTSNPTIntegrator(NVEIntegrator):
+    """Integrator object for constant temperature simulations.
+ 
+    Has the relevant conserved quantity and normal mode propagator for the
+    constant temperature ensemble. Contains a thermostat object containing the
+    algorithms to keep the temperature constant.
+    """
+ 
+    def pstep(self, level=0, alpha=1.0):
+        """Velocity Verlet monemtum propagator."""
+        self.beads.p += self.forces.forces_mts(level)*0.5*(self.dt/alpha)
+       
+    def qcstep(self, alpha=1.0):
+        """Velocity Verlet centroid position propagator."""
+        self.nm.qnm[0,:] += depstrip(self.nm.pnm)[0,:]/depstrip(self.beads.m3)[0]*self.dt/alpha
+       
+    def mtsprop(self, index, alpha):
+        """ Recursive MTS step """
+        nmtslevels = len(self.nmts)
+        mk = self.nmts[index]  # mtslevels starts at level zero, where nmts should be 1 in most cases
+        alpha *= mk
+        for i in range(mk):  
+            # propagate p for dt/2alpha with force at level index      
+            self.ptime = -time.time()
+            self.barostat.pvirstep(index, alpha)
+            if(index == nmts - 1):
+                self.barostat.pkinstep(index, alpha)
+            self.pstep(index, alpha)
+            self.pconstraints()
+            self.ptime += time.time()
+ 
+            if index == nmtslevels-1:
+            # call Q propagation for dt/alpha at the inner step
+                self.qtime = -time.time()
+                self.qcstep(alpha)
+                self.nm.free_qstep() # this has been hard-wired to use the appropriate time step with depend magic
+                self.qtime += time.time()
+            else:
+                self.mtsprop(index+1, alpha)
+ 
+            # propagate p for dt/2alpha
+            self.ptime = -time.time()
+            self.barostat.pvirstep(index, alpha)
+            if(index == nmts - 1):
+                self.barostat.pkinstep(index, alpha)
+            self.pstep(index, alpha)
+            self.pconstraints()
+            self.ptime += time.time()
 
+    def step(self, step=None):
+        """Does one simulation time step."""
+ 
+        # thermostat is applied at the outer loop
+        self.ttime = -time.time()
+        self.thermostat.step()
+        self.barostat.thermostat.step()
+        self.pconstraints()
+        self.ttime += time.time()
+ 
+        # bias is applied at the outer loop too
+        self.beads.p += depstrip(self.bias.f)*(self.dt*0.5)
+ 
+        self.mtsprop(0,1.0)
+ 
+        self.beads.p += depstrip(self.bias.f)*(self.dt*0.5)
+ 
+        self.ttime -= time.time()
+        self.thermostat.step()
+        self.barostat.thermostat.step()
+        self.pconstraints()
+        self.ttime += time.time()
+ 
 class MTSIntegrator(NVEIntegrator):
     """Integrator object for constant temperature simulations.
  
