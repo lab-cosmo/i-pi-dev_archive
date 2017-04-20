@@ -74,9 +74,6 @@ class InputBaro(Input):
       if type(baro) is BaroBZP:
          self.mode.store("isotropic")
          self.p.store(baro.p)
-      elif type(baro) is BaroSCBZP:
-         self.mode.store("sc-isotropic")
-         self.p.store(baro.p)
       elif type(baro) is BaroRGB:
          self.mode.store("anisotropic")
          self.p.store(baro.p)

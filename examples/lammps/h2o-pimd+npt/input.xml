@@ -4,17 +4,17 @@
         <trajectory filename="pos" stride="20"> positions </trajectory>
         <checkpoint stride="200000"/>
     </output>
-    <total_steps> 10000 </total_steps>
+    <total_steps> 1000 </total_steps>
     <prng><seed>31415</seed></prng>
     <ffsocket name="lmpserial1" mode="unix">
-        <address>mts_short</address>
+        <address>mts_shor</address>
     </ffsocket>
     <ffsocket name="lmpserial2" mode="unix">
-        <address>mts_long</address>
+        <address>mts_lon</address>
     </ffsocket>
     <system>
         <initialize nbeads="4">
-            <file mode="pdb"> init.pdb </file>
+            <file mode="chk"> init.chk </file>
             <velocities mode="thermal" units="kelvin"> 300 </velocities>
         </initialize>
         <forces>

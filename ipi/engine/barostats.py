@@ -323,8 +323,8 @@ class BaroBZP(Barostat):
 
       return self.thermostat.ethermo + self.kin + self.pot - np.log(self.cell.V)*Constants.kb*self.temp
 
-   def pkinstep(self, alpha=1.0, level=0):
-      """Propagates the momenta for half a time step."""
+   def pkinstep(self, level=0, alpha=1.0):
+      """Propagates the momenta using the momentum of the centroid for half a time step."""
 
       dthalf = self.dt*0.5/alpha
       dthalf2 = dthalf**2
@@ -345,8 +345,8 @@ class BaroBZP(Barostat):
       self.p += dthalf*3.0*( np.dot(pc,pc/m)/3.0*self.beads.nbeads  - self.cell.V*self.pext*self.beads.nbeads +
                 Constants.kb*self.temp ) + (dthalf2*np.dot(pc,fc/m) + dthalf3*np.dot(fc,fc/m)) * self.beads.nbeads
 
-   def pvirstep(self, alpha=1.0, level=0):
-      """Propagates the momenta for half a time step."""
+   def pvirstep(self, level=0, alpha=1.0):
+      """Propagates the momenta with the virial for half a time step."""
 
       dthalf = self.dt*0.5/alpha
       press = np.trace(self.stress_mts(level)/3.0)
