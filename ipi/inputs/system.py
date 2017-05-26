@@ -127,7 +127,7 @@ class InputSystem(Input):
                                        bcomponents = self.bias.fetch(),
                                        ensemble = self.ensemble.fetch(),
                                        motion = self.motion.fetch(),
-                                       prefix = self.prefix.fetch()
-                                       )
+                                       prefix = self.prefix.fetch(),
+                                       iobj = self)
 
       return rsys

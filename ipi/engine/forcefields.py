@@ -60,7 +60,7 @@ class ForceField(dobject):
         _threadlock: Python handle used to lock the thread held in _thread.
     """
 
-    def __init__(self, latency=1.0, name="", pars=None, dopbc=True):
+    def __init__(self, latency=1.0, name="", pars=None, dopbc=True, iobj=None):
         """Initialises ForceField.
 
         Args:
@@ -85,6 +85,7 @@ class ForceField(dobject):
         self._thread = None
         self._doloop = [False]
         self._threadlock = threading.Lock()
+        self.iobj = iobj
 
     def queue(self, atoms, cell, reqid=-1):
         """Adds a request.
@@ -231,7 +232,7 @@ class FFSocket(ForceField):
             communication between the forcefield and the driver is done.
     """
 
-    def __init__(self, latency=1.0, name="", pars=None, dopbc=True, interface=None):
+    def __init__(self, latency=1.0, name="", pars=None, dopbc=True, interface=None, iobj=None):
         """Initialises FFSocket.
 
         Args:
@@ -247,7 +248,7 @@ class FFSocket(ForceField):
         """
 
         # a socket to the communication library is created or linked
-        super(FFSocket, self).__init__(latency, name, pars, dopbc)
+        super(FFSocket, self).__init__(latency, name, pars, dopbc, iobj)
         if interface is None:
             self.socket = InterfaceSocket()
         else:
@@ -291,7 +292,7 @@ class FFLennardJones(ForceField):
                          'start': starting time}.
     """
 
-    def __init__(self, latency=1.0e-3, name="", pars=None, dopbc=False):
+    def __init__(self, latency=1.0e-3, name="", pars=None, dopbc=False, iobj=None):
         """Initialises FFLennardJones.
 
         Args:
@@ -303,7 +304,7 @@ class FFLennardJones(ForceField):
             raise ValueError("Periodic boundary conditions are not supported by FFLennardJones.")
 
         # a socket to the communication library is created or linked
-        super(FFLennardJones, self).__init__(latency, name, pars, dopbc=False)
+        super(FFLennardJones, self).__init__(latency, name, pars, dopbc=False, iobj=iobj)
         self.epsfour = float(self.pars["eps"]) * 4
         self.sixepsfour = 6 * self.epsfour
         self.sigma2 = float(self.pars["sigma"]) * float(self.pars["sigma"])
@@ -353,7 +354,7 @@ class FFLennardJones(ForceField):
 class FFDebye(ForceField):
    """Debye crystal harmonic reference potential
 
-   Computes a harmonic forcefield. 
+   Computes a harmonic forcefield.
 
    Attributes:
       parameters: A dictionary of the parameters used by the driver. Of the
@@ -364,8 +365,8 @@ class FFDebye(ForceField):
                       'status': status, 'result': result, 'id': bead id,
                       'start': starting time}.
    """
-   
-   def __init__(self, latency = 1.0, name = "",  H=None, xref=None, vref=0.0, pars=None, dopbc = False, threaded=True):
+
+   def __init__(self, latency = 1.0, name = "",  H=None, xref=None, vref=0.0, pars=None, dopbc = False, threaded=True, iobj=None):
       """Initialises FFDebye.
 
       Args:
@@ -374,19 +375,19 @@ class FFDebye(ForceField):
 
       # a socket to the communication library is created or linked
       # NEVER DO PBC -- forces here are computed without.
-      super(FFDebye,self).__init__(latency, name, pars, dopbc=False)
-            
+      super(FFDebye,self).__init__(latency, name, pars, dopbc=False, iobj=iobj)
+
       if H is None:
           raise ValueError("Must provide the Hessian for the Debye crystal.")
       if xref is None:
           raise ValueError("Must provide a reference configuration for the Debye crystal.")
-  		  
+
       self.H = H
       self.xref = xref
       self.vref = vref
 
-      eigsys=np.linalg.eigh(self.H) 
-      info(" @ForceField: Hamiltonian eigenvalues: " + ' '.join(map(str, eigsys[0])), verbosity.medium)                 
+      eigsys=np.linalg.eigh(self.H)
+      info(" @ForceField: Hamiltonian eigenvalues: " + ' '.join(map(str, eigsys[0])), verbosity.medium)
 
    def poll(self):
       """ Polls the forcefield checking if there are requests that should
@@ -408,14 +409,14 @@ class FFDebye(ForceField):
 
       q = r["pos"]
       n3 = len(q)
-      if self.H.shape != (n3,n3): 
+      if self.H.shape != (n3,n3):
           raise ValueError("Hessian size mismatch")
-      if self.xref.shape != (n3,): 
+      if self.xref.shape != (n3,):
           raise ValueError("Reference structure size mismatch")
-      
+
       d = q-self.xref
       mf = np.dot(self.H, d)
-            
+
       r["result"] = [ self.vref + 0.5*np.dot(d,mf), -mf, np.zeros((3,3),float), ""]
       r["status"] = "Done"
       r["t_finished"] = time.time()
