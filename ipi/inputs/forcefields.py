@@ -6,13 +6,14 @@
 
 
 from copy import copy
+import numpy as np
 
-from ipi.engine.forcefields import ForceField, FFSocket, FFLennardJones
+from ipi.engine.forcefields import ForceField, FFSocket, FFLennardJones, FFDebye
 from ipi.interfaces.sockets import InterfaceSocket
 from ipi.utils.inputvalue import *
 
 
-__all__ = ["InputFFSocket", 'InputFFLennardJones']
+__all__ = ["InputFFSocket", 'InputFFLennardJones', 'InputFFDebye']
 
 
 class InputForceField(Input):
@@ -23,7 +24,7 @@ class InputForceField(Input):
    instance of the object.
 
    Attributes:
-      name: The number of beads that the forcefield will be evaluated on.
+      name: The name by which the forcefield will be identified in the System forces section.
       pbc: A boolean describing whether periodic boundary conditions will
          be applied to the atom positions before they are sent to the driver
          code.
@@ -34,7 +35,7 @@ class InputForceField(Input):
    """
 
    attribs = { "name" : ( InputAttribute, { "dtype"   : str,
-                                         "help"    : "The name by which the forcefienld will be identified in the System forces section." } ),
+                                         "help"    : "Mandatory. The name by which the forcefield will be identified in the System forces section." } ),
                "pbc":  ( InputAttribute, { "dtype"   : bool,
                                          "default" : True,
                                          "help"    : "Applies periodic boundary conditions to the atoms coordinates before passing them on to the driver code." })
@@ -185,3 +186,32 @@ class InputFFLennardJones(InputForceField):
 
       return FFLennardJones(pars = self.parameters.fetch(), name = self.name.fetch(),
                latency = self.latency.fetch(), dopbc = self.pbc.fetch())
+
+
+class InputFFDebye(InputForceField):
+
+   fields = { 
+   "hessian" : (InputArray, {"dtype": float, "default"      : input_default(factory=np.zeros, args=(0,)), "help": "Specifies the Hessian of the harmonic potential (atomic units!)"} ), 
+   "x_reference" : (InputArray, {"dtype": float, "default"  : input_default(factory=np.zeros, args=(0,)), "help": "Minimum-energy configuration for the harmonic potential", "dimension" : "length"} ),
+   "v_reference" : (InputValue, {"dtype": float, "default"  : 0.0, "help": "Zero-value of energy for the harmonic potential", "dimension":"energy"})
+   }
+   
+   fields.update(InputForceField.fields)
+   
+   attribs = {}
+   attribs.update(InputForceField.attribs)
+   
+   default_help = """Harmonic energy calculator """
+   default_label = "FFDEBYE"
+	  
+   def store(self, ff):
+      super(InputFFDebye,self).store(ff)
+      self.hessian.store(ff.H)
+      self.x_reference.store(ff.xref)
+      self.v_reference.store(ff.vref)
+
+   def fetch(self):
+      super(InputFFDebye,self).fetch()
+
+      return FFDebye(H=self.hessian.fetch(), xref=self.x_reference.fetch(), vref=self.v_reference.fetch(), name = self.name.fetch(),
+               latency = self.latency.fetch(), dopbc = self.pbc.fetch() )

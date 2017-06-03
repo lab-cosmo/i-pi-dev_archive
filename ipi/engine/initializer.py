@@ -1,3 +1,4 @@
+# pylint: disable=bad-indentation
 """Contains the classes that are used to initialize data in the simulation.
 
 These classes can either be used to restart a simulation with some different
@@ -16,6 +17,7 @@ from ipi.engine.beads import Beads
 from ipi.engine.cell import Cell
 from ipi.engine.normalmodes import NormalModes
 from ipi.engine.ensembles import Ensemble
+from ipi.engine.motion import Motion
 from ipi.utils.io import read_file
 from ipi.utils.io.inputs.io_xml import xml_parse_file
 from ipi.utils.depend import dobject
@@ -121,7 +123,7 @@ def init_chk(filename):
    """
 
    # reads configuration from a checkpoint file
-   rfile = open(filename,"r")
+   rfile = open(filename, "r")
    xmlchk = xml_parse_file(rfile) # Parses the file.
 
    from ipi.inputs.simulation import InputSimulation
@@ -132,9 +134,9 @@ def init_chk(filename):
       warning("Restart from checkpoint with "+str(len(sim.syslist))+" systems will fetch data from the first system.")
    rcell = sim.syslist[0].cell
    rbeads = sim.syslist[0].beads
-   rthermo = sim.syslist[0].ensemble.thermostat
+   rmotion = sim.syslist[0].motion
 
-   return (rbeads, rcell, rthermo)
+   return (rbeads, rcell, rmotion)
 
 
 def init_beads(iif, nbeads):
@@ -174,7 +176,8 @@ def init_vector(iif, nbeads, momenta=False):
          from a checkpoint file, this is set to True.
    """
 
-   mode = iif.mode; value = iif.value
+   mode = iif.mode
+   value = iif.value
    if mode == "xyz" or mode == "pdb":
       rq = init_beads(iif, nbeads).q
    elif mode == "chk":
@@ -208,8 +211,10 @@ def set_vector(iif, dq, rq):
       rq: The vector to initialize from.
    """
 
-   (nbeads, natoms) = rq.shape; natoms /= 3
-   (dbeads, datoms) = dq.shape; datoms /= 3
+   (nbeads, natoms) = rq.shape
+   natoms /= 3
+   (dbeads, datoms) = dq.shape
+   datoms /= 3
 
    # Check that indices make sense
    if iif.index < 0 and natoms != datoms:
@@ -304,14 +309,24 @@ class Initializer(dobject):
          info(" # Initializer (stage 1) parsing " + str(k) + " object.", verbosity.high)
 
          if k == "cell":
-            if fcell :
-               warning("Overwriting previous cell parameters", verbosity.medium)
             if v.mode == "manual":
                 rh = v.value.reshape((3,3))
             elif v.mode == "chk":
                rh = init_chk(v.value)[1].h
+            elif init_file(v.mode,v.value)[1].h.trace() == -3:
+               # In case the file do not contain any
+               #+ cell parameters, the diagonal elements of the cell will be
+               #+set to -1 from the io_units and nothing is read here.
+               continue
             else:
-               rh = init_file(v.mode,v.value)[1].h
+               rh =  init_file(v.mode,v.value)[1].h
+
+            if fcell :
+               warning("Overwriting previous cell parameters", verbosity.low)
+
+
+            warning_units_message(v, 'cell')
+
             rh *= unit_to_internal("length",v.units,1.0)
 
             simul.cell.h = rh
@@ -368,8 +383,12 @@ class Initializer(dobject):
                warning("Overwriting previous atomic positions", verbosity.medium)
             # read the atomic positions as a vector
             rq = init_vector(v, self.nbeads)
+
+            warning_units_message(v, 'position')
+
             rq *= unit_to_internal("length",v.units,1.0)
-            (nbeads, natoms) = rq.shape;   natoms /= 3
+            nbeads, natoms = rq.shape
+            natoms /= 3
 
             # check if we must initialize the simulation beads
             if simul.beads.nbeads == 0:
@@ -409,8 +428,9 @@ class Initializer(dobject):
             else:
                rbeads.m[:] = simul.beads.m[v.index]
             rnm = NormalModes(mode=simul.nm.mode, transform_method=simul.nm.transform_method, freqs=simul.nm.nm_freqs)
-            rens = Ensemble(dt=simul.ensemble.dt, temp=simul.ensemble.temp)
-            rnm.bind(rbeads,rens)
+            rens = Ensemble(temp=simul.ensemble.temp)
+            rmv = Motion()
+            rnm.bind(rens, rmv, rbeads)
             # then we exploit the sync magic to do a complicated initialization
             # in the NM representation
             # with (possibly) shifted-frequencies NM
@@ -426,13 +446,14 @@ class Initializer(dobject):
             if fmom:
                warning("Overwriting previous atomic momenta", verbosity.medium)
             # read the atomic momenta as a vector
-            rp = init_vector(v, self.nbeads, momenta = True)
-            rp *= unit_to_internal("momentum",v.units,1.0)
-            (nbeads, natoms) = rp.shape;   natoms /= 3
+            rp = init_vector(v, self.nbeads, momenta=True)
+            rp *= unit_to_internal("momentum", v.units, 1.0)
+            nbeads, natoms = rp.shape
+            natoms /= 3
 
             # checks if we must initialize the simulation beads
             if simul.beads.nbeads == 0:
-               if v.index >= 0 :
+               if v.index >= 0:
                   raise ValueError("Cannot initialize single atoms before the size of the system is known")
                simul.beads.resize(natoms,self.nbeads)
 
@@ -440,13 +461,16 @@ class Initializer(dobject):
             set_vector(v, simul.beads.p, rp)
             fmom = True
 
+            warning_units_message(v, 'momenta')
+
          elif k == "velocities":
             if fmom:
                warning("Overwriting previous atomic momenta", verbosity.medium)
             # read the atomic velocities as a vector
             rv = init_vector(v, self.nbeads)
-            rv *= unit_to_internal("velocity",v.units,1.0)
-            (nbeads, natoms) = rv.shape;   natoms /= 3
+            rv *= unit_to_internal("velocity", v.units, 1.0)
+            nbeads, natoms = rv.shape
+            natoms /= 3
 
             # checks if we must initialize the simulation beads
             if simul.beads.nbeads == 0 or not fmass:
@@ -462,6 +486,9 @@ class Initializer(dobject):
             rv *= np.sqrt(self.nbeads/nbeads)
             set_vector(v, simul.beads.p, rv)
             fmom = True
+
+            warning_units_message(v, 'velocity')
+
          elif k == "gle": pass   # thermostats must be initialised in a second stage
 
       if simul.beads.natoms == 0:
@@ -507,12 +534,22 @@ class Initializer(dobject):
                   raise ValueError("Size mismatch in thermostat initialization data")
                sinput.shape = ssimul.shape
             elif v.mode == "chk":
-               rthermo = init_chk(v.value)[2]
-               if not hasattr(rthermo,"s"):
+               rmotion = init_chk(v.value)[2]
+               if not hasattr(rmotion,"thermostat") or not hasattr(rmotion.thermostat,"s") :
                   raise ValueError("Checkpoint file does not contain usable thermostat data")
-               sinput = rthermo.s.copy()
+               sinput = rmotion.thermostat.s.copy()
                if sinput.shape != ssimul.shape :
                   raise ValueError("Shape mismatch in thermostat initialization data")
 
             # if all the preliminary checks are good, we can initialize the s's
             ssimul[:] = sinput
+
+
+def warning_units_message(v, prop):
+   if (v.mode == "xyz" or v.mode == "pdb") and len(v.units) > 0:
+       warning("If the "+ prop+ " units are already specified into the pdb "
+               "or xyz file,\n   the conversion will be applied twice with "
+               "unpredictable results!!\n   This attribute is also "
+               "deprecated and will be removed in the following "
+               "versions.", verbosity.quiet)
+       raw_input("   Read the lines above, then press enter to continue...")

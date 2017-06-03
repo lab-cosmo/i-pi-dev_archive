@@ -43,13 +43,16 @@ class Cell(dobject):
       if h is None:
          h = np.zeros((3,3), float)
          
-      dself = self.dd
+      dself = dd(self) # gets a direct-access view to self
 
       dself.h = depend_array(name='h', value=h)
       dself.ih = depend_array(name="ih", value=np.zeros((3,3),float),
             func=self.get_ih, dependencies=[dself.h])
       dself.V = depend_value(name='V', func=self.get_volume,
             dependencies=[dself.h])
+
+   def copy(self):
+      return Cell(depstrip(self.h).copy())
 
    def get_ih(self):
       """Inverts the lattice vector matrix."""

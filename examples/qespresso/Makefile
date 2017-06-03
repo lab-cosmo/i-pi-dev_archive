@@ -1,58 +1,64 @@
-# Makefile for the Quantum Espresso examples
-# 
-# Copyright (C) 2013, Joshua More and Michele Ceriotti
-# 
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-# 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-# GNU General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http.//www.gnu.org/licenses/>.
+# Makefile for the CP2K example
+#
+# This file is part of i-PI.
+# i-PI Copyright (C) 2014-2015 i-PI developers
+# See the "licenses" directory for full license information.
 
-.PHONY: all water lithium clean
-all: water lithium zundel
+.PHONY: all clean dia-npt-classical dia_big-npt-classical dia-npt-pimd.4 dia_big-npt-pimd.4 water lithium
+all: dia-npt-classical dia_big-npt-classical dia-npt-pimd.4 dia_big-npt-pimd.4
 
-PW:=pw.x
-CP:=cp.x
-IPI:=../../../i-pi
-
-define run_pw
-  for i in `seq 1 $1`; do \
-    mkdir -p run_$$i; cd run_$$i; \
-    $(PW) < ../$2 > qe.out & cd ..; \
-  done;
-endef
-
-define run_cp
-  for i in `seq 1 $1`; do \
-    mkdir -p run_$$i; cd run_$$i; \
-    $(CP) < ../$2 > qe.out & cd ..; \
-  done;
-endef
-
+DRIVER:=pw.x
+IPI:=i-pi
 
 -include make.in
 
+define run_driver
+  for i in `seq 1 $1`; do \
+    mkdir -p run_$$i; cd run_$$i; \
+    $(DRIVER) < ../$2 > pw.out --ipi $3 & cd ..; \
+	sleep 3; \
+  done;
+endef
+
 water:
-	cd h2o; $(IPI) h2o-ipi.xml & sleep 3; \
-	$(call run_pw,4,h2o-pw.in) \
+	cd h2o; $(IPI) ipi.xml & sleep 3; \
+	$(call run_driver,4,pw.in,localhost:3141) \
 	wait
 
 lithium:
-	cd li4; $(IPI) li4-ipi.xml & sleep 3; \
-	$(call run_pw,4,li4-pw.in) \
+	cd li4; $(IPI) ipi.xml & sleep 3; \
+	$(call run_driver,4,pw.in,localhost:31415) \
 	wait
 
-zundel:
-	cd zundel-cp; $(IPI) zundel-ipi.xml & sleep 3; \
-	$(call run_cp,4,zundel-cp.in) \
+dia-npt-classical:
+	cd dia-npt-classical; $(IPI) ipi.xml & sleep 5; \
+	$(call run_driver,1,pw.in, localhost:3142) \
 	wait
-	
+
+dia-npt-pimd.4:
+	cd dia-npt-pimd.4; $(IPI) ipi.xml & sleep 5; \
+	$(call run_driver,4,pw.in, localhost:3143) \
+	wait
+
+dia_big-npt-classical:
+	cd dia_big-npt-classical; $(IPI) ipi.xml & sleep 5; \
+	$(call run_driver,1,pw.in, localhost:3144) \
+	wait
+
+dia_big-npt-pimd.4: 
+	cd dia_big-npt-pimd.4; $(IPI) ipi.xml & sleep 5; \
+	$(call run_driver,4,pw.in, localhost:3145) \
+	wait
+
+npt-piglet:
+	cd npt-piglet; $(IPI) nptpgl_ipi.xml & sleep 10; \
+	$(call run_driver,4,pw.in) \
+	wait
+
+nvt-piglet:
+	cd nvt-piglet; $(IPI) nvtpgl_ipi.xml & sleep 10; \
+	$(call run_driver,4,pw.in) \
+	wait
+
 clean:
-	rm -rf */*_output.* */*.log */run_* */RESTART */EXIT
+	rm -rf */\#*\#* */example.* */*.out */*.log */run_* */RESTART */EXIT

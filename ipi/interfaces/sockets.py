@@ -28,7 +28,7 @@ __all__ = ['InterfaceSocket']
 
 HDRLEN = 12
 UPDATEFREQ = 10
-TIMEOUT = 0.2
+TIMEOUT = 0.1
 SERVERTIMEOUT = 5.0*TIMEOUT
 NTIMEOUT = 20
 
@@ -155,14 +155,14 @@ class DriverSocket(socket.socket):
                raise socket.timeoout    # if this keeps returning no data, we are in trouble....
             self._buf[bpos:bpos + len(bpart)] = np.fromstring(bpart, np.byte)
          except socket.timeout:
-            warning(" @SOCKET:   Timeout in status recvall, trying again!", verbosity.low)
+            warning(" @SOCKET:   Timeout in recvall, trying again!", verbosity.low)
             timeout = True
             ntimeout += 1
             if ntimeout > NTIMEOUT:
                warning(" @SOCKET:  Couldn't receive within %5d attempts. Time to give up!" % (NTIMEOUT), verbosity.low)
                raise Disconnected()
             pass
-         if (not timeout and bpart == 0):
+         if not timeout and len(bpart) == 0:
             raise Disconnected()
          bpos += len(bpart)
 
@@ -213,6 +213,13 @@ class Driver(DriverSocket):
       self.lastreq = None
       self.locked = False
 
+   def shutdown(self, how=socket.SHUT_RDWR):
+      """Tries to send an exit message to clients to let them exit gracefully."""
+               
+      self.sendall(Message("exit"))
+      self.status = Status.Disconnected
+      super(DriverSocket,self).shutdown(how)
+
    def poll(self):
       """Waits for driver status."""
 
@@ -230,18 +237,20 @@ class Driver(DriverSocket):
 
       if not self.waitstatus:
          try:
-            readable, writable, errored = select.select([], [self], [])
+            # This can sometimes hang with no timeout.
+            # Using the recommended 60 s.
+            readable, writable, errored = select.select([], [self], [], 60)
             if self in writable:
                self.sendall(Message("status"))
                self.waitstatus = True
-         except:
+         except socket.error:
             return Status.Disconnected
 
       try:
          reply = self.recv(HDRLEN)
          self.waitstatus = False # got some kind of reply
       except socket.timeout:
-         warning(" @SOCKET:   Timeout in status recv!", verbosity.debug )
+         warning(" @SOCKET:   Timeout in status recv!", verbosity.trace )
          return Status.Up | Status.Busy | Status.Timeout
       except:
          return Status.Disconnected
@@ -316,7 +325,7 @@ class Driver(DriverSocket):
       Returns:
          A list of the form [potential, force, virial, extra].
       """
-
+      
       if (self.status & Status.HasData):
          self.sendall(Message("getforce"));
          reply = ""
@@ -433,6 +442,7 @@ class InterfaceSocket(object):
 
       elif self.mode == "inet":
          self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+         self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
          self.server.bind((self.address,self.port))
          info("Created inet socket with address " + self.address + " and port number " + str(self.port), verbosity.medium)
       else:
@@ -454,6 +464,7 @@ class InterfaceSocket(object):
             c.close()
          except:
             pass
+
       # flush it all down the drain
       self.clients = []
       self.jobs = []
@@ -482,7 +493,7 @@ class InterfaceSocket(object):
                warning(" @SOCKET:   Client " + str(c.peername) +" died or got unresponsive(C). Removing from the list.", verbosity.low)
                c.shutdown(socket.SHUT_RDWR)
                c.close()
-            except:
+            except socket.error:
                pass
             c.status = Status.Disconnected
             self.clients.remove(c)
@@ -490,7 +501,7 @@ class InterfaceSocket(object):
                if j is c:
                   self.jobs = [ w for w in self.jobs if not ( w[0] is k and w[1] is j ) ] # removes pair in a robust way
                   #self.jobs.remove([k,j])
-                  k["status"] = "Queued"
+                  k["status"] = "Queued"                  
                   k["start"] = -1
 
       if len(self.clients) == 0:
@@ -499,8 +510,8 @@ class InterfaceSocket(object):
          searchtimeout = 0.0
 
       keepsearch = True
-      while keepsearch:
-         readable, writable, errored = select.select([self.server], [], [], searchtimeout)
+      while keepsearch:         
+         readable, writable, errored = select.select([self.server], [], [], searchtimeout)         
          if self.server in readable:
             client, address = self.server.accept()
             client.settimeout(TIMEOUT)
@@ -510,7 +521,7 @@ class InterfaceSocket(object):
             if (driver.status | Status.Up):
                self.clients.append(driver)
                info(" @SOCKET:   Handshaking was successful. Added to the client list.", verbosity.low)
-               self.poll_iter = UPDATEFREQ   # if a new client was found, will try again a harder next time
+               self.poll_iter = UPDATEFREQ   # if a new client was found, will try again harder next time
                searchtimeout = SERVERTIMEOUT
             else:
                warning(" @SOCKET:   Handshaking failed. Dropping connection.", verbosity.low)
@@ -561,7 +572,7 @@ class InterfaceSocket(object):
                   continue
                elif match_ids == "free" and fc.locked:
                   continue
-               info(" @SOCKET: Assigning [%5s] request id %4s to client with last-id %4s (% 3d/% 3d : %s)" % (match_ids,  str(r["id"]),  str(fc.lastreq), self.clients.index(fc), len(self.clients), str(fc.peername) ), verbosity.high )
+               info(" @SOCKET: %s Assigning [%5s] request id %4s to client with last-id %4s (% 3d/% 3d : %s)" % (time.strftime("%y/%m/%d-%H:%m:%S"), match_ids,  str(r["id"]),  str(fc.lastreq), self.clients.index(fc), len(self.clients), str(fc.peername) ), verbosity.high )
 
                while fc.status & Status.Busy:
                   fc.poll()
@@ -573,6 +584,7 @@ class InterfaceSocket(object):
                if fc.status & Status.Ready:
                   fc.sendpos(r["pos"], r["cell"])
                   r["status"] = "Running"
+                  r["t_dispatched"] = time.time()
                   r["start"] = time.time() # sets start time for the request
                   #fc.poll()
                   fc.status = Status.Up | Status.Busy   # we know that the client is busy at this stage!
@@ -622,7 +634,7 @@ class InterfaceSocket(object):
                   warning(" @SOCKET:   Client " + str(c.peername) + " died or got unresponsive(A). Disconnecting.", verbosity.low)
                   try:
                      c.shutdown(socket.SHUT_RDWR)
-                  except:
+                  except socket.error:
                      pass
                   c.close()
                   c.status = Status.Disconnected
@@ -632,6 +644,7 @@ class InterfaceSocket(object):
                warning(" @SOCKET:   Client died a horrible death while getting forces. Will try to cleanup.", verbosity.low)
                continue
             r["status"] = "Done"
+            r["t_finished"] = time.time()
             c.lastreq = r["id"] # saves the ID of the request that the client has just processed
             self.jobs = [ w for w in self.jobs if not ( w[0] is r and w[1] is c ) ] # removes pair in a robust way
 

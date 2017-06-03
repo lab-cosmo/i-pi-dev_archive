@@ -9,12 +9,12 @@ from copy import copy
 
 from ipi.engine.forces import *
 from ipi.utils.inputvalue import *
-
+import numpy as np
 
 __all__ = ['InputForces', 'InputForceComponent']
 
 
-class InputForceComponent(InputValue):
+class InputForceComponent(Input):
    """ForceComponent input class.
 
    Uses the forcefield object whose name is specified as the value of the
@@ -34,21 +34,29 @@ class InputForceComponent(InputValue):
                "weight" : ( InputAttribute, { "dtype"   : float,
                                          "default" : 1.0,
                                          "help"    : "A scaling factor for this forcefield, to be applied before adding the force calculated by this forcefield to the total force." } ),
+               "fd_epsilon" : ( InputAttribute, { "dtype"   : float, 
+                                         "default" : -0.001,
+                                         "help"    : "The finite displacement to be used for calculaing the Suzuki-Chin contribution of the force. If the value is negative, a centered finite-difference scheme will be used. [in bohr]" } ),
+               "mts_level" : ( InputAttribute, { "dtype"   : int,
+                                         "default" : 0,
+                                         "help"    : "The depth in a MTS splitting at which this component should be applied" } ),
                "name" : ( InputAttribute, { "dtype" : str,
                                           "default" : "",
-                                          "help" : "An optional name to refer to this force component." } )
+                                          "help" : "An optional name to refer to this force component." } ),
+
+               "forcefield" : ( InputAttribute, { "dtype" : str, 
+                                          "default": "",
+                                          "help" : "Mandatory. The name of the forcefield this force is referring to." } )
             }
+
+   fields={ "mts_weights" : (InputArray, {"dtype"        : float,
+                                    "default"      : np.zeros(1,float)+1.,
+                                    "help"         : "The weight of force in each mts level starting from outer.",
+                                    "dimension"    : "force"})
+          }
 
    default_help = "The class that deals with how each forcefield contributes to the overall potential, force and virial calculation."
    default_label = "FORCECOMPONENT"
-
-   def __init__(self, help=None, dimension=None, units=None, default=None, dtype=None):
-      """Initializes InputForceComponent.
-
-      Just calls the parent initialization function with appropriate arguments.
-      """
-
-      super(InputForceComponent,self).__init__(dtype=str, dimension=dimension, default=default, help=help)
 
    def store(self, forceb):
       """Takes a ForceComponent instance and stores a minimal
@@ -61,7 +69,10 @@ class InputForceComponent(InputValue):
       super(InputForceComponent,self).store(forceb.ffield)
       self.nbeads.store(forceb.nbeads)
       self.weight.store(forceb.weight)
+      self.mts_weights.store(forceb.mts_weights)
+      self.fd_epsilon.store(forceb.epsilon)
       self.name.store(forceb.name)
+      self.forcefield.store(forceb.ffield)
 
    def fetch(self):
       """Creates a ForceComponent object.
@@ -70,8 +81,8 @@ class InputForceComponent(InputValue):
          A ForceComponent object.
       """
 
-      val=super(InputForceComponent,self).fetch()
-      return ForceComponent(ffield=val, nbeads=self.nbeads.fetch(), weight=self.weight.fetch(), name=self.name.fetch())
+      super(InputForceComponent,self).fetch()
+      return ForceComponent(ffield=self.forcefield.fetch(), nbeads=self.nbeads.fetch(), weight=self.weight.fetch(), name=self.name.fetch(), mts_weights=self.mts_weights.fetch(), epsilon=self.fd_epsilon.fetch())
 
    def check(self):
       """Checks for optional parameters."""
