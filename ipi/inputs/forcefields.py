@@ -8,12 +8,12 @@
 from copy import copy
 import numpy as np
 
-from ipi.engine.forcefields import ForceField, FFSocket, FFLennardJones, FFDebye
+from ipi.engine.forcefields import ForceField, FFSocket, FFLennardJones, FFDebye, FFRestrain
 from ipi.interfaces.sockets import InterfaceSocket
 from ipi.utils.inputvalue import *
 
 
-__all__ = ["InputFFSocket", 'InputFFLennardJones', 'InputFFDebye']
+__all__ = ["InputFFSocket", 'InputFFLennardJones', 'InputFFDebye', 'InputFFRestrain']
 
 
 class InputForceField(Input):
@@ -185,6 +185,24 @@ class InputFFLennardJones(InputForceField):
       super(InputFFLennardJones,self).fetch()
 
       return FFLennardJones(pars = self.parameters.fetch(), name = self.name.fetch(),
+               latency = self.latency.fetch(), dopbc = self.pbc.fetch())
+
+class InputFFRestrain(InputForceField):
+
+   attribs = {}
+   attribs.update(InputForceField.attribs)
+
+   default_help = """Simple, internal restraining potential.
+                   Expects parameters, e.g. { eps: 0.1, Rc: 1.0, n: 2 }. """
+   default_label = "FFRESTRAIN"
+
+   def store(self, ff):
+      super(InputFFRestrain,self).store(ff)
+
+   def fetch(self):
+      super(InputFFRestrain,self).fetch()
+
+      return FFRestrain(pars = self.parameters.fetch(), name = self.name.fetch(),
                latency = self.latency.fetch(), dopbc = self.pbc.fetch())
 
 

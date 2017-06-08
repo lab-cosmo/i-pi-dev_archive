@@ -21,7 +21,7 @@ from ipi.engine.thermostats import Thermostat
 from ipi.engine.barostats import Barostat
 
 
-#__all__ = ['Dynamics', 'NVEIntegrator', 'NVTIntegrator', 'NPTIntegrator', 'NSTIntegrator', 'SCIntegrator`']
+#__all__ = ['Dynamics', 'NVEIntegrator', 'NVTIntegrator', 'NPTIntegrator', 'NPTSCIntegrator', 'NSTIntegrator', 'SCIntegrator`']
 
 class Dynamics(Motion):
     """self (path integral) molecular dynamics class.
@@ -90,6 +90,8 @@ class Dynamics(Motion):
             self.integrator = MTSIntegrator()
         elif self.enstype == "sc":
             self.integrator = SCIntegrator()
+        elif self.enstype == "sc-npt":
+            self.integrator = NPTSCIntegrator()
         
         else:
             self.integrator = DummyIntegrator()
@@ -414,6 +416,60 @@ class NPTIntegrator(NVTIntegrator):
         self.pconstraints()
         self.ttime += time.time()
 
+class NPTSCIntegrator(NVTIntegrator):
+    """Integrator object for constant pressure simulations.
+
+    Has the relevant conserved quantity and normal mode propagator for the
+    constant pressure ensemble. Contains a thermostat object containing the
+    algorithms to keep the temperature constant, and a barostat to keep the
+    pressure constant.
+    """
+
+    def bind(self, mover):
+        """Binds ensemble beads, cell, bforce, bbias and prng to the dynamics.
+        """
+
+        super(NPTSCIntegrator,self).bind(mover)
+        self.ensemble.add_econs(dget(self.forces, "potsc"))
+
+
+    def step(self, step=None):
+        """NPT time step.
+
+        Note that the barostat only propagates the centroid coordinates. If this
+        approximation is made a centroid virial pressure and stress estimator can
+        be defined, so this gives the best statistical convergence. This is
+        allowed as the normal mode propagation is approximately unaffected
+        by volume fluctuations as long as the system box is much larger than
+        the radius of gyration of the ring polymers.
+        """
+
+        self.ttime = -time.time()
+        self.thermostat.step()
+        self.barostat.thermostat.step()
+        self.pconstraints()
+        self.ttime += time.time()
+
+        self.ptime = -time.time()
+        self.barostat.pstep()
+        self.pconstraints()
+        self.ptime += time.time()
+
+        self.qtime = -time.time()
+        self.barostat.qcstep()
+        self.nm.free_qstep()
+        self.qtime += time.time()
+
+        self.ptime -= time.time()
+        self.barostat.pstep()
+        self.pconstraints()
+        self.ptime += time.time()
+
+        self.ttime -= time.time()
+        self.barostat.thermostat.step()
+        self.thermostat.step()
+        self.pconstraints()
+        self.ttime += time.time()
 
 class NSTIntegrator(NVTIntegrator):
     """Ensemble object for constant pressure simulations.

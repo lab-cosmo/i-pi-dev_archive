@@ -22,7 +22,7 @@ from ipi.utils.depend import dobject
 from ipi.utils.depend import depstrip
 
 
-__all__ = ['ForceField', 'FFSocket', 'FFLennardJones', 'FFDebye']
+__all__ = ['ForceField', 'FFSocket', 'FFLennardJones', 'FFDebye', 'FFRestrain']
 
 
 class ForceRequest(dict):
@@ -119,12 +119,16 @@ class ForceField(dobject):
             par_str = " "
 
         pbcpos = depstrip(atoms.q).copy()
+        m3 = depstrip(atoms.m3).copy()
+        m = depstrip(atoms.m3).copy()
         if self.dopbc:
             cell.array_pbc(pbcpos)
 
         newreq = ForceRequest({
             "id": reqid,
             "pos": pbcpos,
+            "m3": m3,
+            "m": m,
             "cell": (depstrip(cell.h).copy(), depstrip(cell.ih).copy()),
             "pars": par_str,
             "result": None,
@@ -350,6 +354,81 @@ class FFLennardJones(ForceField):
         r["result"] = [v, f.reshape(nat*3), np.zeros((3,3), float), ""]
         r["status"] = "Done"
 
+
+class FFRestrain(ForceField):
+    """Basic fully pythonic force provider.
+
+    Computes potential of a restrain of the form V(r) = eps*((r - R)/Rc)**n
+
+    Attributes:
+        parameters: A dictionary of the parameters used by the driver. Of the
+            form {'name': value}.
+        requests: During the force calculation step this holds a dictionary
+            containing the relevant data for determining the progress of the step.
+            Of the form {'atoms': atoms, 'cell': cell, 'pars': parameters,
+                         'status': status, 'result': result, 'id': bead id,
+                         'start': starting time}.
+    """
+
+    def __init__(self, latency=1.0e-3, name="", pars=None, dopbc=False):
+        """Initialises FFRestrain.
+
+        Args:
+           pars: Optional dictionary, giving the parameters needed by the driver.
+        """
+
+        # check input - PBCs are not implemented here
+        if dopbc:
+            raise ValueError("Periodic boundary conditions are not supported by FFRestrain.")
+
+        # a socket to the communication library is created or linked
+        super(FFRestrain, self).__init__(latency, name, pars, dopbc=False)
+        self.eps = float(self.pars["eps"])
+        self.Rc = float(self.pars["Rc"])
+        self.n = float(self.pars["n"])
+
+    def poll(self):
+        """Polls the forcefield checking if there are requests that should
+        be answered, and if necessary evaluates the associated forces and energy."""
+
+        # We have to be thread-safe, as in multi-system mode this might get
+        # called by many threads at once.
+        self._threadlock.acquire()
+        try:
+            for r in self.requests:
+                if r["status"] == "Queued":
+                    r["status"] = "Running"
+                    r["t_dispatched"] = time.time()
+                    self.evaluate(r)
+        finally:
+            self._threadlock.release()
+
+    def evaluate(self, r):
+        """Just a silly function evaluating a restraining potential."""
+
+        def df(q, n):
+            return np.power(np.linalg.norm(q),n)
+
+        q = r["pos"].reshape((-1, 3))
+        R = np.mean(q, axis=0)
+        q = (q - R)/self.Rc
+
+        nat = len(q)
+
+        v = 0.0
+        f = np.zeros(q.shape)
+        for i in range(0, nat):
+            dv = df(q[i],self.n)
+            v += dv
+            f[i] = dv/df(q[i],2) * q[i]
+ 
+        v *= self.eps 
+        f = -self.eps * self.n / self.Rc * (f - np.mean(f, axis=0))
+
+        r["result"] = [v, f.reshape(nat*3), np.zeros((3,3), float), ""]
+        r["status"] = "Done"
+
+
 class FFDebye(ForceField):
    """Debye crystal harmonic reference potential
 
@@ -419,3 +498,5 @@ class FFDebye(ForceField):
       r["result"] = [ self.vref + 0.5*np.dot(d,mf), -mf, np.zeros((3,3),float), ""]
       r["status"] = "Done"
       r["t_finished"] = time.time()
+
+

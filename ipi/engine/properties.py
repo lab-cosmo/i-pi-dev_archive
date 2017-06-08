@@ -190,7 +190,7 @@ class Properties(dobject):
    """
 
    _DEFAULT_FINDIFF = 1e-4
-   _DEFAULT_FDERROR = 1e-6
+   _DEFAULT_FDERROR = 1e-5
    _DEFAULT_MINFID = 1e-7
 
    def __init__(self):
@@ -398,6 +398,9 @@ class Properties(dobject):
       "pressure_cv": {"dimension": "pressure",
                       "help": "The quantum estimator for pressure of the physical system.",
                       "func": (lambda: np.trace(self.forces.vir + self.kstress_cv())/(3.0*self.cell.V*self.beads.nbeads))},
+      "pressure_opsc": {"dimension": "pressure",
+                      "help": "The quantum estimator for pressure of the physical system.",
+                      "func": self.get_pressure_opsc }, 
       "kstress_cv":  {"dimension": "pressure",
                       "size" : 6,
                       "help": "The quantum estimator for the kinetic stress tensor of the physical system.",
@@ -432,6 +435,18 @@ class Properties(dobject):
                        then its magnitude will be reduced automatically by the code if the finite difference error
                        becomes too large.""",
                       'func': self.get_yama_estimators,
+                      "size": 2},
+      "vk_scaledcoords": {   "dimension": "undefined",
+                      "help" : "The scaled coordinates estimators that can be used to compute energy and heat capacity",
+                       "longhelp": """Returns the estimators that are required to evaluate the scaled-coordinates estimators
+                       for total energy and heat capacity, as described in T. M. Yamamoto,
+                       J. Chem. Phys., 104101, 123 (2005). Returns eps_v and eps_v', as defined in that paper.
+                       As the two estimators have a different dimensions, this can only be output in atomic units.
+                       Takes one argument, 'fd_delta', which gives the value of the finite difference parameter used -
+                       which defaults to """+ str(-self._DEFAULT_FINDIFF) + """. If the value of 'fd_delta' is negative,
+                       then its magnitude will be reduced automatically by the code if the finite difference error
+                       becomes too large.""",
+                      'func': self.get_vkyama_estimators,
                       "size": 2},
       "sc_scaledcoords": {   "dimension": "undefined",
                       "help" : "The scaled coordinates estimators that can be used to compute energy and heat capacity for the Suzuki-Chin propagator",
@@ -743,6 +758,18 @@ class Properties(dobject):
           else:
               v += 4.0*pots[k]/3.0  + 2.0*(potssc[k]-pots[k]/3.0)
       return v/(k+1)
+
+   def get_pressure_opsc(self):
+      """
+      Calculates the fourth order operator method centroid-virial pressure estimator.
+      """
+      press = 0.0
+      for b in range(0,self.beads.nbeads,2):
+         press += 2.0*np.trace(self.forces.virs[b])/self.cell.V/3.0
+         press -= 2.0/3.0*np.dot((self.beads.q[b] - self.beads.qc), self.forces.f[b])/self.cell.V
+
+      press += 3.0*self.beads.natoms*Constants.kb*self.ensemble.temp/self.cell.V/3.0*self.beads.nbeads
+      return press/self.beads.nbeads
 
    def get_sckinop(self, atom=""):
       """Calculates the Suzuki-Chin quantum centroid virial kinetic energy estimator.
@@ -1275,6 +1302,41 @@ class Properties(dobject):
 
       return np.asarray([eps, eps_prime])
 
+   def get_vkyama_estimators(self, fd_delta= - _DEFAULT_FINDIFF):
+      """Calculates the quantum scaled coordinate suzuki-chin kinetic energy estimator for the Suzuki-Chin propagator.
+
+      Uses a finite difference method to calculate the estimators
+      needed to calculate the energy and heat capacity of the system, as
+      shown in Takeshi M. Yamamoto, Journal of Chemical Physics,
+      104101, 123 (2005). Returns both eps_v and eps_v' as defined in
+      the above article. Note that heat capacity is calculated as
+      beta**2*kboltzmann*(<eps_v**2> - <eps_v>**2 - <eps_v'>), and the
+      energy of the system as <eps_v>.
+
+      Args:
+         fd_delta: the relative finite difference in temperature to apply in
+         computing finite-difference quantities. If it is negative, will be
+         scaled down automatically to avoid discontinuities in the potential.
+      """
+
+      r1 = self.get_sckinop() + 2.0/self.beads.nbeads*sum(self.forces.pots[int(k)] for k in range(0,self.beads.nbeads,2))
+
+      eps = abs(float(fd_delta))
+      beta = 1.0/(Constants.kb*self.ensemble.temp)
+      beta2 = beta**2
+      qc = depstrip(self.beads.qc)
+      q = depstrip(self.beads.q)
+      print (q-qc)[::2].shape
+      self.dbeads.q[::2] = self.beads.q[::2] + eps*(q - qc)[::2]
+    
+      vir1 = 1.50*np.dot(((q - qc)[::2]).flatten(), (self.forces.f[::2]).flatten())
+      vir2 = 0.50*np.dot(((q - qc)[::2]).flatten(), ((self.dforces.f - self.forces.f)[::2]).flatten()/eps)
+
+      r2 = 1.5*self.beads.natoms/beta2 + 0.5/beta*(vir1 + vir2)/self.beads.nbeads*2
+
+      return np.asarray([r1, -r2])
+
+
    def get_scyama_estimators(self, fd_delta= - _DEFAULT_FINDIFF):
       """Calculates the quantum scaled coordinate suzuki-chin kinetic energy estimator for the Suzuki-Chin propagator.
 
@@ -1292,7 +1354,8 @@ class Properties(dobject):
          scaled down automatically to avoid discontinuities in the potential.
       """
 
-      dbeta = abs(float(fd_delta))
+      fd_delta = float(fd_delta)
+      dbeta = abs(fd_delta)
       beta = 1.0/(Constants.kb*self.ensemble.temp)
       self.dforces.omegan2=self.forces.omegan2
       self.dforces.alpha=self.forces.alpha
@@ -1301,20 +1364,27 @@ class Properties(dobject):
       q = depstrip(self.beads.q)
 
       v0=(self.forces.pot+self.forces.potsc)/self.beads.nbeads
+      #print "test-this-shit",  self.forces.pot, self.forces.potsc, v0
+      #self.dbeads.q= self.beads.q
+      #print "test-that-shit",  self.dforces.pot, self.dforces.potsc, v0
 
       while True:
          splus = np.sqrt(1.0 + dbeta)
          sminus = np.sqrt(1.0 - dbeta)
 
+         #change beta
+         self.dforces.omegan2=depstrip(self.forces.omegan2)/(1.0 + dbeta)**2
          for b in range(self.beads.nbeads):
             self.dbeads[b].q = qc*(1.0 - splus) + splus*q[b,:]
          vplus=(self.dforces.pot+self.dforces.potsc)/self.beads.nbeads
 
+         self.dforces.omegan2=depstrip(self.forces.omegan2)/(1.0 - dbeta)**2
          for b in range(self.beads.nbeads):
             self.dbeads[b].q = qc*(1.0 - sminus) + sminus*q[b,:]
          vminus=(self.dforces.pot+self.dforces.potsc)/self.beads.nbeads
 
          if (fd_delta < 0 and abs((vplus+vminus-2*v0)/(vplus-vminus)) > self._DEFAULT_FDERROR):
+             print "SOMEWHAT I GOT IN HERE"
              if  dbeta > self._DEFAULT_MINFID :
                 dbeta *= 0.5
                 info("Reducing displacement in scaled coordinates estimator", verbosity.low)
@@ -1325,11 +1395,15 @@ class Properties(dobject):
                 eps_prime = 0.0
                 break
          else:
+             
             eps = ((1.0 + dbeta)*vplus - (1.0 - dbeta)*vminus)/(2*dbeta)
             eps += 0.5*(3*self.beads.natoms)/beta
 
             eps_prime = ((1.0 + dbeta)*vplus + (1.0 - dbeta)*vminus - 2*v0)/(dbeta**2*beta)
+            print "COMPUTING EPS_PRIME", eps_prime, vplus, vminus, v0
             eps_prime -= 0.5*(3*self.beads.natoms)/beta**2
+            print "COMPUTING EPS_PRIME", eps_prime
+            
 
             break
 
