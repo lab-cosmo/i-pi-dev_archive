@@ -399,17 +399,22 @@ class NSTIntegrator(NVTIntegrator):
         self.ttime += time.time()
 
         self.ptime = -time.time()
-        self.barostat.pstep()
+        self.barostat.pstep1()
+        self.barostat.pstep2()
+        self.barostat.pstep3()
         self.pconstraints()
         self.ptime += time.time()
 
         self.qtime = -time.time()
-        self.barostat.qcstep()
+        self.barostat.qcstep(2)
+        self.barostat.qcstep(2)
         self.nm.free_qstep()
         self.qtime += time.time()
 
         self.ptime -= time.time()
-        self.barostat.pstep()
+        self.barostat.pstep1()
+        self.barostat.pstep2()
+        self.barostat.pstep3()
         self.pconstraints()
         self.ptime += time.time()
 
