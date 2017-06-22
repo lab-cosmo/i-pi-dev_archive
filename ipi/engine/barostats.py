@@ -517,7 +517,13 @@ class BaroRGB(Barostat):
       # This leads to an ensemble equaivalent to Martyna-Hughes-Tuckermann for both fixed and moving COM
       # Anyway, it is a small correction so whatever.
 
-      self.p += dthalf*( self.cell.V* np.triu( self.stress - self.beads.nbeads*pi_ext ) +
+      kst = np.zeros((3,3), float)   
+      for i in range(3):
+          kst[i,i] += np.dot(pc[i:na3:3],pc[i:na3:3]/m) *self.beads.nbeads
+
+      stress = depstrip(self.stress) + kst / self.cell.V
+
+      self.p += dthalf*( self.cell.V* np.triu( stress - self.beads.nbeads*pi_ext ) +
                            Constants.kb*self.temp*L)
 
       fc = np.sum(depstrip(self.forces.f),0).reshape(self.beads.natoms,3)/self.beads.nbeads
