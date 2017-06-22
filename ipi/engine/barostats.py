@@ -206,7 +206,7 @@ class Barostat(dobject):
 
       return (self.kstress_mts(level)+ self.forces.vir_mts(level) + bvir)/self.cell.V
  
-   def get_stress(self, level):
+   def get_stress(self):
       """Calculates the internal stress tensor."""
 
       bvir = np.zeros((3,3),float)
@@ -502,7 +502,7 @@ class BaroRGB(Barostat):
       lastterm = Constants.kb*self.temp*lastterm
       return self.thermostat.ethermo + self.kin + self.pot - lastterm
 
-   def pstep(self):
+   def pstep1(self):
       """Propagates the momenta for half a time step."""
 
       dthalf = self.dt*0.5
@@ -517,7 +517,18 @@ class BaroRGB(Barostat):
       # This leads to an ensemble equaivalent to Martyna-Hughes-Tuckermann for both fixed and moving COM
       # Anyway, it is a small correction so whatever.
 
-      self.p += dthalf*( self.cell.V* np.triu( self.stress - self.beads.nbeads*pi_ext ) +
+
+      pc = depstrip(self.beads.pc)
+      m = depstrip(self.beads.m)
+      na3 = 3*self.beads.natoms
+
+      kst = np.zeros((3,3), float)   
+      for i in range(3):
+          kst[i,i] += np.dot(pc[i:na3:3],pc[i:na3:3]/m) *self.beads.nbeads
+
+      stress = kst / self.cell.V
+
+      self.p += dthalf*( self.cell.V* np.triu( stress - self.beads.nbeads*pi_ext ) +
                            Constants.kb*self.temp*L)
 
       fc = np.sum(depstrip(self.forces.f),0).reshape(self.beads.natoms,3)/self.beads.nbeads
@@ -530,14 +541,56 @@ class BaroRGB(Barostat):
       # again, these are tiny tiny terms so whatever.
       self.p += np.triu(dthalf2*np.dot(fcTonm,pc) + dthalf3*np.dot(fcTonm,fc)) * self.beads.nbeads
 
-      self.beads.p += depstrip(self.forces.f)*dthalf
       if self.bias != None:  self.beads.p += depstrip(self.bias.f)*dthalf
 
-   def qcstep(self):
+   def pstep2(self):
+      """Propagates the momenta for half a time step."""
+
+      dthalf = self.dt*0.5
+      dthalf2 = dthalf**2
+      dthalf3 = dthalf**3/3.0
+
+      hh0=np.dot(self.cell.h, self.h0.ih)
+      pi_ext=np.dot(hh0, np.dot(self.stressext, hh0.T))*self.h0.V/self.cell.V
+      L=np.diag([3,2,1])
+
+      # This differs from the BZP thermostat in that it uses just one kT in the propagator.
+      # This leads to an ensemble equaivalent to Martyna-Hughes-Tuckermann for both fixed and moving COM
+      # Anyway, it is a small correction so whatever.
+
+
+      pc = depstrip(self.beads.pc)
+      m = depstrip(self.beads.m)
+      na3 = 3*self.beads.natoms
+
+      kst = np.zeros((3,3), float)   
+      for i in range(3):
+          kst[i,i] += np.dot(pc[i:na3:3],pc[i:na3:3]/m) *self.beads.nbeads
+
+      stress = depstrip(self.stress)
+
+      self.p += dthalf*( self.cell.V* np.triu( stress ) )
+
+      fc = np.sum(depstrip(self.forces.f),0).reshape(self.beads.natoms,3)/self.beads.nbeads
+      if self.bias != None: fc+= np.sum(depstrip(self.bias.f),0).reshape(self.beads.natoms,3)/self.beads.nbeads
+      fcTonm = (fc/depstrip(self.beads.m3)[0].reshape(self.beads.natoms,3)).T
+      pc = depstrip(self.beads.pc).reshape(self.beads.natoms,3)
+
+      # I am not 100% sure, but these higher-order terms come from integrating the pressure virial term,
+      # so they should need to be multiplied by nbeads to be consistent with the equations of motion in the PI context
+      # again, these are tiny tiny terms so whatever.
+
+   def pstep3(self):
+      """Propagates the momenta for half a time step."""
+
+      dthalf = self.dt*0.5
+      self.beads.p += depstrip(self.forces.f)*dthalf
+
+   def qcstep(self, alpha=1.0):
       """Propagates the centroid position and momentum and the volume."""
 
       v = self.p/self.m[0]
-      expq, expp = (matrix_exp(v*self.dt), matrix_exp(-v*self.dt))
+      expq, expp = (matrix_exp(v*self.dt/alpha), matrix_exp(-v*self.dt/alpha))
 
       m = depstrip(self.beads.m)
 
