@@ -206,7 +206,7 @@ class Barostat(dobject):
 
       return (self.kstress_mts(level)+ self.forces.vir_mts(level) + bvir)/self.cell.V
  
-   def get_stress(self, level):
+   def get_stress(self):
       """Calculates the internal stress tensor."""
 
       bvir = np.zeros((3,3),float)
@@ -516,6 +516,11 @@ class BaroRGB(Barostat):
       # This differs from the BZP thermostat in that it uses just one kT in the propagator.
       # This leads to an ensemble equaivalent to Martyna-Hughes-Tuckermann for both fixed and moving COM
       # Anyway, it is a small correction so whatever.
+
+
+      pc = depstrip(self.beads.pc)
+      m = depstrip(self.beads.m)
+      na3 = 3*self.beads.natoms
 
       kst = np.zeros((3,3), float)   
       for i in range(3):
