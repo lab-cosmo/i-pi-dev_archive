@@ -13,12 +13,14 @@ choosing which properties to initialise, and which properties to output.
 
 import os
 import time
+import numpy as np
 from copy import deepcopy
 
-from ipi.utils.depend import depend_value, dobject, dset
+from ipi.utils.depend import depend_value, dobject, dset, depstrip
 from ipi.utils.io.inputs.io_xml import xml_parse_file
 from ipi.utils.messages import verbosity, info, warning, banner
 from ipi.utils.softexit import softexit
+from ipi.utils.units import Constants
 import ipi.engine.outputs as eoutputs
 import ipi.inputs.simulation as isimulation
 
@@ -235,7 +237,9 @@ class Simulation(dobject):
                 self.paratemp.parafile.write("\n")
                 self.paratemp.parafile.flush()
                 os.fsync(self.paratemp.parafile)
-
+            #elif self.mode == "alchemical":
+   
+                                
             self.step = 0
 
         steptime = 0.0
@@ -246,6 +250,7 @@ class Simulation(dobject):
         #tqtime = 0.0
         #tttime = 0.0
         ttot = 0.0
+        nexch = 0 # alchemical exchange counter
         # main MD loop
         for self.step in range(self.step, self.tsteps):
             # stores the state before doing a step.
@@ -295,6 +300,59 @@ class Simulation(dobject):
                 os.fsync(self.paratemp.parafile)
 
                 self.paratemp.swap(self.step)
+                
+            if self.mode == "alchemical":
+                for s in self.syslist:
+                    # selects the two type of atoms for exchange
+                    atomexchangelist=[]
+                    for i in range(s.beads.natoms):
+                        if (s.beads.names[i] == "H" or s.beads.names[i] == "X"): 
+                            atomexchangelist.append(i)
+                            
+                    # record the spring energy (divided by mass) for each atom in the exchange chain
+                    q = depstrip(s.beads.q)
+                    atomspring = np.zeros(len(atomexchangelist));
+                    i=0
+                    for atomnum in atomexchangelist:
+                        spr = 0.0
+                        for b in range(1,s.beads.nbeads):
+                            for j in range(3*atomnum,3*(atomnum+1)):
+                                spr += (q[b,j]-q[b-1,j])**2
+                        for j in range(3*atomnum,3*(atomnum+1)):
+                            spr += (q[s.beads.nbeads-1,j]-q[0,j])**2
+                        # no mass here
+                        spr *= 0.5*s.nm.omegan2
+                        atomspring[i]=spr
+                        i+=1
+                     
+                
+                    # do the exchange
+                    betaP = 1.0/(Constants.kb*s.ensemble.temp*s.beads.nbeads)
+                    for i in range(len(atomexchangelist)):
+                        for j in range(i):
+                            # no exchange for same type of atoms
+                            if (s.beads.names[atomexchangelist[i]] == s.beads.names[atomexchangelist[j]]) : continue
+                            # energy increase due to the swap
+                            difspring = (atomspring[i]-atomspring[j])*(s.beads.m[atomexchangelist[j]]-s.beads.m[atomexchangelist[i]])
+                            pexchange = np.exp(-betaP*difspring)
+                            #print 'exchange probablity: %10.5e  n. exchanges this far: %5d' % ( pexchange, nexch )
+                
+                            # attemps the exchange
+                            if (pexchange > self.prng.u):
+                                nexch += 1
+                                # swap names
+                                nameswap = s.beads.names[atomexchangelist[i]]
+                                s.beads.names[atomexchangelist[i]] = s.beads.names[atomexchangelist[j]]
+                                s.beads.names[atomexchangelist[j]] = nameswap
+                                # change masses
+                                massratio = s.beads.m[atomexchangelist[i]]/s.beads.m[atomexchangelist[j]]
+                                s.beads.m[atomexchangelist[i]] /= massratio
+                                s.beads.m[atomexchangelist[j]] *= massratio
+                                # adjust the (classical) momenta
+                                s.beads.p[3*atomexchangelist[i]:3*(atomexchangelist[i]+1)] /= np.sqrt(massratio)
+                                s.beads.p[3*atomexchangelist[j]:3*(atomexchangelist[j]+1)] *= np.sqrt(massratio)
+                                print 'exchange atom No.  ', atomexchangelist[i], '  and  ', atomexchangelist[j]
+                            
 
             if softexit.triggered:
                 # Don't write if we are about to exit.
