@@ -38,8 +38,8 @@ h2o-piglet_8:
         $(call run_lammps,4,in.water) \
 	wait
 
-h2o-pimd:
-	cd h2o-pimd; $(IPI) input.xml & sleep 5; \
+h2o-pimd.1:
+	cd h2o-pimd.1; $(IPI) input.xml & sleep 5; \
         $(call run_lammps,4,in.water) \
 	wait
 
