@@ -5,11 +5,9 @@
 import time
 import numpy as np
 
+from ipi.utils.depend import dstrip
 from ipi.engine.motion import Motion
 from ipi.utils.softexit import softexit
-from ipi.utils.io import read_file
-from ipi.utils.io.inputs.io_xml import xml_parse_file
-from ipi.utils.units import unit_to_internal
 
 
 __all__ = ['Displace']
@@ -50,7 +48,8 @@ class Displace(Motion):
             softexit.trigger("Unknown step count. Exiting simulation")
             return
 
-        for bead in self.beads:
+        for i, bead in enumerate(self.beads):
+            f = dstrip(self.forces.f[i]).reshape(-1, 3)
             # To get correct displacement of all atoms
             n = bead.q.size / 3
             bead.q += np.tile(self.displacement, n)
