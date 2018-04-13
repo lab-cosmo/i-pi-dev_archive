@@ -25,6 +25,7 @@ import numpy as np
 from copy import copy
 import ipi.engine.initializer
 from ipi.engine.motion import Motion, Dynamics, Replay, GeopMotion, NEBMover, DynMatrixMover, MultiMotion, AlchemyMC
+from ipi.engine.motion import Displace
 from ipi.engine.motion import DynMatrixMover
 from ipi.utils.inputvalue import *
 from ipi.inputs.thermostats import *
@@ -34,6 +35,7 @@ from .neb import InputNEB
 from .dynamics import InputDynamics
 from .phonons import InputDynMatrix
 from .alchemy import InputAlchemy
+from .displace import InputDisplace
 from ipi.utils.units import *
 
 __all__ = ['InputMotion']
@@ -56,7 +58,7 @@ class InputMotionBase(Input):
 
     attribs = {"mode": (InputAttribute, {"dtype": str,
                                          "help": "How atoms should be moved at each step in the simulatio. 'replay' means that a simulation is restarted from a previous simulation.",
-                                         "options": ['vibrations', 'minimize', 'replay', 'neb', 'dynamics', 'alchemy', 'dummy']})}
+                                         "options": ['vibrations', 'minimize', 'replay', 'neb', 'dynamics', 'alchemy', 'displace', 'dummy']})}
 
     fields = {"fixcom": (InputValue, {"dtype": bool,
                                       "default": True,
@@ -75,7 +77,10 @@ class InputMotionBase(Input):
               "vibrations": (InputDynMatrix, {"default": {},
                                               "help": "Option for phonon computation"}),
               "alchemy": (InputAlchemy, {"default": {},
-                                         "help": "Option for alchemical exchanges"})
+                                         "help": "Option for alchemical exchanges"}),
+              "displace": (InputDisplace, {"default": {},
+                                         "help": "Option for fixed displacement calculations"})
+
               }
 
     dynamic = {}
@@ -117,6 +122,10 @@ class InputMotionBase(Input):
             self.mode.store("alchemy")
             self.alchemy.store(sc)
             tsc = 1
+        elif isinstance(sc, Displace):
+            self.mode.store("displace")
+            self.displace.store(sc)
+            tsc = 1
         else:
             raise ValueError("Cannot store Mover calculator of type " + str(type(sc)))
 
@@ -148,6 +157,8 @@ class InputMotionBase(Input):
             sc = DynMatrixMover(fixcom=self.fixcom.fetch(), fixatoms=self.fixatoms.fetch(), **self.vibrations.fetch())
         elif self.mode.fetch() == "alchemy":
             sc = AlchemyMC(fixcom=self.fixcom.fetch(), fixatoms=self.fixatoms.fetch(), **self.alchemy.fetch())
+        elif self.mode.fetch() == "displace":
+            sc = Displace(fixcom=self.fixcom.fetch(), fixatoms=self.fixatoms.fetch(), **self.displace.fetch())
         else:
             sc = Motion()
             #raise ValueError("'" + self.mode.fetch() + "' is not a supported motion calculation mode.")
