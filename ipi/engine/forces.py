@@ -274,7 +274,7 @@ class ForceComponent(dobject):
           Depends on each replica's ufvx list.
     """
 
-    def __init__(self, ffield, nbeads=0, weight=1.0, name="", mts_weights=None, epsilon=-0.001):
+    def __init__(self, ffield, nbeads=0, weight=1.0, name="", mts_weights=None, bead_weights=None, epsilon=-0.001):
         """Initializes ForceComponent
 
         Args:
@@ -297,6 +297,16 @@ class ForceComponent(dobject):
             self.mts_weights = np.asarray([])
         else:
             self.mts_weights = np.asarray(mts_weights)
+        
+        self.bead_weights = depend_array(name="bead_weights",
+                               value=np.ones((self.nbeads)))
+        if not bead_weights is None:
+            try:
+                self.bead_weights[:] = np.asarray(bead_weights)
+                print "ASSIGNED BEAD WEIGHTS", self.bead_weights
+            except:
+                info("Error assigning bead_weights from input")
+                raise
         self.epsilon = epsilon
 
     def bind(self, beads, cell, fflist):
@@ -436,6 +446,7 @@ class ScaledForceComponent(dobject):
 
         self.bf = baseforce
         self.name = baseforce.name
+        self.nbeads = baseforce.nbeads
         self.ffield = baseforce.ffield
         dself = dd(self)
         dself.scaling = depend_value(name="scaling", value=scaling)
@@ -464,6 +475,7 @@ class ScaledForceComponent(dobject):
         self.weight = depend_value(name="weight", value=0)
         dpipe(dd(self.bf).weight, dself.weight)
         self.mts_weights = self.bf.mts_weights
+        self.bead_weights = self.bf.bead_weights
 
     def get_vir(self):
         """Sums the virial of each replica.
@@ -579,7 +591,7 @@ class Forces(dobject):
             # if the number of beads for this force component is unspecified,
             # assume full force evaluation
             if newb == 0 or newb > beads.nbeads: newb = beads.nbeads
-            newforce = ForceComponent(ffield=fc.ffield, name=fc.name, nbeads=newb, weight=fc.weight, mts_weights=fc.mts_weights, epsilon=fc.epsilon)
+            newforce = ForceComponent(ffield=fc.ffield, name=fc.name, nbeads=newb, weight=fc.weight, mts_weights=fc.mts_weights, bead_weights=fc.bead_weights, epsilon=fc.epsilon)
             newbeads = Beads(beads.natoms, newb)
             newrpc = nm_rescale(beads.nbeads, newb)
 
@@ -915,7 +927,12 @@ class Forces(dobject):
             # "expand" to the total number of beads the forces from the
             # contracted one
             if self.mforces[k].weight != 0:
-                rf += self.mforces[k].weight * self.mforces[k].mts_weights.sum() * self.mrpc[k].b2tob1(dstrip(self.mforces[k].f))
+                
+                scalef = dstrip(self.mforces[k].f).copy()
+                for b in range(self.mforces[k].nbeads):
+                    scalef[b] *= self.mforces[k].bead_weights[b]
+                print "scaled forces by ", self.mforces[k].bead_weights
+                rf += self.mforces[k].weight * self.mforces[k].mts_weights.sum() * self.mrpc[k].b2tob1(scalef)
         return rf
 
     def f_4th_order_combine(self):
@@ -936,7 +953,10 @@ class Forces(dobject):
             # "expand" to the total number of beads the potentials from the
             # contracted one
             if self.mforces[k].weight != 0:
-                rp += self.mforces[k].weight * self.mforces[k].mts_weights.sum() * self.mrpc[k].b2tob1(self.mforces[k].pots)
+                scalepots = dstrip(self.mforces[k].pots).copy()
+                for b in range(self.mforces[k].nbeads):
+                    scalepots[b] *= self.mforces[k].bead_weights[b]
+                rp += self.mforces[k].weight * self.mforces[k].mts_weights.sum() * self.mrpc[k].b2tob1(scalepots)
         return rp
 
     def extra_combine(self):
@@ -958,12 +978,14 @@ class Forces(dobject):
         rp = np.zeros((self.nbeads, 3, 3), float)
         for k in range(self.nforces):
             if self.mforces[k].weight != 0:
-                virs = dstrip(self.mforces[k].virs)
+                scalevirs = dstrip(self.mforces[k].virs).copy()
+                for b in range(self.mforces[k].nbeads):
+                    scalevirs[b] *= self.mforces[k].bead_weights[b]
                 # "expand" to the total number of beads the virials from the
                 # contracted one, element by element
                 for i in range(3):
                     for j in range(3):
-                        rp[:, i, j] += self.mforces[k].weight * self.mforces[k].mts_weights.sum() * self.mrpc[k].b2tob1(virs[:, i, j])
+                        rp[:, i, j] += self.mforces[k].weight * self.mforces[k].mts_weights.sum() * self.mrpc[k].b2tob1(scalevirs[:, i, j])
         return rp
 
     def get_potssc(self):

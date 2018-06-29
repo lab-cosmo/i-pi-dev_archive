@@ -50,8 +50,11 @@ class InputForceComponent(Input):
     fields = {
                "mts_weights": (InputArray, {"dtype": float,
                                            "default": np.zeros(1, float) + 1.,
-                                           "help": "The weight of force in each mts level starting from outer.",
-                                           "dimension": "force"})
+                                           "help": "The weight of force in each mts level starting from outer."                                           }),
+               "bead_weights": (InputArray, {"dtype": float,
+                                           "default": np.zeros(0, float),
+                                           "help": "A list of weights assigned to each bead."
+                                             })
               }
 
     default_help = "The class that deals with how each forcefield contributes to the overall potential, force and virial calculation."
@@ -69,6 +72,7 @@ class InputForceComponent(Input):
         self.nbeads.store(forceb.nbeads)
         self.weight.store(forceb.weight)
         self.mts_weights.store(forceb.mts_weights)
+        self.bead_weights.store(forceb.bead_weights)
         self.fd_epsilon.store(forceb.epsilon)
         self.name.store(forceb.name)
         self.forcefield.store(forceb.ffield)
@@ -81,7 +85,7 @@ class InputForceComponent(Input):
         """
 
         super(InputForceComponent, self).fetch()
-        return ForceComponent(ffield=self.forcefield.fetch(), nbeads=self.nbeads.fetch(), weight=self.weight.fetch(), name=self.name.fetch(), mts_weights=self.mts_weights.fetch(), epsilon=self.fd_epsilon.fetch())
+        return ForceComponent(ffield=self.forcefield.fetch(), nbeads=self.nbeads.fetch(), weight=self.weight.fetch(), name=self.name.fetch(), mts_weights=self.mts_weights.fetch(), bead_weights=self.bead_weights.fetch(), epsilon=self.fd_epsilon.fetch())
 
     def check(self):
         """Checks for optional parameters."""

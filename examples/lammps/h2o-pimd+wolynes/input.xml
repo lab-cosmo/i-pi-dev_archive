@@ -21,8 +21,8 @@
       <velocities mode='thermal' units='kelvin'> 300 </velocities>
     </initialize>
     <forces>
-      <force nbeads='4' forcefield='lmpserial1'/>
-      <force nbeads='4' forcefield='lmpserial2'/>
+      <force nbeads='4' forcefield='lmpserial1'> <bead_weights> [1,-10,10,0] </bead_weights> </force>
+      <force nbeads='4' forcefield='lmpserial2'>  <bead_weights> [0,10,-10,1] </bead_weights> </force>
     </forces>
     <motion mode='dynamics'>
       <dynamics mode='nvt'>
