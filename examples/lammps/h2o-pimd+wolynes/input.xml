@@ -1,6 +1,8 @@
 <simulation verbosity='high'>
   <output prefix='simulation'>
     <properties stride='4' filename='out'>  [ step, time{picosecond}, conserved, temperature{kelvin}, kinetic_cv, potential, pressure_cv{megapascal}] </properties>
+    <properties stride='4' filename='pes'> [ pot_component_raw(0;0), pot_component_raw(0;1), pot_component_raw(0;2), pot_component_raw(0;3),
+                                             pot_component_raw(1;0), pot_component_raw(1;1), pot_component_raw(1;2), pot_component_raw(1;3) ] </properties>
     <trajectory filename='pos' stride='40'> positions </trajectory>
   </output>
   <total_steps>40000</total_steps>
@@ -14,13 +16,13 @@
     <address>h2o-pimd+rpc_long</address>
   </ffsocket>
   <system>
-    <initialize nbeads='32'>
+    <initialize nbeads='4'>
       <file mode='pdb'> init.pdb </file>
       <velocities mode='thermal' units='kelvin'> 300 </velocities>
     </initialize>
     <forces>
-      <force nbeads='32' forcefield='lmpserial1'/>
-      <force nbeads='5' forcefield='lmpserial2'/>
+      <force nbeads='4' forcefield='lmpserial1'/>
+      <force nbeads='4' forcefield='lmpserial2'/>
     </forces>
     <motion mode='dynamics'>
       <dynamics mode='nvt'>

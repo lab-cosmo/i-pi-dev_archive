@@ -47,7 +47,8 @@ class InputForceComponent(Input):
                                                "help": "Mandatory. The name of the forcefield this force is referring to."})
                }
 
-    fields = {"mts_weights": (InputArray, {"dtype": float,
+    fields = {
+               "mts_weights": (InputArray, {"dtype": float,
                                            "default": np.zeros(1, float) + 1.,
                                            "help": "The weight of force in each mts level starting from outer.",
                                            "dimension": "force"})
