@@ -4,30 +4,32 @@ import sys
 import os
 import math
 import argparse
+""" Reads all the information needed from a i-pi RESTART file and compute the partition 
+    functions of the reactant, transition state (TS) or instanton according to
+    J. Phys. Chem. Lett. 7, 437(2016) (Instanton Rate calculations) 
+    or J. Chem. Phys. 134, 054109 (2011) (Tunneling Splitting)
 
-""" Reads all the information needed from a i-pi RESTART file and compute the partition functions of the reactant, transition state (TS) or
-instanton according to J. Phys. Chem. Lett. 7, 437(2016) (Instanton Rate calculations) or J. Chem. Phys. 134, 054109 (2011) (Tunneling Splitting)
+    Syntax:  
+     python  Instanton_postproc.py  <checkpoint_file> -c <case> -t  <temperature (K)> 
+                   (-n <nbeads(full polymer)>) (-freq <freq_reactant.dat>)
 
+    Examples for rate calculation:
+      python  Instanton_postproc.py   RESTART  -c  instanton    -t   300
+      python  Instanton_postproc.py   RESTART  -c  reactant     -t   300            -n 50
+      python  Instanton_postproc.py   RESTART  -c    TS         -t   300
 
-Syntax:    python  Instanton_postproc.py  <checkpoint_file> -c <case> -t  <temperature (K)>  (-n <nbeads(full polymer)>) (-freq <freq_reactant.dat>)
-
-Examples for rate calculation:
-           python  Instanton_postproc.py   RESTART  -c  instanton    -t   300
-           python  Instanton_postproc.py   RESTART  -c  reactant     -t   300            -n 50
-           python  Instanton_postproc.py   RESTART  -c    TS         -t   300
-
-Examples for splitting  calculation (2 steps):
-         i)   python  Instanton_postproc.py   RESTART  -c  reactant   -t   10  -n 32 --->this generate the 'freq.dat' file
-         ii)  python  Instanton_postproc.py   RESTART  -c  instanton  -t   10  -freq freq.dat
-
-
-
-Type python Instanton_postproc.py -h for more information
+   Examples for splitting  calculation (2 steps):
+      i)   python  Instanton_postproc.py   RESTART  -c  reactant   -t   10  -n 32 --->this generate the 'freq.dat' file
+      ii)  python  Instanton_postproc.py   RESTART  -c  instanton  -t   10  -freq freq.dat
 
 
-Relies on the infrastructure of i-pi, so the ipi package should
-be installed in the Python module directory, or the i-pi
-main directory must be added to the PYTHONPATH environment variable.
+
+   Type python Instanton_postproc.py -h for more information
+
+
+   Relies on the infrastructure of i-pi, so the ipi package should
+   be installed in the Python module directory, or the i-pi
+   main directory must be added to the PYTHONPATH environment variable.
 """
 
 # Y. Litman, 2017.
@@ -45,8 +47,9 @@ main directory must be added to the PYTHONPATH environment variable.
 
 from ipi.engine.simulation import Simulation
 from ipi.utils.units import unit_to_internal, unit_to_user, Constants, Elements
-from ipi.utils.instools import red2comp, clean_hessian
+from ipi.utils.instools import red2comp, clean_hessian,band_me,banded_hessian_SPLIT,sym_band
 from ipi.engine.motion.instanton import SpringMapper
+from ipi.utils.messages import verbosity, info
 
 np.set_printoptions(precision=6, suppress=True, threshold=np.nan)
 
@@ -70,6 +73,7 @@ parser.add_argument('-f', '--filter', default=[], help='List of atoms indexes to
 parser.add_argument('-n', '--nbeadsR', default=0, help='Number of beads (full polymer) to compute the approximate partition function (only reactant case)', type=int)
 parser.add_argument('-freq', '--freq_reac', default=None, help="List of frequencies of the minimum. Required for splitting calculation.")
 parser.add_argument('-q', '--quiet', default=False, action='store_true', help="Avoid the Qvib and Qrot calculation in the instanton case.")
+parser.add_argument('-b', '--banded', default=True, action='store_false', help="Avoid the Qvib and Qrot calculation in the instanton case.")
 
 args = parser.parse_args()
 inputt = args.input
@@ -81,6 +85,7 @@ filt = args.filter
 nbeadsR = args.nbeadsR
 input_freq = args.freq_reac
 quiet = args.quiet
+banded = args.banded
 
 if case not in list(['reactant', 'TS', 'instanton']):
     raise ValueError("We can not indentify the case. The valid cases are: 'reactant', 'TS' and 'instanton'")
@@ -240,6 +245,7 @@ elif case == 'instanton':
         sys.exit()
     print 'The instanton mode is %s' % mode
     print 'The temperature is %f K' % (temp / K2au)
+    print ' '
 
     if mode == 'rate':
         h0 = red2comp(hessian, nbeads, natoms)
@@ -252,23 +258,26 @@ elif case == 'instanton':
             h = np.add(hessian, spring)
         print 'The full ring polymer is made of %i' % (nbeads)
         print 'We used %i beads in the calculation.' % (nbeads / 2)
+        print ' '
     elif mode == 'splitting':
         if input_freq == None:
-            print 'Please provide a name of the file containing the list of the frequencies for the minimum using "-freq" flag'
+            print 'Please provide a name of the file containing the list of the frequencies \
+            for the minimum using "-freq" flag'
             print '(You can generate that file using this script in the case reactant.)'
+            print ' '
             sys.exit()
 
         print 'Our linear polymer has  %i' % (nbeads)
         pos = beads.q
         m3 = beads.m3
         omega2 = (temp * nbeads * kb / hbar) ** 2
-        # spring  = SpringMapper.spring_hessian(natoms,nbeads,beads.m3[0],omega2,mode='half')
-        if not quiet:
+        if not quiet and not banded:
             h0 = red2comp(hessian, nbeads, natoms)
             spring = SpringMapper.spring_hessian(natoms, nbeads, beads.m3[0], omega2, mode='splitting')
             h = np.add(h0, spring)
             if asr != 'none':
-                print 'We are changing asr to none since we consider a fixed ended linear polimer for the post-processing'
+                print 'We are changing asr to none since we consider a fixed ended linear polimer \
+                for the post-processing'
                 asr = 'none'
     else:
         print 'We can not recognize the mode. STOP HERE'
@@ -279,10 +288,10 @@ beta = 1.0 / (kb * temp)
 betaP = 1.0 / (kb * (nbeads) * temp)
 
 print 'We have %i atoms.' % natoms
-print 'We are using asr = %s' % asr
 print ''
 
 if not quiet:
+  if case != 'instanton' or mode =='rate': #ALBERTO
     print 'Diagonalization....'
     d, w, detI = clean_hessian(h, pos, natoms, nbeads, m, m3, asr, mofi=True)
     print "Final lowest 15 frequencies (cm^-1)"
@@ -387,6 +396,26 @@ elif case == 'instanton':
         print 'S/hbar %f' % (action1 + action2)
 
     elif mode == 'splitting':
+   
+        print 'Diagonalization....'
+
+        if not quiet:
+         if banded: #ALBERTO
+            try:
+               from scipy import linalg
+               info("Import of scipy successful", verbosity.medium)
+            except ImportError:
+               raise ValueError("We can not import scipy ")
+
+            print 'We are using banded diagonalization'
+            h_banded = banded_hessian_SPLIT(hessian,nbeads,natoms,beads.m3,omega2)
+            d,w = linalg.eig_banded(h_banded,lower=True)
+         else:
+            print 'We are not using banded diagonalization. If have memory problems please use banded diag.'
+            d, w, detI = clean_hessian(h, pos, natoms, nbeads, m, m3, asr, mofi=True)
+            
+         print "Final lowest 15 frequencies (cm^-1)"
+         print np.sign(d[0:15]) * np.absolute(d[0:15]) ** 0.5 / cm2au  # convert to cm^-1
 
         out = open(input_freq, 'r')
         d_min = np.zeros(natoms * 3)
@@ -443,7 +472,8 @@ elif case == 'instanton':
 
 print ''
 print ''
-print 'Remember that the output obtained from this script simply gives you components that you can use in order to calculate a rate or a tunneling splitting in the instanton approximation.'
+print 'Remember that the output obtained from this script simply gives you components that you can use'
+print ' in order to calculate a rate or a tunneling splitting in the instanton approximation.'
 print 'Use, for example, the references below in order to obtain final desired results.'
 print 'Instanton Rate: J. Phys. Chem. Lett.  7, 4374(2016)'
 print 'Tunneling Splitting: J. Chem. Phys. 134, 054109 (2011)'

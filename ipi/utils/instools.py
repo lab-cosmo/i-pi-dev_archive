@@ -6,6 +6,51 @@ import ipi.utils.mathtools as mt
 import os.path
 
 
+def banded_hessian_SPLIT(h0, nbeads,natoms,m3,omega2, shift=1e-13): # ALBERTO  #ALBERTISIMO
+    #DIFFERENEC is that we don't pass im but all the elements
+    #and that we construct the dynmat and not hess
+    """Given Hessian in the reduced format (h), construct
+    the upper band DYNMAT including the RP terms"""
+    ii = natoms * 3 * nbeads
+    ndiag = natoms * 3 + 1  # only upper diagonal form
+
+    # np.set_printoptions(precision=6, suppress=True, threshold=np.nan, linewidth=1000)
+
+    hnew = np.zeros((ndiag, ii))
+    
+    #get dynmat
+    A = np.diag(m3[0]**(-0.5))
+    B = np.diag(m3.flatten()**(-0.5))
+    h = np.dot(np.dot(A,h0),B)
+    # add physical part
+    for i in range(nbeads):
+        h_aux = h[:, i * natoms * 3:(i + 1) * natoms * 3]  # Peaks one physical hessian
+        for j in range(ndiag):
+            hnew[j, i*natoms*3: -j + (i + 1) * natoms * 3] = np.diag(h_aux,  j)
+           # hnew[j, (ndiag - 1 - j) + i * natoms * 3:(i + 1) * natoms * 3] = np.diag(h_aux, ndiag - 1 - j)
+
+    # add spring parts
+    if nbeads > 1:
+        # Diagonal
+        #d_corner = np.ones(natoms*3)* omega2
+        #d_0 = np.array([[d_corner * 2]]).repeat(nbeads - 2, axis=0).flatten()
+        #diag_sp = np.concatenate((d_corner, d_0, d_corner))
+        d_ = np.ones(natoms*3)* omega2
+        #d_ = m3[0]* omega2
+        diag_sp = np.array([[2*d_]]).repeat(nbeads , axis=0).flatten()
+        hnew[0, :] += diag_sp
+
+        # Non-Diagonal
+        d_out = - d_
+        ndiag_sp = np.array([[d_out]]).repeat(nbeads - 1, axis=0).flatten()
+        hnew[-1, :] = np.concatenate((ndiag_sp,np.zeros(natoms * 3)))
+    
+    # Add safety shift value
+    hnew[0, :] += shift
+
+    return hnew
+
+
 def banded_hessian(h, im, shift=0.001):
     """Given Hessian in the reduced format (h), construct
     the upper band hessian including the RP terms"""
@@ -42,6 +87,18 @@ def banded_hessian(h, im, shift=0.001):
     hnew[-1, :] += shift
 
     return hnew
+
+def band_me(h, ndiags, shift=1e-13): # ALBERTO ALBERTISIMISO we are creating the big matrix without needed
+    """Given a square matrix (NOT reduced format) returns the LOWER band form ( splitting calculation ) """
+    hnew = np.zeros((ndiags, h.shape[0] ))
+
+    for i in range(ndiags):
+       hnew[i,0:h.shape[0]-i] = np.diag(h,i)
+
+    hnew[0, :] += shift
+
+    return hnew
+
 
 
 def sym_band(A):
@@ -156,8 +213,7 @@ def get_hessian(h, gm, x0, d=0.0005):
         except OSError:
             pass
 
-
-def clean_hessian(h, q, natoms, nbeads, m, m3, asr, mofi=False):
+def clean_hessian(h, q, natoms, nbeads, m, m3, asr, mofi=False,split=False):
     """
         Removes the translations and rotations modes.
         IN  h      = hessian
@@ -238,6 +294,9 @@ def clean_hessian(h, q, natoms, nbeads, m, m3, asr, mofi=False):
     hmT = hm.T
     hm = (hmT + hm) / 2.0
 
+    if split:
+       return hm #ALBERTO
+ 
     d, w = np.linalg.eigh(hm)
 
     # Count
