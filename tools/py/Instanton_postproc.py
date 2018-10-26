@@ -74,6 +74,7 @@ parser.add_argument('-n', '--nbeadsR', default=0, help='Number of beads (full po
 parser.add_argument('-freq', '--freq_reac', default=None, help="List of frequencies of the minimum. Required for splitting calculation.")
 parser.add_argument('-q', '--quiet', default=False, action='store_true', help="Avoid the Qvib and Qrot calculation in the instanton case.")
 parser.add_argument('-b', '--banded', default=True, action='store_false', help="Avoid the Qvib and Qrot calculation in the instanton case.")
+parser.add_argument('-s', '--scale', default=1.0, type=float, help="Scale the potential energy differencee.")
 
 args = parser.parse_args()
 inputt = args.input
@@ -86,6 +87,7 @@ nbeadsR = args.nbeadsR
 input_freq = args.freq_reac
 quiet = args.quiet
 banded = args.banded
+scale = args.scale
 
 if case not in list(['reactant', 'TS', 'instanton']):
     raise ValueError("We can not indentify the case. The valid cases are: 'reactant', 'TS' and 'instanton'")
@@ -430,7 +432,7 @@ elif case == 'instanton':
         ww = get_rp_freq(d_min, nbeads, temp, mode='splitting')
         react = np.sum(np.log(ww))
 
-        action1 = (pots.sum() - nbeads * V0) * 1 / (temp * nbeads * kb)
+        action1 = scale*(pots.sum() - nbeads * V0) * 1 / (temp * nbeads * kb)
         action2 = spring_pot(nbeads, pos, omega2, m3) / (temp * nbeads * kb)
         action = action1 + action2
         if action / hbar > 5.0:
@@ -462,7 +464,7 @@ elif case == 'instanton':
         print ''
         if quiet:
             print 'phi is not computed because you specified the quiet option'
-            print 'We can provied only Tetaphi which value is %f a.u. ' % (tetaphi)
+            print 'We can provide only Tetaphi which value is %f a.u. ' % (tetaphi)
         else:
             print 'phi %f a.u.   Teta %f a.u. ' % (phi, tetaphi / phi)
             print 'Tunnelling splitting matrix element (h)  %f a.u (%f cm^-1)' % (h, h / cm2au)
